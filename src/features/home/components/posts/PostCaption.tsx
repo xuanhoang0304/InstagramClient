@@ -1,29 +1,30 @@
-import MiniUserProfile from "@/features/home/components/posts/miniUser/MiniUserProfile";
-import { PostProp } from "@/features/home/components/posts/type";
-import { cn } from "@/lib/utils";
-import { IPost } from "@/types/types";
-import { useState } from "react";
+import { useState } from 'react';
+
+import MiniUserProfile from '@/features/home/components/posts/miniUser/MiniUserProfile';
+import { PostProp } from '@/features/home/components/posts/type';
+import { cn } from '@/lib/utils';
+
 type PostCaptionProps = {
-    onSetPosts: (post: IPost) => void;
     showAvt?: boolean;
 } & PostProp;
-const PostCaption = ({ item, onSetPosts, showAvt }: PostCaptionProps) => {
+const PostCaption = ({ item, showAvt }: PostCaptionProps) => {
     const [showCaption, setShowCaption] = useState(false);
     return (
-        <div className="flex gap-x-2">
+        <div
+            className={cn(
+                "flex gap-x-2",
+                showAvt && "sticky z-10 py-2 top-0 left-4 bg-black"
+            )}
+        >
             {showAvt && (
-                <MiniUserProfile
-                    onSetPosts={onSetPosts}
-                    user={item.createdBy}
-                    item={item}
-                ></MiniUserProfile>
+                <MiniUserProfile user={item?.createdBy}></MiniUserProfile>
             )}
 
-            <div>
+            <div className={cn(showAvt && "text-primary-white")}>
                 <h3 className="text-sm font-semibold inline mr-2">
-                    {item.createdBy.name}
+                    {item?.createdBy.name}
                 </h3>
-                {item.isReel && (
+                {item?.isReel && (
                     <svg
                         aria-label="Đã xác minh"
                         className="x1lliihq x1n2onr6 inline mr-2"
@@ -47,15 +48,17 @@ const PostCaption = ({ item, onSetPosts, showAvt }: PostCaptionProps) => {
                     )}
                 >
                     {showCaption
-                        ? item.caption
-                        : item.caption.slice(0, 100) +
-                          (item.caption.length < 100 ? "" : "...")}
+                        ? item?.caption
+                        : item?.caption.slice(0, 100) +
+                          (item?.caption && item?.caption?.length < 100
+                              ? ""
+                              : "...")}
                 </p>
                 <button
                     onClick={() => setShowCaption((prev) => !prev)}
                     className={cn(
                         "text-sm text-second-gray",
-                        item.caption.length < 100 && "hidden"
+                        item?.caption && item?.caption.length < 100 && "hidden"
                     )}
                 >
                     {showCaption ? "ẩn bớt" : "xem thêm"}

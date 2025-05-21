@@ -1,74 +1,67 @@
-import { apiClient } from "@/configs/axios";
-import CommentItem from "@/features/home/components/comments/CommentItem";
-import PostCaption from "@/features/home/components/posts/PostCaption";
-import { PostProp } from "@/features/home/components/posts/type";
-import { HttpResponse, IComment, IPost } from "@/types/types";
-import { CirclePlus } from "lucide-react";
-import { useEffect, useState } from "react";
+import { CirclePlus } from 'lucide-react';
+
+import CommentItem from '@/features/home/components/comments/CommentItem';
+import PostCaption from '@/features/home/components/posts/PostCaption';
+import { cn, handleGetParentCmtByPostId } from '@/lib/utils';
+import { IComment, IPost } from '@/types/types';
+
 type CommentListProps = {
-    onSetPosts: (post: IPost) => void;
-} & PostProp;
-type getPostById = {
-    result: {
-        comments: IComment[];
-        totalComments: number;
-    };
-} & HttpResponse;
-const CommentList = ({ item, onSetPosts }: CommentListProps) => {
-    const [commentList, setCommentList] = useState<IComment[]>([]);
-    const [nextPage, setNextPage] = useState(1);
-    const [totalCmt, setTotalCmt] = useState(0);
-    const handleGetCommentsByPostId = async (postId: string) => {
-        try {
-            const data: getPostById = await apiClient.fetchApi(
-                `http://localhost:5000/api/posts/${postId}/comments?page=${nextPage}&limit=4`
-            );
-            if (data.code === 200) {
-                if (commentList.length === data.result.totalComments) return;
-                const comments = data.result.comments;
-                if (!commentList.length) {
-                    setCommentList(comments);
-                    setTotalCmt(data.result.totalComments);
-                    return;
-                }
-                setCommentList((prev) => [...prev, ...comments]);
-            }
-        } catch (error) {
-            console.log("error", error);
+    post: IPost | null;
+    parentList: IComment[];
+    totalCmt: number;
+    page: number;
+    listPosts: IPost[] | undefined;
+    onSetNextPage?: () => void;
+    onSetPosts?: (posts: IPost[] | []) => void;
+    onSetCmtList: (list: IComment[] | []) => void;
+};
+
+const CommentList = ({
+    post,
+    parentList,
+    totalCmt,
+    page,
+    listPosts,
+    onSetPosts,
+    onSetNextPage,
+    onSetCmtList,
+}: CommentListProps) => {
+    const handleLoadMore = async () => {
+        if (parentList.length >= totalCmt) {
+            return;
         }
+        const res = await handleGetParentCmtByPostId(
+            post?._id as string,
+            page + 1
+        );
+        if (res?.comments) {
+            const newList = [...parentList, ...res?.comments];
+            onSetCmtList?.(newList);
+        }
+        onSetNextPage?.();
     };
-    // const handleSetCommentist = (cmts: IComment[]) => {
-    //     setCommentList(cmts);
-    // };
-    useEffect(() => {
-        handleGetCommentsByPostId(item._id);
-    }, [item._id, nextPage]);
-    if (commentList.length > 0)
+    if (parentList.length > 0)
         return (
-            <ul className="px-4 pt-4 pb-10 bg-black z-[10] relative h-[420px] flex flex-col gap-y-3 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-                <PostCaption
-                    showAvt
-                    item={item}
-                    onSetPosts={onSetPosts}
-                ></PostCaption>
-                {commentList.map((cmt) => (
+            <ul className={cn("px-4 pt-4 pb-10  flex flex-col gap-y-3  ")}>
+                <PostCaption showAvt item={post}></PostCaption>
+
+                {parentList.map((cmt) => (
                     <CommentItem
                         key={cmt._id}
-                        item={item}
+                        item={post}
                         cmt={cmt}
+                        list={parentList}
+                        listPosts={listPosts}
                         onSetPosts={onSetPosts}
+                        onSetCmtList={onSetCmtList}
                     ></CommentItem>
                 ))}
 
                 {/* Load more */}
-                {commentList.length > 0 && commentList.length < totalCmt && (
+                {parentList.length > 0 && parentList.length < totalCmt && (
                     <button
                         className="w-full mt-2 flex items-center justify-center py-1 "
-                        onClick={() => {
-                            if (commentList.length < totalCmt) {
-                                setNextPage((prev) => prev + 1);
-                            }
-                        }}
+                        onClick={handleLoadMore}
                     >
                         <CirclePlus />
                     </button>
@@ -76,12 +69,8 @@ const CommentList = ({ item, onSetPosts }: CommentListProps) => {
             </ul>
         );
     return (
-        <div className="border-y border-primary-gray p-4 h-[420px] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-            <PostCaption
-                showAvt
-                item={item}
-                onSetPosts={onSetPosts}
-            ></PostCaption>
+        <div className="border-y border-primary-gray p-4 h-full">
+            <PostCaption showAvt item={post}></PostCaption>
             <div className=" flex flex-col h-[90%] items-center gap-y-2 justify-center">
                 <p className="text-2xl font-bold">Chưa có bình luận nào</p>
                 <p className="text-sm ">Bắt đầu trò chuyện</p>

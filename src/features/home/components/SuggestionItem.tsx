@@ -1,38 +1,46 @@
-import { User } from "@/types/types";
-import Image from "next/image";
-import Link from "next/link";
+import Link from 'next/link';
+
+import { handleFollowingUser } from '@/lib/utils';
+import { useMyStore } from '@/store/zustand';
+import { User } from '@/types/types';
+
+import MiniUserProfile from './posts/miniUser/MiniUserProfile';
 
 interface ISuggestionItem {
-    item: User;
+    user: User;
+    onSetSuggestion: () =>Promise<void>;
 }
-const SuggestionItem = ({ item }: ISuggestionItem) => {
+const SuggestionItem = ({ user, onSetSuggestion }: ISuggestionItem) => {
+    const { setMyUser } = useMyStore();
+    const handlFollowOrUnFollow = async (id: string) => {
+        const data = await handleFollowingUser(id);
+        if (data?.code === 200) {
+            setMyUser(data.data);
+            await onSetSuggestion();
+        }
+    };
     return (
         <li className=" flex justify-between items-center">
             <div className=" flex items-center gap-x-2">
-                <Link href={""}>
-                    <figure className="size-11 rounded-full">
-                        <Image
-                            src={item?.avatar || "/images/default.jpg"}
-                            alt="Profile-avt"
-                            width={44}
-                            height={44}
-                            className="rounded-full size-full object-cover"
-                        ></Image>
-                    </figure>
+                <Link href={`/${user?._id}`}>
+                    <MiniUserProfile user={user}></MiniUserProfile>
                 </Link>
                 <div className="flex flex-col">
                     <Link
-                        href={""}
+                        href={`/${user?._id}`}
                         className=" text-sm leading-[18px] font-semibold max-w-[150px] line-clamp-1"
                     >
-                        {item?.name}
+                        {user?.name}
                     </Link>
-                    <p className="text-second-gray text-sm leading-[18px]">
-                        {item?.bio ? item.bio : "Gợi ý cho bạn"}
+                    <p className="text-second-gray text-sm leading-[18px] line-clamp-1 max-w-[100px]">
+                        {user?.bio ? user.bio : "Gợi ý cho bạn"}
                     </p>
                 </div>
             </div>
-            <button className="text-primary-blue font-semibold text-xs hover:text-primary-blue-hover">
+            <button
+                onClick={() => handlFollowOrUnFollow(user._id)}
+                className="text-primary-blue font-semibold text-xs hover:text-primary-blue-hover"
+            >
                 Theo dõi
             </button>
         </li>

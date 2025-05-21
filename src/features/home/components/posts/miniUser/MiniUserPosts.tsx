@@ -22,8 +22,8 @@ const MiniUserPosts = ({posts}: MiniUserPostsProps) => {
                               ) : (
                                   <figure className="size-full">
                                       <Image
-                                          width={120}
-                                          height={120}
+                                          width={300}
+                                          height={300}
                                           src={
                                               item.media[0].path ||
                                               "/images/default.jpg"

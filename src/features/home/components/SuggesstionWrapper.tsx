@@ -1,11 +1,12 @@
 "use client";
-import SuggestionItem from "@/features/home/components/SuggestionItem";
-import { Skeleton } from "@/components/ui/skeleton";
-import { apiClient } from "@/configs/axios";
-import { tempArr } from "@/lib/utils";
-import { getExloreUser, User } from "@/types/types";
-import Link from "next/link";
-import { useEffect, useState } from "react";
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+
+import { Skeleton } from '@/components/ui/skeleton';
+import { apiClient } from '@/configs/axios';
+import SuggestionItem from '@/features/home/components/SuggestionItem';
+import { tempArr } from '@/lib/utils';
+import { getExloreUser, User } from '@/types/types';
 
 const SuggesstionWrapper = () => {
     const [list, setList] = useState<User[]>([]);
@@ -21,6 +22,7 @@ const SuggesstionWrapper = () => {
             console.log("error", error);
         }
     };
+ 
     useEffect(() => {
         getSuggestionList();
     }, []);
@@ -37,7 +39,8 @@ const SuggesstionWrapper = () => {
                     ? list.map((item: User) => (
                           <SuggestionItem
                               key={item._id}
-                              item={item}
+                              user={item}
+                              onSetSuggestion={getSuggestionList}
                           ></SuggestionItem>
                       ))
                     : tempArr.slice(5).map((item) => (

@@ -1,9 +1,11 @@
-import { User } from "@/types/types";
-import { Link2 } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
+import { Link2 } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+
+import { User } from '@/types/types';
+
 type MiniUserInfoProps = {
-    user: User;
+    user: User | undefined;
 };
 const MiniUserInfo = ({ user }: MiniUserInfoProps) => {
     return (
@@ -12,23 +14,23 @@ const MiniUserInfo = ({ user }: MiniUserInfoProps) => {
                 <Image
                     width={66}
                     height={66}
-                    src={user.avatar || "/images/default.jpg"}
+                    src={user?.avatar || "/images/default.jpg"}
                     alt="post-createdBy-avt"
                     className="size-full object-cover rounded-full"
                 ></Image>
             </figure>
-            <div>
-                <Link href={""}>
-                    <h3 className="text-sm font-bold">{user.name}</h3>
+            <div className="max-w-[200px]">
+                <Link href={`/${user?._id}`}>
+                    <h3 className="text-sm font-bold ">{user?.name}</h3>
                 </Link>
-                <p className="text-sm text-second-gray">{user.bio}</p>
-                {user.website && (
+                <p className="text-sm text-second-gray">{user?.bio}</p>
+                {user?.website && (
                     <Link
                         href={""}
                         className="flex items-center gap-x-1 mt-1 px-2 py-1 rounded-full bg-[#363636]"
                     >
                         <Link2 className="w-4 h-5" />
-                        <h4 className="text-xs">{user.name}</h4>
+                        <h4 className="text-xs">{user?.name}</h4>
                     </Link>
                 )}
             </div>

@@ -1,5 +1,5 @@
-import { IPost } from "@/types/types";
+import { IPost } from '@/types/types';
 
 export type PostProp = {
-    item: IPost;
+    item: IPost | null;
 };

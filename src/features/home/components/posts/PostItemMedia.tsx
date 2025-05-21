@@ -1,13 +1,14 @@
-import Image from "next/image";
-import { Swiper, SwiperSlide } from "swiper/react";
+import 'swiper/css';
+import 'swiper/css/pagination';
+import 'swiper/css/navigation';
 
-// Import Swiper styles
-import "swiper/css";
-import "swiper/css/pagination";
-import "swiper/css/navigation";
-import { Pagination, Navigation, Keyboard } from "swiper/modules";
-import { cn } from "@/lib/utils";
-import { PostProp } from "@/features/home/components/posts/type";
+import Image from 'next/image';
+import { Keyboard, Navigation, Pagination } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
+
+import { PostProp } from '@/features/home/components/posts/type';
+import { cn } from '@/lib/utils';
+
 type PostItemMediaProps = {
     className?: string;
     figureClassName?: string;
@@ -23,7 +24,7 @@ const PostItemMedia = ({
 }: PostItemMediaProps) => {
     return (
         <>
-            {!item.isReel ? (
+            {!item?.isReel ? (
                 <Swiper
                     pagination={true}
                     navigation={true}
@@ -31,7 +32,7 @@ const PostItemMedia = ({
                     modules={[Pagination, Navigation, Keyboard]}
                     className={cn("PostItemSwiper  rounded-[4px]", className)}
                 >
-                    {item.media.map((item) => (
+                    {item?.media.map((item) => (
                         <SwiperSlide className="rounded-[4px]" key={item.path}>
                             <figure
                                 className={cn(

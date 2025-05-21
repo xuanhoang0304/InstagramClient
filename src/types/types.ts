@@ -1,4 +1,6 @@
-import { EUserGender, IPostMedia } from "./enum";
+import { Media } from '@/components/layout/SideBar/type';
+
+import { EUserGender, IPostMedia } from './enum';
 
 export type User = {
     name: string;
@@ -22,14 +24,15 @@ export type IPost = {
     comments: string[];
     savedBy: string[];
     isReel: boolean;
+    pinned: number;
 } & IMongosee;
 export type IComment = {
     createdBy: User;
     content: string;
     post: string;
-    likes: User;
-    replies: User;
-    parentCommentId: boolean;
+    likes: User[];
+    replies: IComment[];
+    parentCommentId: string | null;
 } & IMongosee;
 
 export interface IMongosee {
@@ -66,3 +69,27 @@ export interface TimeInterval {
     label: string;
     seconds: number;
 }
+export type updateComment = {
+    data: IComment;
+} & HttpResponse;
+export type getRepleisResponse = {
+    replies: IComment[];
+    totalReplies: number;
+};
+export type CommentResponse = {
+    result: IComment;
+} & HttpResponse;
+export type getParentCmtByPostId = {
+    result: {
+        comments: IComment[];
+        totalComments: number;
+    };
+} & HttpResponse;
+
+export type getPostsByCreated = {
+    result: IPost[];
+    total: number;
+};
+export type UploadMedia = {
+    data: Media;
+} & HttpResponse;

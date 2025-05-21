@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { User } from "@/types/types";
+import { IComment, User } from "@/types/types";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
@@ -13,6 +14,8 @@ export type Store = {
     setToken: (tokens: ITokens) => void;
     myUser: User | null;
     setMyUser: (user: User | null) => void;
+    targetCmt: IComment | null;
+    settargetCmt: (targetCmtId: IComment | null) => void;
 };
 
 const customStorage = {
@@ -66,6 +69,9 @@ export const useMyStore = create<Store>()(
             setToken: (tokens: ITokens) => set(() => ({ tokens })),
             myUser: null,
             setMyUser: (myUser: User | null) => set(() => ({ myUser })),
+            targetCmt: null,
+            settargetCmt: (targetCmt: IComment | null) =>
+                set(() => ({ targetCmt })),
         }),
         {
             name: "my-store",

@@ -1,17 +1,29 @@
 "use client";
-import StoriesWrapper from "@/features/home/components/StoriesWrapper";
-import SwitchUser from "@/features/home/components/SwitchUser";
-import SuggesstionWrapper from "@/features/home/components/SuggesstionWrapper";
-import ListPosts from "@/features/home/components/posts/ListPosts";
+
+import ListPosts from '@/features/home/components/posts/ListPosts';
+import SuggesstionWrapper from '@/features/home/components/SuggesstionWrapper';
+import SwitchUser from '@/features/home/components/SwitchUser';
+import { useMyStore } from '@/store/zustand';
+
+import FollowMoreUser from './components/FollowMoreUser';
+
 const HomePage = () => {
+    const { myUser } = useMyStore();
     return (
-        <div className=" flex-1 flex justify-center gap-x-[64px] pb-10">
+        <div className=" flex-1 flex justify-center gap-x-[64px] pb-10 lg:px-0 px-3">
             {/* Content */}
             <div className="w-full max-w-[630px]">
                 {/* Stories */}
-                <StoriesWrapper></StoriesWrapper>
+                {/* {myUser?.followings?.length ? (
+                    <StoriesWrapper></StoriesWrapper>
+                ) : null} */}
                 {/* Posts */}
-                <ListPosts></ListPosts>
+                {myUser &&
+                    (myUser.followings.length ? (
+                        <ListPosts></ListPosts>
+                    ) : (
+                        <FollowMoreUser></FollowMoreUser>
+                    ))}
             </div>
             {/* Suggestion */}
             <div className="w-full max-w-[320px] hidden lg:block">

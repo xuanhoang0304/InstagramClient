@@ -1,22 +1,24 @@
-import { apiClient } from "@/configs/axios";
-import MiniUserProfile from "@/features/home/components/posts/miniUser/MiniUserProfile";
-import PostReportModal from "@/features/home/components/posts/PostReportModal";
-import { PostProp } from "@/features/home/components/posts/type";
-import { cn, getRelativeTime, handleFollowingUser } from "@/lib/utils";
-import { useMyStore } from "@/store/zustand";
-import { IPost } from "@/types/types";
-import { Dot } from "lucide-react";
-import Link from "next/link";
+import { Dot } from 'lucide-react';
+import Link from 'next/link';
+
+import MiniUserProfile from '@/features/home/components/posts/miniUser/MiniUserProfile';
+import PostReportModal from '@/features/home/components/posts/PostReportModal';
+import { PostProp } from '@/features/home/components/posts/type';
+import { cn, getRelativeTime, handleFollowingUser } from '@/lib/utils';
+import { useMyStore } from '@/store/zustand';
+
+import ModalReportBtn from './postModal/ModalReportBtn';
+
 type PostItemHeadingProps = {
     isShowTime: boolean;
-    onSetPosts: (post: IPost) => void;
     className?: string;
+    modal: boolean;
 } & PostProp;
 const PostItemHeading = ({
     item,
-    onSetPosts,
     className,
     isShowTime,
+    modal,
 }: PostItemHeadingProps) => {
     const { myUser, setMyUser } = useMyStore();
     const hanndleFollowUser = async (userId: string) => {
@@ -24,26 +26,25 @@ const PostItemHeading = ({
         if (data?.code === 200) {
             setMyUser(data?.data);
         }
-        const newPost: IPost = await apiClient.fetchApi(`/posts/${item._id}`);
-        onSetPosts?.(newPost);
     };
     return (
         <div className={cn("flex items-center justify-between", className)}>
-            <div className="flex items-center gap-x-2 relative">
+            <div
+                className={cn(
+                    "flex items-center gap-x-2 relative",
+                    modal && "text-primary-white"
+                )}
+            >
                 {/* avt */}
-                <MiniUserProfile
-                    user={item.createdBy}
-                    item={item}
-                    onSetPosts={onSetPosts}
-                ></MiniUserProfile>
+                <MiniUserProfile user={item?.createdBy}></MiniUserProfile>
                 {/* name */}
                 <div className="flex items-center gap-x-1">
-                    <Link href={""}>
+                    <Link href={`/${item?.createdBy._id}`}>
                         <h3 className="text-sm font-semibold">
-                            {item.createdBy.name}
+                            {item?.createdBy.name}
                         </h3>
                     </Link>
-                    {item.isReel && (
+                    {item?.isReel && (
                         <svg
                             aria-label="Đã xác minh"
                             className="x1lliihq x1n2onr6"
@@ -67,25 +68,27 @@ const PostItemHeading = ({
                         <Dot className="size-4" />
 
                         <p className="text-sm text-second-gray">
-                            {getRelativeTime(String(item.createdAt))}
+                            {getRelativeTime(String(item?.createdAt))}
                         </p>
                     </div>
                 )}
-                {!myUser?.followings.includes(item.createdBy._id) && (
-                    <button
-                        onClick={async () =>
-                            hanndleFollowUser(item.createdBy._id)
-                        }
-                        className="text-sm font-semibold text-primary-blue hover:text-primary-blue-hover"
-                    >
-                        Theo dõi
-                    </button>
-                )}
+                {!myUser?.followings.includes(item?.createdBy._id as string) &&
+                    item?.createdBy._id !== myUser?._id && (
+                        <button
+                            onClick={async () =>
+                                hanndleFollowUser(item?.createdBy._id as string)
+                            }
+                            className="text-sm font-semibold text-primary-blue hover:text-primary-blue-hover"
+                        >
+                            Theo dõi
+                        </button>
+                    )}
             </div>
-            <PostReportModal
-                item={item}
-                onSetPosts={onSetPosts}
-            ></PostReportModal>
+            {modal ? (
+                <ModalReportBtn post={item}></ModalReportBtn>
+            ) : (
+                <PostReportModal item={item}></PostReportModal>
+            )}
         </div>
     );
 };

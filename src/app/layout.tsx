@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import { Toaster } from "@/components/ui/sonner";
-import "./globals.css";
-import "swiper/css";
-import DarkMode from "./_components/DarkMode";
-import { cookies } from "next/headers";
-import SideBar from "@/app/_components/SideBar/SideBar";
+import './globals.css';
+
+import { Geist, Geist_Mono } from 'next/font/google';
+
+import { Toaster } from '@/components/ui/sonner';
+
+import DarkMode from '../components/layout/DarkMode';
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -27,32 +27,6 @@ export default async function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    const cookieStore = cookies();
-    const token = (await cookieStore).get("refresh_token")?.value as string;
-    const handleGetAccessToken = async (token: string) => {
-        try {
-            if (!token) return;
-            const res = await fetch(
-                "http://localhost:5000/api/auth/refresh-token",
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                    credentials: "include",
-                }
-            );
-            const data = await res.json();
-            const setCookie = res.headers.get("Set-Cookie");
-            if (setCookie) {
-                console.log("Found Set-Cookie:", setCookie);
-            }
-
-            return data;
-        } catch (error) {
-            console.log(error);
-        }
-    };
-    await handleGetAccessToken(token);
     return (
         <html lang="en" className="dark">
             <body
@@ -64,11 +38,9 @@ export default async function RootLayout({
                     position="top-right"
                     closeButton={true}
                 />
-                <main className="flex">
-                    <SideBar></SideBar>
 
-                    {children}
-                </main>
+                {children}
+
                 <DarkMode></DarkMode>
             </body>
         </html>

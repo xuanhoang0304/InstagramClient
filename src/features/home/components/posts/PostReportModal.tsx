@@ -1,17 +1,14 @@
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { apiClient } from "@/configs/axios";
-import { PostProp } from "@/features/home/components/posts/type";
-import { UnFollowModal } from "@/features/home/components/posts/UnFollowModal";
-import { handleFollowingUser } from "@/lib/utils";
-import { useMyStore } from "@/store/zustand";
-import { IPost } from "@/types/types";
-import { DialogClose, DialogTitle } from "@radix-ui/react-dialog";
-import { Ellipsis } from "lucide-react";
-import { useState } from "react";
-type PostReportModalProps = {
-    onSetPosts: (post: IPost) => void;
-} & PostProp;
-function PostReportModal({ item, onSetPosts }: PostReportModalProps) {
+import { Ellipsis } from 'lucide-react';
+import { useState } from 'react';
+
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { PostProp } from '@/features/home/components/posts/type';
+import { UnFollowModal } from '@/features/home/components/posts/UnFollowModal';
+import { handleFollowingUser } from '@/lib/utils';
+import { useMyStore } from '@/store/zustand';
+import { DialogClose, DialogTitle } from '@radix-ui/react-dialog';
+
+function PostReportModal({ item }: PostProp) {
     const { myUser, setMyUser } = useMyStore();
     const [open, setOpen] = useState(false);
     const handlFollowOrUnFollow = async (id: string) => {
@@ -19,17 +16,12 @@ function PostReportModal({ item, onSetPosts }: PostReportModalProps) {
         if (data?.code === 200) {
             setMyUser(data.data);
         }
-        const newPost: IPost = await apiClient.fetchApi(`/posts/${item._id}`);
-        onSetPosts?.(newPost);
         setOpen(false);
     };
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Ellipsis
-                    // onClick={() => setOpen(true)}
-                    className="cursor-pointer"
-                />
+                <Ellipsis className="cursor-pointer" />
             </DialogTrigger>
             <DialogContent
                 showclose="false"
@@ -39,7 +31,7 @@ function PostReportModal({ item, onSetPosts }: PostReportModalProps) {
                 <button className="px-2 py-[13.6px] font-bold text-[#ed4956] border-b dark:border-[#363636] border-solid">
                     Báo cáo
                 </button>
-                {myUser?.followings.includes(String(item.createdBy._id)) && (
+                {myUser?.followings.includes(String(item?.createdBy._id as string)) && (
                     <UnFollowModal
                         Trigger={
                             <button className="px-2 py-[13.6px] font-bold text-[#ed4956] border-b dark:border-[#363636] border-solid">
@@ -47,7 +39,7 @@ function PostReportModal({ item, onSetPosts }: PostReportModalProps) {
                             </button>
                         }
                         onFollowFunc={handlFollowOrUnFollow}
-                        user={item.createdBy}
+                        user={item?.createdBy}
                     ></UnFollowModal>
                 )}
                 <button className="px-2 py-[13.6px] border-b dark:border-[#363636] border-solid">

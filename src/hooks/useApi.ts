@@ -1,63 +1,37 @@
-import axios, { AxiosError, AxiosResponse } from 'axios';
-// hooks/useApi.ts
-import useSWR, { SWRConfiguration, SWRResponse } from 'swr';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { apiClient } from "@/configs/axios";
+import { AxiosRequestConfig } from "axios";
+import useSWR, { SWRConfiguration, SWRResponse } from "swr";
 
-export type ApiResponse<T> = {
-    data: T | undefined;
-    error: AxiosError | undefined;
+
+const fetcherConfig = async <T>(url: string, config: AxiosRequestConfig = {}): Promise<T> => {
+    return apiClient.fetchApi<T>(url, config);
+};
+interface ApiResponse<T> extends SWRResponse<T, any> {
     isLoading: boolean;
-    isValidating: boolean;
-    mutate: SWRResponse<T, AxiosError>["mutate"];
-};
-
-export type ApiConfig = {
-    url: string;
-    method?: "GET" | "POST" | "PUT" | "DELETE";
-    params?: object;
-    headers?: object;
-    data?: object;
-};
-
-const defaultConfig: SWRConfiguration = {
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-    shouldRetryOnError: false,
-    revalidateOnMount: true,
-    refreshInterval: 0,
-    dedupingInterval: 1 * 24 * 60 * 60 * 1000, // 1 day
-};
-
-const axiosInstance = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL,
-});
-
-const fetcher = async (config: ApiConfig): Promise<AxiosResponse["data"]> => {
-    const { url, method = "GET", params, headers, data } = config;
-    const response = await axiosInstance.request({
-        url,
-        method,
-        params,
-        headers,
-        data,
-    });
-    return response.data;
-};
+    error: any;
+}
 
 export function useApi<T>(
-    config: ApiConfig,
-    swrOptions: SWRConfiguration = {}
+    url: string | null,
+    config: AxiosRequestConfig = {},
+    swrConfig: SWRConfiguration = {}
 ): ApiResponse<T> {
-    const { data, error, isValidating, mutate } = useSWR<T, AxiosError>(
-        config.url,
-        () => fetcher(config),
-        { ...defaultConfig, ...swrOptions }
+    const { data, error, isValidating, mutate, ...rest } = useSWR<T>(
+        url ? [url, config] : null, // Key for SWR cache, null to disable fetching
+        ([url, config]) => fetcherConfig<T>(url, config as AxiosRequestConfig),
+        {
+            revalidateOnFocus: false, // Disable revalidation on window focus
+            revalidateOnReconnect: false, // Disable revalidation on reconnect
+            ...swrConfig, // Allow custom SWR configuration
+        }
     );
 
     return {
         data,
         error,
-        isLoading: !error && !data,
         isValidating,
         mutate,
+        ...rest,
     };
 }

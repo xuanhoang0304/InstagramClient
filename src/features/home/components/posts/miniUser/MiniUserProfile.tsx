@@ -1,47 +1,35 @@
-import { apiClient } from "@/configs/axios";
-import MiniUserActions from "@/features/home/components/posts/miniUser/MiniUserActions";
-import MiniUserDetails from "@/features/home/components/posts/miniUser/MiniUserDetails";
-import MiniUserInfo from "@/features/home/components/posts/miniUser/MiniUserInfo";
-import MiniUserPosts from "@/features/home/components/posts/miniUser/MiniUserPosts";
-import { PostProp } from "@/features/home/components/posts/type";
+import Image from 'next/image';
+import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
-import { handleFollowingUser } from "@/lib/utils";
-import { useMyStore } from "@/store/zustand";
-import { IPost, User } from "@/types/types";
-import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
-type getPostsByCreated = {
-    result: IPost[];
-    total: number;
-};
+import envConfig from '@/configs/envConfig';
+import MiniUserActions from '@/features/home/components/posts/miniUser/MiniUserActions';
+import MiniUserDetails from '@/features/home/components/posts/miniUser/MiniUserDetails';
+import MiniUserInfo from '@/features/home/components/posts/miniUser/MiniUserInfo';
+import MiniUserPosts from '@/features/home/components/posts/miniUser/MiniUserPosts';
+import { useApi } from '@/hooks/useApi';
+import { handleFollowingUser } from '@/lib/utils';
+import { useMyStore } from '@/store/zustand';
+import { getPostsByCreated, IPost, User } from '@/types/types';
+
 type MiniUserProfileProps = {
-    user: User;
-    onSetPosts: (post: IPost) => void;
-} & PostProp;
-const MiniUserProfile = ({ item, onSetPosts, user }: MiniUserProfileProps) => {
+    user: User | undefined;
+};
+const MiniUserProfile = ({ user }: MiniUserProfileProps) => {
     const { setMyUser } = useMyStore();
     const [showMiniUser, setShowMiniUser] = useState(false);
     const [position, setPosition] = useState({ top: 0, left: 0 });
     const [posts, setPosts] = useState<IPost[]>([]);
     const figureRef = useRef<HTMLElement>(null);
-    const handleGetPostsByCreated = async (createdBy: string) => {
-        try {
-            const data: getPostsByCreated = await apiClient.fetchApi(
-                `/posts/?filters={"createdBy": ["${createdBy}"]}`
-            );
-            setPosts(data.result);
-        } catch (error) {
-            console.log("error", error);
-        }
-    };
+    const { data: userPost } = useApi<getPostsByCreated>(
+        `${envConfig.BACKEND_URL}/posts/?filters={"createdBy": ["${user?._id}"]}&limit=3&page=1&sorts={ "pinned": -1, "createdAt":-1}`
+    );
+
     const handlFollowOrUnFollow = async (id: string) => {
         const data = await handleFollowingUser(id);
         if (data?.code === 200) {
             setMyUser(data.data);
         }
-        const newPost: IPost = await apiClient.fetchApi(`/posts/${item._id}`);
-        onSetPosts?.(newPost);
     };
     const handleHideUser = () => {
         setShowMiniUser(false);
@@ -50,15 +38,17 @@ const MiniUserProfile = ({ item, onSetPosts, user }: MiniUserProfileProps) => {
         if (figureRef.current) {
             const rect = figureRef.current.getBoundingClientRect();
             setPosition({
-                top: rect.top + window.scrollY + rect.width ,
+                top: rect.top + window.scrollY + rect.width,
                 left: rect.left + window.scrollX,
             });
         }
         setShowMiniUser(true);
     };
     useEffect(() => {
-        handleGetPostsByCreated(user._id);
-    }, [user._id]);
+        if (userPost) {
+            setPosts(userPost.result);
+        }
+    }, [user?._id, userPost]);
     return (
         <>
             <figure
@@ -70,7 +60,7 @@ const MiniUserProfile = ({ item, onSetPosts, user }: MiniUserProfileProps) => {
                 <Image
                     width={32}
                     height={32}
-                    src={user.avatar || "/images/default.jpg"}
+                    src={user?.avatar || "/images/default.jpg"}
                     alt="post-createdBy-avt"
                     className="size-full object-cover rounded-full"
                 ></Image>
@@ -95,11 +85,11 @@ const MiniUserProfile = ({ item, onSetPosts, user }: MiniUserProfileProps) => {
                                 desc="bài viết"
                             ></MiniUserDetails>
                             <MiniUserDetails
-                                quantity={user.followers?.length || 0}
+                                quantity={user?.followers?.length || 0}
                                 desc="người theo dõi"
                             ></MiniUserDetails>
                             <MiniUserDetails
-                                quantity={user.followings?.length || 0}
+                                quantity={user?.followings?.length || 0}
                                 desc="đang theo dõi"
                             ></MiniUserDetails>
                         </div>

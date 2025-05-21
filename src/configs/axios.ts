@@ -5,7 +5,7 @@ import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 interface RefreshTokenResponse {
     code: number;
     message: string;
-    data: string; // Giả sử data là accessToken mới
+    data: string;
 }
 
 class AxiosClient {

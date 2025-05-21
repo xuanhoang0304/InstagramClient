@@ -1,8 +1,16 @@
+import { ClassValue, clsx } from 'clsx';
+import { toast } from 'sonner';
+import { twMerge } from 'tailwind-merge';
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { apiClient } from "@/configs/axios";
-import { IPost, TimeInterval, updatePost, updateUser } from "@/types/types";
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { apiClient, authClient } from '@/configs/axios';
+import {
+    CommentInputFormData
+} from '@/features/home/components/comments/schema/CommentInputSchema';
+import {
+    getMe, getParentCmtByPostId, getRepleisResponse, IPost, TimeInterval, updateComment, updatePost,
+    updateUser, UploadMedia
+} from '@/types/types';
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -51,7 +59,15 @@ export function getRelativeTime(isoTime: string): string {
 
     return "vừa xong";
 }
-
+export function textWithLinks(input: string) {
+    return input
+        .replaceAll(`\\n`, "</br>")
+        .replaceAll(
+            /[^: \n]+:([^ \n]+)/g,
+            (match, url) =>
+                `<a href="${url}" class="text-primary-blue hover:text-primary-blue-hover" target="_blank">${match}</a>`
+        );
+}
 export const tempArr = [
     { id: 1 },
     { id: 2 },
@@ -71,8 +87,8 @@ export const handleLikePost = async (post: IPost) => {
             }
         );
         return data;
-    } catch (error) {
-        console.log("error", error);
+    } catch (error: any) {
+        toast.error(error.message);
     }
 };
 export const handleSavePost = async (post: IPost) => {
@@ -84,8 +100,8 @@ export const handleSavePost = async (post: IPost) => {
             }
         );
         return data;
-    } catch (error) {
-        console.log("error", error);
+    } catch (error: any) {
+        toast.error(error.message);
     }
 };
 export const handleFollowingUser = async (id: string) => {
@@ -97,7 +113,128 @@ export const handleFollowingUser = async (id: string) => {
             }
         );
         return data;
-    } catch (error) {
-        console.log("error", error);
+    } catch (error: any) {
+        toast.error(error.message);
     }
-}; 
+};
+export const handleCmtPost = async (data: CommentInputFormData) => {
+    try {
+        const result: updateComment = await apiClient.fetchApi("/comments/", {
+            method: "POST",
+            data,
+        });
+        if (result.code === 201) {
+            toast.success("Đã đăng comment!");
+            return result.data;
+        }
+    } catch (error: any) {
+        toast.error(error.message);
+    }
+};
+export const handleReplyCmtPost = async (
+    parentId: string,
+    data: CommentInputFormData
+) => {
+    try {
+        const result: updateComment = await apiClient.fetchApi(
+            `comments/${parentId}/reply`,
+            {
+                method: "POST",
+                data,
+            }
+        );
+        if (result.code === 201) {
+            toast.success("Đã đăng câu trả lời!");
+            return result.data;
+        }
+    } catch (error: any) {
+        toast.error(error.message);
+    }
+};
+export const handleGetRepliesByParentCmtId = async (
+    parentId: string,
+    page: number
+) => {
+    try {
+        const res: getRepleisResponse = await apiClient.fetchApi(
+            `/comments/${parentId}/replies?${page && `page=${page}`}&limit=3`
+        );
+        if (res.replies.length) {
+            return res;
+        }
+    } catch (error: any) {
+        handleError("handleGetRepliesByParentCmtId", error);
+    }
+};
+export const handleGetParentCmtByPostId = async (
+    postId: string,
+    page: number
+) => {
+    try {
+        const data: getParentCmtByPostId = await apiClient.fetchApi(
+            `http://localhost:5000/api/posts/${postId}/comments?page=${page}&limit=3`
+        );
+        if (data.code) {
+            return data.result;
+        }
+    } catch (error: any) {
+        handleError("handleGetParentCmtByPostId", error);
+    }
+};
+export const handleGetMe = async () => {
+    try {
+        const data: getMe = await authClient.fetchApi("/@me");
+        return data;
+    } catch (error: any) {
+        handleError("handleGetMe", error);
+    }
+};
+export const handleGetPostByPostId = async (postId: string) => {
+    try {
+        const data: IPost = await apiClient.fetchApi(`/posts/${postId}`);
+        return data;
+    } catch (error: any) {
+        handleError("handleGetPostByPostId", error);
+    }
+};
+export const handleUploadMediaFile = async (
+    data: FormData,
+    type: "video" | "image"
+) => {
+    try {
+        const response: UploadMedia = await apiClient.fetchApi(
+            `upload/${type}`,
+            {
+                method: "POST",
+                data,
+                headers: { "Content-Type": "multipart/form-data" },
+            }
+        );
+        if (response.data && response.code === 201) {
+            return response.data;
+        }
+        return null;
+    } catch (error) {
+        handleError("handleUploadMedia", error);
+        return null;
+    }
+};
+export const handleDeletePost = async (postId: string) => {
+    try {
+        const data: updatePost = await apiClient.fetchApi(`/posts/${postId}`, {
+            method: "DELETE",
+        });
+        if (data.code === 204) {
+            toast.success("Đã xóa bài viết!");
+            return data;
+        }
+        return null;
+    } catch (error: any) {
+        handleError("handleDeletePost", error);
+    }
+};
+export const handleError = (id: string, error: any | unknown) => {
+    toast.error(error?.message + "id:" + id, {
+        duration: 5000,
+    });
+};
