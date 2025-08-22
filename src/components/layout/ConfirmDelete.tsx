@@ -10,7 +10,7 @@ type ConfirmDeleteProps = {
     action: string;
     actionTitle: string;
     actionDescription: string;
-    trigger: React.ReactNode | string;
+    trigger?: React.ReactNode | string;
     inModal?: boolean;
     onDelete: () => void;
     onCancel: () => void;
@@ -35,12 +35,14 @@ const ConfirmDelete = ({
 
     return (
         <>
-            <button
-                onClick={onOpenChange}
-                className="px-2 py-[13.6px] font-bold text-[#ed4956] border-b dark:border-[#363636] border-solid"
-            >
-                {trigger}
-            </button>
+            {trigger && (
+                <button
+                    onClick={onOpenChange}
+                    className="px-2 py-[13.6px] font-bold text-[#ed4956] border-b dark:border-[#363636] border-solid"
+                >
+                    {trigger}
+                </button>
+            )}
 
             {isOpen && inModal ? (
                 <div className="bg-black/50 fixed inset-0 z-[50] flex items-center justify-center">

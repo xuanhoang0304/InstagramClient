@@ -1,6 +1,6 @@
-import { Media } from '@/components/layout/SideBar/type';
+import { Media } from "@/components/layout/SideBar/type";
 
-import { EUserGender, IPostMedia } from './enum';
+import { EUserGender, IPostMedia } from "./enum";
 
 export type User = {
     name: string;
@@ -44,7 +44,11 @@ export interface getMe {
     status: string;
     code: number;
     message: string;
-    result: User;
+    result: {
+        user: User;
+        accessToken: string;
+        refreshToken: string;
+    };
 }
 export interface getExloreUser {
     result: {
@@ -53,6 +57,7 @@ export interface getExloreUser {
 }
 export interface getExlorePost {
     result: IPost[];
+    total: number;
 }
 export type HttpResponse = {
     status: string;

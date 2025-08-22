@@ -1,20 +1,18 @@
 "use client";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm } from "react-hook-form";
+import axios from 'axios';
+import { CircleX, OctagonAlert } from 'lucide-react';
+import { useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
-import { cn } from "@/lib/utils";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
+import envConfig from '@/configs/envConfig';
+import { cn } from '@/lib/utils';
+import { VerifyOTPFormData, VerifyOTPSchema } from '@/schemas/VerifyOTPSchema';
+import { zodResolver } from '@hookform/resolvers/zod';
 
-import {
-    InputOTP,
-    InputOTPGroup,
-    InputOTPSlot,
-} from "@/components/ui/input-otp";
-import { VerifyOTPFormData, VerifyOTPSchema } from "../schema/VerifyOTPSchema";
-import axios from "axios";
-import { toast } from "sonner";
-import { CircleX, OctagonAlert } from "lucide-react";
-import { useState } from "react";
-import { status } from "./FormSendOTP";
+import { status } from './FormSendOTP';
+
 type FormVerifyOTPType = {
     onSetStep: (step: number) => void;
     email: string;
@@ -37,7 +35,7 @@ const FormVerifyOTP = ({ onSetStep, email }: FormVerifyOTPType) => {
             if (status == "error") return;
             setStatus("pending");
             const response = await axios.post(
-                "http://localhost:5000/api/auth/verify-otp",
+                `${envConfig.BACKEND_URL}/api/auth/verify-otp`,
                 data,
                 {
                     withCredentials: true,
@@ -90,11 +88,11 @@ const FormVerifyOTP = ({ onSetStep, email }: FormVerifyOTPType) => {
     return (
         <form
             onSubmit={handleSubmit(handleVerifyOTP)}
-            className=" flex mb-[84px] mt-10 flex-col gap-y-5 bg-[var(--bg-second-white)] dark:bg-primary-bgcl px-4 py-6  lg:max-w-[30%] max-w-[90%]  rounded-lg mx-auto"
+            className=" flex mt-6 md:mt-10 flex-col gap-y-3 bg-[var(--bg-second-white)] dark:bg-primary-bgcl  py-6  lg:max-w-[30%] md:max-w-[90%]  rounded-lg mx-auto"
         >
-            <p className="text-center">
-                Chúng tôi đã gửi mã OTP đến email :{status}
-                <span className="text-red-400">{email}</span>
+            <p className="text-left md:text-center text-sm">
+                Chúng tôi đã gửi mã OTP đến email :
+                <span className="text-red-400 ml-1">{email}</span>
             </p>
             <Controller
                 control={control}
@@ -123,20 +121,23 @@ const FormVerifyOTP = ({ onSetStep, email }: FormVerifyOTPType) => {
             <button
                 type="submit"
                 className={cn(
-                    "mt-2 px-4 py-2 border border-solid",
-                    status !== "" && "bg-gray-400 pointer-events-none "
+                    " px-4 py-2 border border-solid bg-primary-blue font-semibold rounded-lg",
+                    status !== "" &&
+                        "bg-primary-blue opacity-60 pointer-events-none"
                 )}
             >
-                Confirm
+                Xác thực
             </button>
             <button
                 type="button"
                 onClick={() => {
                     onSetStep(1);
                 }}
-                className={cn("mt-2 px-4 py-2 border border-solid")}
+                className={cn(
+                    "mt-2 px-4 py-2 border border-solid rounded-lg border-second-gray"
+                )}
             >
-                Back
+                Quay lại
             </button>
         </form>
     );

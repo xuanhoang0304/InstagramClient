@@ -1,5 +1,12 @@
+import MobileHeaderListPost from './posts/MobileHeaderListPost';
+
 const FollowMoreUser = () => {
-    return <div>FollowMoreUser</div>;
+    return (
+        <>
+            <MobileHeaderListPost></MobileHeaderListPost>
+            <div>FollowMoreUser</div>
+        </>
+    );
 };
 
 export default FollowMoreUser;

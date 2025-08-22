@@ -1,14 +1,17 @@
 "use client";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import axios from 'axios';
+import { CircleX, OctagonAlert } from 'lucide-react';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
-import InputForm from "./InputForm";
-import axios from "axios";
-import { useState } from "react";
-import { cn } from "@/lib/utils";
-import { SendOTPFormData, SendOTPShema } from "../schema/SendOTPSchema";
-import { toast } from "sonner";
-import { CircleX, OctagonAlert } from "lucide-react";
+import envConfig from '@/configs/envConfig';
+import { cn } from '@/lib/utils';
+import { SendOTPFormData, SendOTPShema } from '@/schemas/SendOTPSchema';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+import InputForm from './InputForm';
+
 type FormSendOTPType = {
     onSetStep: (step: number) => void;
     onSetEmail: (email: string) => void;
@@ -35,7 +38,7 @@ const FormSendOTP = ({ onSetStep, onSetEmail, email }: FormSendOTPType) => {
             setStatus("pending");
             onSetEmail(data.email);
             const response = await axios.post(
-                "http://localhost:5000/api/auth/send-otp",
+                `${envConfig.BACKEND_URL}/api/auth/send-otp`,
                 { ...data, typeOTP: "REGISTER" },
                 {
                     withCredentials: true,
@@ -89,7 +92,7 @@ const FormSendOTP = ({ onSetStep, onSetEmail, email }: FormSendOTPType) => {
     return (
         <form
             onSubmit={handleSubmit(handleSendOTPRegister)}
-            className=" flex mb-[84px] mt-10 flex-col gap-y-5 bg-[var(--bg-second-white)] dark:bg-primary-bgcl px-4 py-6  lg:max-w-[30%] max-w-[90%]  rounded-lg mx-auto"
+            className=" flex mt-4 md:mt-10 flex-col gap-y-5 bg-[var(--bg-second-white)] dark:bg-primary-bgcl px-4 py-6  lg:max-w-[30%] max-w-[90%]  rounded-lg mx-auto"
         >
             <div className="input-group flex  flex-col gap-y-6">
                 <InputForm
@@ -98,14 +101,14 @@ const FormSendOTP = ({ onSetStep, onSetEmail, email }: FormSendOTPType) => {
                     name="email"
                     inputId="email"
                     error={errors.email}
-                    className=""
+                    isFocus
                 ></InputForm>
             </div>
             <button
                 type="submit"
                 className={cn(
-                    "mt-2 px-4 py-2 border border-solid",
-                    status !== "" && "bg-gray-200 pointer-events-none "
+                    "mt-2 px-4 py-2 border border-solid bg-primary-blue rounded-lg font-semibold",
+                    status !== "" && "bg-primary-blue opacity-60 pointer-events-none "
                 )}
             >
                 Gửi OTP

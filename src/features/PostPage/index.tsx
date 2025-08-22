@@ -1,7 +1,10 @@
 "use client";
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useMediaQuery } from 'usehooks-ts';
 
-import Loading from '@/app/loading';
+import Loading from '@/components/layout/loading';
+import NotFound from '@/components/layout/NotFound';
 import envConfig from '@/configs/envConfig';
 import { useApi } from '@/hooks/useApi';
 import { IPost } from '@/types/types';
@@ -11,26 +14,32 @@ import SuggesstionPost from './SuggesstionPost';
 
 const PostPage = ({ postId }: { postId: string }) => {
     const [post, setPost] = useState<IPost | null>(null);
+    const isMobile = useMediaQuery("(max-width: 767px)");
     const { data, isLoading } = useApi<IPost>(
-        `${envConfig.BACKEND_URL}/posts/${postId}`
+        `${envConfig.BACKEND_URL}/api/posts/${postId}`
     );
-    
+
     const handleSetPostPage = (post: IPost) => {
         setPost(post);
     };
+    const router = useRouter();
     useEffect(() => {
         if (data) {
             setPost(data);
         }
     }, [data]);
-
+    useEffect(() => {
+        if (isMobile) {
+            router.push(`/p/${data?.createdBy._id}?postId=${postId}`);
+        }
+    }, [isMobile]);
     if (isLoading) return <Loading></Loading>;
     if (!post) {
-        return <p>Bài viết không tồn tại hoặc đã bị xóa</p>;
+        return <NotFound></NotFound>;
     }
     return (
-        <div className="mx-auto mt-10 max-w-[935px]">
-            <div className="flex max-h-[588px] shadow-[0_0_23px_0_rgba(255,255,255,0.2)] rounded-lg">
+        <div className="mx-auto lg:my-10 my-7 px-3 max-w-[935px]">
+            <div className="flex max-h-[585px] shadow-[0_0_23px_0_rgba(255,255,255,0.2)] rounded-lg">
                 <PostModalContent
                     item={post}
                     onSetNewPost={handleSetPostPage}

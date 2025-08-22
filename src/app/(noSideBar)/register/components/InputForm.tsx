@@ -1,7 +1,9 @@
-import { Controller, Control, FieldPath, FieldValues } from "react-hook-form";
+import { useEffect, useRef } from 'react';
+import { Control, Controller, FieldPath, FieldValues } from 'react-hook-form';
 
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
+import { useMyStore } from '@/store/zustand';
 
 type InputFormType<T extends FieldValues> = {
     labelTitle?: string;
@@ -14,6 +16,7 @@ type InputFormType<T extends FieldValues> = {
     };
     type?: string;
     placeholder?: string;
+    isFocus?: boolean;
 };
 
 const InputForm = <T extends FieldValues>({
@@ -24,22 +27,32 @@ const InputForm = <T extends FieldValues>({
     error,
     type,
     placeholder,
-
+    isFocus,
     className,
 }: InputFormType<T>) => {
+    const { targetCmt, newCmt } = useMyStore();
+    const ref = useRef<HTMLInputElement>(null);
+    useEffect(() => {
+        if (isFocus) {
+            if (targetCmt?._id || ref?.current || newCmt?._id) {
+                ref.current?.focus();
+            }
+        }
+    }, [targetCmt?._id]);
     return (
         <Controller
             name={name}
             control={control}
             render={({ field }) => (
                 <>
-                    <div className="relative">
+                    <div className={cn("relative", error && "mb-4")}>
                         <Input
                             {...field}
+                            ref={ref}
                             id={inputId}
                             placeholder={placeholder ? placeholder : ""} // Placeholder rỗng để kích hoạt :placeholder-shown
                             className={cn(
-                                "input-field border-none outline-none !bg-transparent border-gray-400",
+                                "input-field  outline-none !bg-transparent !border-gray-400 rounded-sm ",
                                 className
                             )}
                             type={type}

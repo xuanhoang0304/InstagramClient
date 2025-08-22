@@ -1,21 +1,46 @@
-import PostButtons from '@/features/home/components/posts/PostButtons';
+import { RefObject, useState } from 'react';
+import { useMediaQuery } from 'usehooks-ts';
+
 import PostCaption from '@/features/home/components/posts/PostCaption';
 import PostItemHeading from '@/features/home/components/posts/PostItemHeading';
 import PostItemMedia from '@/features/home/components/posts/PostItemMedia';
-import PostModal from '@/features/home/components/posts/postModal/PostModal';
-import PostModalContent from '@/features/home/components/posts/postModal/PostModalContent';
 import { PostProp } from '@/features/home/components/posts/type';
+import { cn } from '@/lib/utils';
 import { IPost } from '@/types/types';
 
 import { CommentInput } from '../comments/CommentInput';
+import MobileCmtDrawer from '../comments/moblie/MobileCmtDrawer';
+import PostButtons from './PostButtons';
+import PostModal from './PostModal';
+import PostModalContent from './postModal/PostModalContent';
 
 type PostItemsProps = {
     onSetPosts: (post: IPost[] | []) => void;
+    PostRef?: RefObject<HTMLLIElement | null> | undefined;
     listPosts: IPost[];
 } & PostProp;
-const PostItems = ({ item, onSetPosts, listPosts }: PostItemsProps) => {
+const PostItems = ({
+    item,
+    onSetPosts,
+    listPosts,
+    PostRef,
+}: PostItemsProps) => {
+    const [showModal, setShowModal] = useState(false);
+    const isMobile = useMediaQuery("(max-width: 767px)");
+    const handleOpenModal = () => {
+        setShowModal(true);
+        window.history.pushState({}, "", `/post/${item?._id}`);
+    };
+    const handleCloseModal = () => {
+        setShowModal(false);
+        window.history.pushState({}, "", "/");
+    };
     return (
-        <li id={`${item?._id}`}>
+        <li
+            id={`${item?._id}`}
+            ref={PostRef}
+            className={cn("", PostRef && "scroll-mt-[74px]")}
+        >
             {/* heading */}
             <PostItemHeading
                 isShowTime
@@ -23,7 +48,12 @@ const PostItems = ({ item, onSetPosts, listPosts }: PostItemsProps) => {
                 modal={false}
             ></PostItemHeading>
             {/* Media */}
-            <PostItemMedia item={item} className="mt-3"></PostItemMedia>
+            <PostItemMedia
+                item={item}
+                className="mt-3"
+                figureClassName="w-full"
+                videoClassName="w-full"
+            ></PostItemMedia>
             {/*Post Buttons */}
             <PostButtons
                 item={item}
@@ -43,23 +73,37 @@ const PostItems = ({ item, onSetPosts, listPosts }: PostItemsProps) => {
             <PostCaption item={item}></PostCaption>
             {/* Comments */}
             {item?.comments.length ? (
+                <button
+                    onClick={handleOpenModal}
+                    className="text-xs hidden md:block text-second-gray"
+                >
+                    Xem thêm {item?.comments.length} bình luận
+                </button>
+            ) : null}
+            {!isMobile && showModal && (
                 <PostModal
-                    post={item}
-                    Trigger={
-                        <p className="text-sm text-second-gray">
-                            Xem tất cả {item.comments.length} bình luận
-                        </p>
-                    }
                     Content={
                         <PostModalContent
                             item={item}
                             listPosts={listPosts}
                             onSetPosts={onSetPosts}
+                            isModal
                         ></PostModalContent>
                     }
-                    className="px-0"
+                    onCloseModal={handleCloseModal}
                 ></PostModal>
-            ) : null}
+            )}
+            <MobileCmtDrawer
+                triger={
+                    item?.comments.length ? (
+                        <div className="text-xs mt-1 md:hidden text-second-gray">
+                            Xem thêm {item?.comments.length} bình luận
+                        </div>
+                    ) : null
+                }
+                post={item}
+                onSetPosts={onSetPosts}
+            ></MobileCmtDrawer>
             {/* Cmt Input */}
             <CommentInput
                 modal={false}

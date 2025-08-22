@@ -11,6 +11,8 @@ import { useApi } from '@/hooks/useApi';
 import { tempArr } from '@/lib/utils';
 import { IPost } from '@/types/types';
 
+import FollowMoreUser from '../FollowMoreUser';
+import MobileHeaderListPost from './MobileHeaderListPost';
 import PostItems from './PostItems';
 
 const ListPosts = () => {
@@ -19,51 +21,39 @@ const ListPosts = () => {
     const [hasMore, setHasMore] = useState(false);
     const [excludes, setExcludes] = useState<string[]>([]);
 
-    const {
-        data: following,
-        isLoading: isLoadingFollowing,
-        mutate: followingMutate,
-    } = useApi<any>(
-        `${envConfig.BACKEND_URL}/posts/following?sort=createdAt&page=${flPage}&limit=3`,
-        {},
-        { revalidateOnMount: true }
+    const { data: following, isLoading: isLoadingFollowing } = useApi<any>(
+        `${envConfig.BACKEND_URL}/api/posts/following?sort=createdAt&page=${flPage}&limit=3`
     );
 
-    const {
-        data: explore,
-        isLoading: isLoadingExplore,
-        mutate: exploreMutate,
-    } = useApi<any>(
-        `${envConfig.BACKEND_URL}/posts/discover?filters={"excludes": [${excludes}]}&sort=createdAt&limit=3`
+    const { data: explore, isLoading: isLoadingExplore } = useApi<any>(
+        `${envConfig.BACKEND_URL}/api/posts/discover?filters={"excludes": [${excludes}]}&sort=createdAt&limit=3`
     );
 
     const fetchData = () => {
         if (listPosts.length < following.total) {
-            console.log("fetch more following");
+            // console.log("fetch more following");
             setFlPage((prev) => prev + 1);
 
             return;
         }
-        console.log("fetch more explore");
+        // console.log("fetch more explore");
         setExcludes((prev) => [
             ...prev,
             ...explore.result.map((item: IPost) => `"${item._id}"`),
         ]);
-        setListPosts((prev) => [...prev, ...explore.result]);
+        setListPosts((prev) => _.unionBy([...prev, ...explore.result], "_id"));
         if (
             following &&
             explore &&
             listPosts.length === following.total + explore.total
         ) {
-            console.log("no more");
+            // console.log("no more");
             setHasMore(false);
         }
     };
 
     const handleSetPosts = (post: IPost[] | []) => {
         setListPosts(post);
-        followingMutate();
-        exploreMutate();
     };
     useEffect(() => {
         if (following && listPosts.length < following.total) {
@@ -72,58 +62,71 @@ const ListPosts = () => {
             setHasMore(true);
         }
     }, [following, explore]);
-
-    return (
-        <InfiniteScroll
-            dataLength={listPosts.length}
-            next={fetchData}
-            className="mt-5"
-            hasMore={hasMore}
-            loader={
-                (isLoadingFollowing || isLoadingExplore) && (
-                    <ul className="flex flex-col gap-y-5 max-w-[468px] mx-auto mt-6">
-                        {tempArr.map((item) => (
-                            <li key={item.id}>
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-x-2">
-                                        <Skeleton className="size-8 rounded-full cursor-pointer"></Skeleton>
-                                        <Skeleton className="w-[130px] h-3"></Skeleton>
-                                    </div>
-                                    <Skeleton className="size-6"></Skeleton>
+    if (isLoadingFollowing || isLoadingExplore) {
+        return (
+            <>
+                <MobileHeaderListPost></MobileHeaderListPost>
+                <ul className="flex flex-col gap-y-5 max-w-[468px] mx-auto mt-5 lg:mt-11">
+                    {tempArr.map((item) => (
+                        <li key={item.id}>
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-x-2">
+                                    <Skeleton className="size-8 rounded-full cursor-pointer"></Skeleton>
+                                    <Skeleton className="w-[130px] h-3"></Skeleton>
                                 </div>
-                                <Skeleton className="w-[468px] h-[585px] rounded-[4px] mt-3"></Skeleton>
-                                <Skeleton className="w-full h-[118px] rounded-[2px] mt-1"></Skeleton>
-                            </li>
-                        ))}
-                    </ul>
-                )
-            }
-        >
-            <ul className="flex flex-col gap-y-5 max-w-[468px] mx-auto mt-6">
-                {isLoadingFollowing && listPosts.length === 0
-                    ? tempArr.map((item) => (
-                          <li key={item.id}>
-                              <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-x-2">
-                                      <Skeleton className="size-8 rounded-full cursor-pointer"></Skeleton>
-                                      <Skeleton className="w-[130px] h-3"></Skeleton>
-                                  </div>
-                                  <Skeleton className="size-6"></Skeleton>
-                              </div>
-                              <Skeleton className="w-[468px] h-[585px] rounded-[4px] mt-3"></Skeleton>
-                              <Skeleton className="w-full h-[118px] rounded-[2px] mt-tega1"></Skeleton>
-                          </li>
-                      ))
-                    : listPosts.map((item) => (
-                          <PostItems
-                              key={item._id}
-                              item={item}
-                              listPosts={listPosts}
-                              onSetPosts={handleSetPosts}
-                          />
-                      ))}
-            </ul>
-        </InfiniteScroll>
+                                <Skeleton className="size-6"></Skeleton>
+                            </div>
+                            <Skeleton className="w-full md:w-[468px] md:h-[585px] aspect-square rounded-[4px] mt-3"></Skeleton>
+                            <Skeleton className="w-full h-[118px] mt-1 rounded-[2px] mt-tega1"></Skeleton>
+                        </li>
+                    ))}
+                </ul>
+            </>
+        );
+    }
+    if (!listPosts?.length) {
+        return <FollowMoreUser></FollowMoreUser>;
+    }
+    return (
+        <>
+            <MobileHeaderListPost></MobileHeaderListPost>
+            <InfiniteScroll 
+                dataLength={listPosts.length}
+                next={fetchData}
+                className="mt-5"
+                hasMore={hasMore}
+                loader={
+                    (isLoadingFollowing || isLoadingExplore) && (
+                        <ul className="flex flex-col gap-y-5 max-w-[468px] mx-auto lg:mt-6">
+                            {tempArr.map((item) => (
+                                <li key={item.id}>
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-x-2">
+                                            <Skeleton className="size-8 rounded-full cursor-pointer"></Skeleton>
+                                            <Skeleton className="w-[130px] h-3"></Skeleton>
+                                        </div>
+                                        <Skeleton className="size-6"></Skeleton>
+                                    </div>
+                                    <Skeleton className="w-[468px] h-[585px] aspect-square rounded-[4px] mt-3"></Skeleton>
+                                    <Skeleton className="w-full h-[118px] rounded-[2px] mt-1"></Skeleton>
+                                </li>
+                            ))}
+                        </ul>
+                    )
+                }
+            >
+                <ul className="flex flex-col gap-y-5 md:max-w-[468px] mx-auto lg:mt-6">
+                    {listPosts.map((item) => (
+                        <PostItems
+                            key={item._id}
+                            item={item}
+                            listPosts={listPosts}
+                            onSetPosts={handleSetPosts}
+                        />
+                    ))}
+                </ul>
+            </InfiniteScroll>
+        </>
     );
 };
 

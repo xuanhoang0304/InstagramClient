@@ -11,3 +11,11 @@ export interface IPostMedia {
     type: EPostMediaType;
     path: string;
 }
+export enum EMessageReaction {
+    LIKE = 'LIKE',
+    HAHA = 'HAHA',
+    SAD = 'SAD',
+    ANGRY = 'ANGRY',
+    LOVE = 'LOVE',
+    NORMAL = '',
+  }

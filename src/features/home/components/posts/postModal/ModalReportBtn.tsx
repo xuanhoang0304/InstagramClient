@@ -4,7 +4,7 @@ import { RefObject, useEffect, useRef, useState } from 'react';
 import { useOnClickOutside } from 'usehooks-ts';
 
 import ConfirmDelete from '@/components/layout/ConfirmDelete';
-import { handleDeletePost, handleFollowingUser } from '@/lib/utils';
+import { handleDeletePost, handleFollowingUser, handleMutateWithKey } from '@/lib/utils';
 import { usePostStore } from '@/store/postStore';
 import { useMyStore } from '@/store/zustand';
 import { IPost } from '@/types/types';
@@ -31,6 +31,7 @@ const ModalReportBtn = ({ post }: ModalReportBtnProps) => {
     const handlFollowOrUnFollow = async (id: string) => {
         const res = await handleFollowingUser(id);
         if (res?.code === 200) {
+            handleMutateWithKey("/users");
             setMyUser(res.data);
         }
         setShowModal(false);
@@ -40,6 +41,18 @@ const ModalReportBtn = ({ post }: ModalReportBtnProps) => {
     };
     const handleCancel = () => {
         setShowConfirmDelete(false);
+    };
+    const handleDeletePostById = async () => {
+        const result = await handleDeletePost(post?._id as string);
+        setShowModal(false);
+        setShowConfirmDelete(false);
+        if (result) {
+            setTargetPost({
+                post: result.data,
+                action: "delete",
+            });
+            router.push(`/${myUser?._id}/${result.data.isReel ? "reel" : ""}`);
+        }
     };
     useOnClickOutside(ref as RefObject<HTMLDivElement>, handleClose);
     useEffect(() => {
@@ -67,24 +80,7 @@ const ModalReportBtn = ({ post }: ModalReportBtnProps) => {
                                 action="Xóa bài biết"
                                 actionTitle="Xóa bài biết"
                                 actionDescription="Bạn có chắc chắn muốn xóa bài biết này không?"
-                                onDelete={async () => {
-                                    const result = await handleDeletePost(
-                                        post?._id as string
-                                    );
-                                    setShowModal(false);
-                                    setShowConfirmDelete(false);
-                                    if (result) {
-                                        setTargetPost({
-                                            post: result.data,
-                                            action: "delete",
-                                        });
-                                        router.push(
-                                            `/${myUser?._id}/${
-                                                result.data.isReel ? "reel" : ""
-                                            }`
-                                        );
-                                    }
-                                }}
+                                onDelete={handleDeletePostById}
                                 onCancel={handleCancel}
                                 onOpenChange={handleOpenConfirmDelete}
                                 inModal

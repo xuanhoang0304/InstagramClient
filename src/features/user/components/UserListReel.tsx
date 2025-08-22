@@ -5,8 +5,8 @@ import { useParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { mutate } from 'swr';
+import { useMediaQuery } from 'usehooks-ts';
 
-import Loading from '@/app/loading';
 import { Skeleton } from '@/components/ui/skeleton';
 import envConfig from '@/configs/envConfig';
 import { useApi } from '@/hooks/useApi';
@@ -17,11 +17,14 @@ import UserPostItem from './UserPostItem';
 
 const UserListReel = () => {
     const { targetPost, resetTargetPost } = usePostStore();
+    const [isPC, setIsPC] = useState(false);
+    const mediaQuery = useMediaQuery("(min-width: 1025px)");
     const [posts, setPosts] = useState<IPost[] | []>([]);
     const [page, setPage] = useState(1);
     const { userId } = useParams();
     const scrollPositionRef = useRef<number>(0);
-    const reelKey = `${envConfig.BACKEND_URL}/posts/?filters={"createdBy": ["${userId}"],"isReel":"true"}&limit=3&page=${page}&sorts={ "pinned": -1, "createdAt":-1}`;
+    const limit = isPC ? 6 : 9;
+    const reelKey = `${envConfig.BACKEND_URL}/api/posts/?filters={"createdBy": ["${userId}"],"isReel":"true"}&limit=${limit}&page=${page}&sorts={ "pinned": -1, "createdAt":-1}`;
     const { data, isLoading } = useApi<getPostsByCreated>(reelKey);
 
     const fetchData = debounce(() => {
@@ -32,7 +35,6 @@ const UserListReel = () => {
     useEffect(() => {
         if (data?.result?.length) {
             setPosts((prev) => _.uniqBy([...prev, ...data.result], "_id"));
-            window.scrollTo(0, scrollPositionRef.current);
         }
     }, [data]);
     useEffect(() => {
@@ -58,11 +60,10 @@ const UserListReel = () => {
             resetTargetPost();
         };
     }, [targetPost, resetTargetPost, reelKey]);
-    if (isLoading && page === 1) {
-        return <Loading />;
-    }
-
-    if (!data?.result?.length && page === 1) {
+    useEffect(() => {
+        setIsPC(mediaQuery);
+    }, [mediaQuery]);
+    if (data?.result?.length === 0) {
         return (
             <div className="text-center mt-10">
                 <Film className="size-10 mx-auto" />
@@ -70,7 +71,20 @@ const UserListReel = () => {
             </div>
         );
     }
-
+    if (isLoading) {
+        return (
+            <div className="grid grid-cols-3 gap-0.5 mt-5">
+                {Array(limit)
+                    .fill(0)
+                    .map((_, index) => (
+                        <Skeleton
+                            key={index}
+                            className="w-full md:aspect-[3/4] aspect-square rounded-none"
+                        />
+                    ))}
+            </div>
+        );
+    }
     return (
         <InfiniteScroll
             dataLength={posts.length}
@@ -80,22 +94,26 @@ const UserListReel = () => {
             hasMore={data?.total ? posts.length < data.total : false}
             loader={
                 isLoading && (
-                    <div className="grid grid-cols-3 gap-1">
+                    <div className="grid grid-cols-3 gap-0.5">
                         {Array(4)
                             .fill(0)
                             .map((_, index) => (
                                 <Skeleton
                                     key={index}
-                                    className="w-full h-[342px] rounded-none"
+                                    className="w-full md:aspect-[3/4] aspect-square rounded-none"
                                 />
                             ))}
                     </div>
                 )
             }
         >
-            <ul className="grid grid-cols-3 gap-1">
+            <ul className="grid grid-cols-3 gap-0.5">
                 {posts.map((item) => (
-                    <UserPostItem post={item} key={item._id} />
+                    <UserPostItem
+                        post={item}
+                        key={item._id}
+                        imageWrapClass="md:aspect-[3/4]"
+                    />
                 ))}
             </ul>
         </InfiniteScroll>

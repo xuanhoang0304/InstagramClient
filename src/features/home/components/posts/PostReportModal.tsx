@@ -1,12 +1,13 @@
 import { Ellipsis } from 'lucide-react';
 import { useState } from 'react';
 
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import {
+    Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger
+} from '@/components/ui/dialog';
 import { PostProp } from '@/features/home/components/posts/type';
 import { UnFollowModal } from '@/features/home/components/posts/UnFollowModal';
-import { handleFollowingUser } from '@/lib/utils';
+import { handleFollowingUser, handleMutateWithKey } from '@/lib/utils';
 import { useMyStore } from '@/store/zustand';
-import { DialogClose, DialogTitle } from '@radix-ui/react-dialog';
 
 function PostReportModal({ item }: PostProp) {
     const { myUser, setMyUser } = useMyStore();
@@ -14,6 +15,7 @@ function PostReportModal({ item }: PostProp) {
     const handlFollowOrUnFollow = async (id: string) => {
         const data = await handleFollowingUser(id);
         if (data?.code === 200) {
+            handleMutateWithKey("/users");
             setMyUser(data.data);
         }
         setOpen(false);
@@ -31,7 +33,9 @@ function PostReportModal({ item }: PostProp) {
                 <button className="px-2 py-[13.6px] font-bold text-[#ed4956] border-b dark:border-[#363636] border-solid">
                     Báo cáo
                 </button>
-                {myUser?.followings.includes(String(item?.createdBy._id as string)) && (
+                {myUser?.followings.includes(
+                    String(item?.createdBy._id as string)
+                ) && (
                     <UnFollowModal
                         Trigger={
                             <button className="px-2 py-[13.6px] font-bold text-[#ed4956] border-b dark:border-[#363636] border-solid">

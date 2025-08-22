@@ -1,5 +1,9 @@
+import { AxiosError } from 'axios';
 import { MessageCircleMore, UserPlus } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
+import { apiClient } from '@/configs/axios';
+import { IGroupResponse } from '@/features/chats/type';
 import { UnFollowModal } from '@/features/home/components/posts/UnFollowModal';
 import { cn } from '@/lib/utils';
 import { useMyStore } from '@/store/zustand';
@@ -14,11 +18,40 @@ const MiniUserActions = ({
     onFollowOrUnFollow,
 }: MiniUserActionsProps) => {
     const { myUser } = useMyStore();
+    const router = useRouter();
+    const handleCreateGroupChat = async (partnerId: string) => {
+        try {
+            const response: IGroupResponse = await apiClient.fetchApi(
+                `groups/`,
+                {
+                    data: {
+                        members: [partnerId],
+                        isGroup: false,
+                    },
+                    method: "POST",
+                }
+            );
+            if (response.code === 201) {
+                router.push(`/chats/${response.data._id}`);
+            }
+        } catch (error) {
+            if (error instanceof AxiosError) {
+                if (error.response?.data.message === "Group chat is existed") {
+                    router.push(`/chats/${error.response?.data.detail}`);
+                }
+            }
+        }
+    };
     return (
         <>
             {myUser?.followings.includes(String(user?._id)) ? (
                 <div className="flex items-center gap-x-2 mt-4 px-4">
-                    <button className="bg-second-blue px-9 py-[6px] rounded-[8px] flex items-center gap-x-2 hover:opacity-75 transition-colors">
+                    <button
+                        onClick={() =>
+                            handleCreateGroupChat(user?._id as string)
+                        }
+                        className="bg-second-blue px-9 py-[6px] rounded-[8px] flex items-center gap-x-2 hover:opacity-75 transition-colors"
+                    >
                         <MessageCircleMore className="size-5" />
                         <p className="text-sm font-semibold">Nhắn tin</p>
                     </button>

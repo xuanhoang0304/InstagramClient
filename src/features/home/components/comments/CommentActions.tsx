@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { useOnClickOutside } from 'usehooks-ts';
 
 import { apiClient } from '@/configs/axios';
-import { handleError, handleGetPostByPostId } from '@/lib/utils';
+import { handleError, handleGetPostByPostId, handleMutateWithKey } from '@/lib/utils';
 import { useRepliesStore } from '@/store/repliesStore';
 import { useMyStore } from '@/store/zustand';
 import { IComment, IPost, updateComment } from '@/types/types';
@@ -17,6 +17,7 @@ type CommentActions = {
     listPosts?: IPost[];
     onSetCmtList: (list: IComment[] | []) => void;
     onSetPosts?: (posts: IPost[] | []) => void;
+    onSetRepliesPage?: (page: number) => void;
 };
 
 export function CommentActions({
@@ -27,6 +28,7 @@ export function CommentActions({
     listPosts,
     onSetCmtList,
     onSetPosts,
+    onSetRepliesPage,
 }: CommentActions) {
     const { myUser } = useMyStore();
     const { setReplies } = useRepliesStore();
@@ -51,7 +53,7 @@ export function CommentActions({
             if (result.code === 204) {
                 toast.success("Đã xóa comment thành công!");
                 if (isParent && parentCmtList) {
-                    console.log("delete parent");
+                    // console.log("delete parent");
                     const newList = [...parentCmtList].filter(
                         (cmt) => cmt._id !== result.data._id
                     );
@@ -65,11 +67,12 @@ export function CommentActions({
                         onSetPosts?.(newListPost);
                     }
                     onSetCmtList?.(newList);
-
+                    setReplies(String(result.data.parentCommentId), newList);
+                    handleMutateWithKey(`posts/${result.data.post}/comments?`);
                     return;
                 }
                 if (repliesList) {
-                    console.log("delete replies");
+                    // console.log("delete replies");
                     const newList = [...repliesList].filter(
                         (cmt) => cmt._id !== cmtId
                     );
@@ -84,18 +87,21 @@ export function CommentActions({
                             ? parentCmt.result
                             : cmt
                     );
-                    onSetCmtList(newParentList);
+                    onSetCmtList?.(newParentList);
+
                     const newPost = await handleGetPostByPostId(
                         result.data.post as string
                     );
-                    if ( listPosts && listPosts.length) {
+                    if (listPosts && listPosts.length) {
                         const newListPost = listPosts.map((post) =>
                             post._id === newPost?._id ? newPost : post
                         );
-                        onSetPosts?.(newListPost);  
+                        onSetPosts?.(newListPost);
                     }
+                    onSetRepliesPage?.(1)
                 }
                 setIsShow(false);
+                handleMutateWithKey(`posts/${result.data.post}/comments?`);
             }
         } catch (error) {
             handleError("handleDeleteCmt-CommentAction", error);
@@ -110,7 +116,7 @@ export function CommentActions({
         <>
             <Ellipsis
                 onClick={() => setIsShow(true)}
-                className="size-6 cursor-pointer lg:opacity-0 group-hover:opacity-100"
+                className="cursor-pointer size-6 lg:opacity-0 group-hover:opacity-100"
             />
             {isShow && (
                 <div className="bg-black/80 fixed inset-0 z-[100] flex items-center justify-center">
@@ -155,10 +161,10 @@ export function CommentActions({
                             <p className="mt-1 italic">
                                 Bạn có chăc chắn muốn xóa bình luận này?
                             </p>
-                            <div className="flex items-center justify-between gap-x-4 mt-2   font-bold">
+                            <div className="flex items-center justify-between mt-2 font-bold gap-x-4">
                                 <button
                                     onClick={() => setShowComfirm(false)}
-                                    className="py-1 px-4 hover:opacity-70 transition-colors"
+                                    className="px-4 py-1 transition-colors hover:opacity-70"
                                 >
                                     Hủy
                                 </button>

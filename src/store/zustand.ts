@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { create } from 'zustand';
+import { createJSONStorage, devtools, persist } from 'zustand/middleware';
+
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { IComment, User } from "@/types/types";
-import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
+import { IComment, User } from '@/types/types';
 
 export interface ITokens {
     refreshToken: string;
@@ -16,6 +17,8 @@ export type Store = {
     setMyUser: (user: User | null) => void;
     targetCmt: IComment | null;
     settargetCmt: (targetCmtId: IComment | null) => void;
+    newCmt: IComment | null;
+    setNewCmt: (newCmt: IComment | null) => void;
 };
 
 const customStorage = {
@@ -60,22 +63,26 @@ const customStorage = {
 };
 
 export const useMyStore = create<Store>()(
-    persist(
-        (set) => ({
-            tokens: {
-                refreshToken: "",
-                accessToken: "",
-            },
-            setToken: (tokens: ITokens) => set(() => ({ tokens })),
-            myUser: null,
-            setMyUser: (myUser: User | null) => set(() => ({ myUser })),
-            targetCmt: null,
-            settargetCmt: (targetCmt: IComment | null) =>
-                set(() => ({ targetCmt })),
-        }),
-        {
-            name: "my-store",
-            storage: createJSONStorage(() => customStorage),
-        }
+    devtools(
+        persist(
+            (set) => ({
+                tokens: {
+                    refreshToken: "",
+                    accessToken: "",
+                },
+                setToken: (tokens: ITokens) => set(() => ({ tokens })),
+                myUser: null,
+                setMyUser: (myUser: User | null) => set(() => ({ myUser })),
+                targetCmt: null,
+                settargetCmt: (targetCmt: IComment | null) =>
+                    set(() => ({ targetCmt })),
+                newCmt: null,
+                setNewCmt: (newCmt: IComment | null) => set(() => ({ newCmt })),
+            }),
+            {
+                name: "my-store",
+                storage: createJSONStorage(() => customStorage),
+            }
+        )
     )
 );

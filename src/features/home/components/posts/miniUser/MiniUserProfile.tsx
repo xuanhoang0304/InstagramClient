@@ -8,7 +8,7 @@ import MiniUserDetails from '@/features/home/components/posts/miniUser/MiniUserD
 import MiniUserInfo from '@/features/home/components/posts/miniUser/MiniUserInfo';
 import MiniUserPosts from '@/features/home/components/posts/miniUser/MiniUserPosts';
 import { useApi } from '@/hooks/useApi';
-import { handleFollowingUser } from '@/lib/utils';
+import { handleFollowingUser, handleMutateWithKey } from '@/lib/utils';
 import { useMyStore } from '@/store/zustand';
 import { getPostsByCreated, IPost, User } from '@/types/types';
 
@@ -22,12 +22,13 @@ const MiniUserProfile = ({ user }: MiniUserProfileProps) => {
     const [posts, setPosts] = useState<IPost[]>([]);
     const figureRef = useRef<HTMLElement>(null);
     const { data: userPost } = useApi<getPostsByCreated>(
-        `${envConfig.BACKEND_URL}/posts/?filters={"createdBy": ["${user?._id}"]}&limit=3&page=1&sorts={ "pinned": -1, "createdAt":-1}`
+        `${envConfig.BACKEND_URL}/api/posts/?filters={"createdBy": ["${user?._id}"]}&limit=3&page=1&sorts={ "pinned": -1, "createdAt":-1}`
     );
 
     const handlFollowOrUnFollow = async (id: string) => {
         const data = await handleFollowingUser(id);
         if (data?.code === 200) {
+            handleMutateWithKey("/users");
             setMyUser(data.data);
         }
     };

@@ -10,7 +10,9 @@ import { apiClient } from '@/configs/axios';
 import {
     CommentFormSchema, CommentInputFormData
 } from '@/features/home/components/comments/schema/CommentInputSchema';
-import { cn, handleCmtPost, handleGetPostByPostId, handleReplyCmtPost } from '@/lib/utils';
+import {
+    cn, handleCmtPost, handleGetPostByPostId, handleMutateWithKey, handleReplyCmtPost
+} from '@/lib/utils';
 import { useRepliesStore } from '@/store/repliesStore';
 import { useMyStore } from '@/store/zustand';
 import { IComment, IPost } from '@/types/types';
@@ -19,7 +21,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 type CommentInputProps = {
     cmtList?: IComment[];
     post: IPost | null;
-    modal: boolean;
+    modal?: boolean;
     listPosts?: IPost[];
     onSetPosts?: (posts: IPost[]) => void;
     onSetCmtList?: (list: IComment[] | []) => void;
@@ -32,8 +34,9 @@ export function CommentInput({
     listPosts,
     onSetPosts,
 }: CommentInputProps) {
-    const { targetCmt, settargetCmt } = useMyStore();
-    const { repliesMap, setReplies } = useRepliesStore();
+    const { targetCmt, setNewCmt, settargetCmt } = useMyStore();
+    const { repliesMap, setReplies , setIsShowReplies} = useRepliesStore();
+   
     const {
         control,
         handleSubmit,
@@ -50,13 +53,13 @@ export function CommentInput({
     });
 
     useEffect(() => {
-        if (targetCmt?._id) {
+        if (targetCmt?._id && modal) {
             setValue("content", `@${targetCmt.createdBy.name} `);
         } else setValue("content", "");
     }, [targetCmt?._id]);
     const content = watch("content");
     async function onSubmit(data: CommentInputFormData) {
-        if (cmtList) {
+        if (cmtList?.length) {
             if (targetCmt?._id) {
                 const newContet = data.content.replace(
                     `@${targetCmt.createdBy.name}`,
@@ -85,23 +88,34 @@ export function CommentInput({
                     const newListPost = listPosts?.map((post) =>
                         post._id === newPost?._id ? newPost : post
                     );
+                    reset();
+                    handleMutateWithKey(`posts/${post?._id}/comments?`);
                     onSetPosts?.(newListPost as IPost[]);
                     onSetCmtList?.(newList);
-                    reset();
                     settargetCmt(null);
+                    setNewCmt(newCmt);
+                    setReplies(parentCmtId, [...repliesMap[parentCmtId], newCmt]);
+                    setIsShowReplies(true);
                     return;
                 }
                 console.log("rep replies");
-                setReplies(parentCmtId, [...repliesMap[parentCmtId], newCmt]);
+                const newList = [...cmtList].map((cmt) =>
+                    cmt._id === parentCmt.result._id ? parentCmt.result : cmt
+                );
                 const newPost = await handleGetPostByPostId(
                     newCmt?.post as string
                 );
                 const newListPost = listPosts?.map((post) =>
                     post._id === newPost?._id ? newPost : post
                 );
-                onSetPosts?.(newListPost as IPost[]);
                 reset();
+                handleMutateWithKey(`posts/${post?._id}/comments?`);
+                setReplies(parentCmtId, [...repliesMap[parentCmtId], newCmt]);
+                onSetPosts?.(newListPost as IPost[]);
+                onSetCmtList?.(newList);
                 settargetCmt(null);
+                setNewCmt(newCmt);
+                setIsShowReplies(true);
                 return;
             }
             console.log("comment post");
@@ -114,9 +128,9 @@ export function CommentInput({
                 const newListPost = listPosts?.map((post) =>
                     post._id === newPost?._id ? newPost : post
                 );
+                reset();
                 onSetPosts?.(newListPost as IPost[]);
                 onSetCmtList?.(newList);
-                reset();
                 return;
             }
         }
@@ -127,6 +141,7 @@ export function CommentInput({
         );
         onSetPosts?.(newList as IPost[]);
         reset();
+        handleMutateWithKey(`posts/${post?._id}/comments?`);
     }
 
     return (
@@ -150,8 +165,9 @@ export function CommentInput({
                         control={control}
                         error={errors.content}
                         placeholder="Bình luận..."
+                        isFocus={true && modal}
                         className={cn(
-                            "focus-visible:ring-0  focus-within:border-none",
+                            "focus-visible:ring-0 border-none  focus-within:border-none",
                             !modal && "px-0"
                         )}
                     ></InputForm>

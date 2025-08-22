@@ -1,10 +1,13 @@
+import { AxiosRequestConfig } from 'axios';
+import useSWR, { SWRConfiguration, SWRResponse } from 'swr';
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { apiClient } from "@/configs/axios";
-import { AxiosRequestConfig } from "axios";
-import useSWR, { SWRConfiguration, SWRResponse } from "swr";
+import { apiClient } from '@/configs/axios';
 
-
-const fetcherConfig = async <T>(url: string, config: AxiosRequestConfig = {}): Promise<T> => {
+const fetcherConfig = async <T>(
+    url: string,
+    config: AxiosRequestConfig = {}
+): Promise<T> => {
     return apiClient.fetchApi<T>(url, config);
 };
 interface ApiResponse<T> extends SWRResponse<T, any> {
@@ -18,12 +21,13 @@ export function useApi<T>(
     swrConfig: SWRConfiguration = {}
 ): ApiResponse<T> {
     const { data, error, isValidating, mutate, ...rest } = useSWR<T>(
-        url ? [url, config] : null, // Key for SWR cache, null to disable fetching
-        ([url, config]) => fetcherConfig<T>(url, config as AxiosRequestConfig),
+        url,
+        (url) => fetcherConfig<T>(url, config),
         {
-            revalidateOnFocus: false, // Disable revalidation on window focus
-            revalidateOnReconnect: false, // Disable revalidation on reconnect
-            ...swrConfig, // Allow custom SWR configuration
+            shouldRetryOnError: false,
+            revalidateOnFocus: false,
+            revalidateOnReconnect: false,
+            ...swrConfig,
         }
     );
 

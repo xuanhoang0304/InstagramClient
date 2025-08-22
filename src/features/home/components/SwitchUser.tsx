@@ -6,8 +6,11 @@ import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useMyStore } from '@/store/zustand';
 
+import { SwitchUserContent } from './SwitchUserContent';
+
 const SwitchUser = () => {
     const { myUser } = useMyStore();
+    
     return (
         <div className=" flex justify-between items-center">
             <div className=" flex items-center gap-x-2">
@@ -47,9 +50,13 @@ const SwitchUser = () => {
                 </div>
             </div>
             {myUser ? (
-                <button className="text-primary-blue font-semibold text-xs hover:text-primary-blue-hover">
-                    Chuyển
-                </button>
+                <SwitchUserContent
+                    trigger={
+                        <button className="text-primary-blue font-semibold text-xs hover:text-primary-blue-hover">
+                            Chuyển
+                        </button>
+                    }
+                ></SwitchUserContent>
             ) : (
                 <Skeleton className="w-10 h-2"></Skeleton>
             )}

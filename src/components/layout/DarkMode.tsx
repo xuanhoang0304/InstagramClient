@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
 export default function DarkMode() {
     const [isDark, setIsDark] = useState(false);
@@ -25,7 +25,7 @@ export default function DarkMode() {
     return (
         <button
             onClick={toggleTheme}
-            className="p-2 rounded-xl dark:bg-gray-800 bg-amber-200 fixed bottom-[10%] right-3 border text-sm transition-all hover:bg-gray-200 dark:hover:bg-gray-700"
+            className="p-2 rounded-xl z-60 dark:bg-gray-800 bg-amber-200 fixed bottom-[10%] right-3 border text-sm transition-all hover:bg-gray-200 dark:hover:bg-gray-700"
         >
             {isDark ? "🌙" : "☀️"}
         </button>

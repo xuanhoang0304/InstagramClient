@@ -9,6 +9,7 @@ type ReplyListProps = {
     listPosts?: IPost[];
     onSetPosts?: (post: IPost[]) => void;
     onSetCmtList: (list: IComment[] | []) => void;
+    onSetRepliesPage: (page: number) => void;
 };
 const ReplyList = ({
     repliesCmt,
@@ -17,9 +18,11 @@ const ReplyList = ({
     listPosts,
     onSetPosts,
     onSetCmtList,
+    onSetRepliesPage,
 }: ReplyListProps) => {
+    // if(!repliesCmt.length) return null;
     return (
-        <ul className="flex flex-col gap-y-4 mt-4">
+        <ul className="flex flex-col mt-4 gap-y-4">
             {repliesCmt &&
                 repliesCmt.map((reply) => (
                     <ReplyItem
@@ -31,6 +34,7 @@ const ReplyList = ({
                         listPosts={listPosts}
                         onSetPosts={onSetPosts}
                         onSetCmtList={onSetCmtList}
+                        onSetRepliesPage={onSetRepliesPage}
                     ></ReplyItem>
                 ))}
         </ul>

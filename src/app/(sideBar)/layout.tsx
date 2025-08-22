@@ -9,7 +9,7 @@ export default async function SideBarLayout({
 }>) {
     return (
         <main className="flex">
-            <SideBar></SideBar>
+            <SideBar type="normal"></SideBar>
             {children}
         </main>
     );

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import { handleFollowingUser } from '@/lib/utils';
+import { handleFollowingUser, handleMutateWithKey } from '@/lib/utils';
 import { useMyStore } from '@/store/zustand';
 import { User } from '@/types/types';
 
@@ -8,15 +8,16 @@ import MiniUserProfile from './posts/miniUser/MiniUserProfile';
 
 interface ISuggestionItem {
     user: User;
-    onSetSuggestion: () =>Promise<void>;
 }
-const SuggestionItem = ({ user, onSetSuggestion }: ISuggestionItem) => {
+const SuggestionItem = ({ user }: ISuggestionItem) => {
     const { setMyUser } = useMyStore();
     const handlFollowOrUnFollow = async (id: string) => {
-        const data = await handleFollowingUser(id);
-        if (data?.code === 200) {
-            setMyUser(data.data);
-            await onSetSuggestion();
+        const res = await handleFollowingUser(id);
+        if (res?.code === 200) {
+            // handleMutateWithKey("/api/posts");
+            handleMutateWithKey("/users");
+            handleMutateWithKey("/posts/following?sort=createdAt&");
+            setMyUser(res.data);
         }
     };
     return (

@@ -1,9 +1,12 @@
 import { ClassValue, clsx } from 'clsx';
 import { toast } from 'sonner';
+import { mutate } from 'swr';
 import { twMerge } from 'tailwind-merge';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { apiClient, authClient } from '@/configs/axios';
+import envConfig from '@/configs/envConfig';
+import { IGroupResponse } from '@/features/chats/type';
 import {
     CommentInputFormData
 } from '@/features/home/components/comments/schema/CommentInputSchema';
@@ -14,6 +17,15 @@ import {
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
+}
+export function handleMutateWithKey(keyword: string) {
+    mutate(
+        (key) => {
+            return typeof key === "string" && key.includes(keyword);
+        },
+        undefined,
+        { revalidate: true }
+    );
 }
 export function formatNumber(num: number): string {
     if (!num || num < 0) return "0";
@@ -40,7 +52,17 @@ export function getRelativeTime(isoTime: string): string {
     const diffInSeconds = Math.floor(
         (now.getTime() - inputDate.getTime()) / 1000
     );
+    const diffInDays = diffInSeconds / (60 * 60 * 24); // Tính số ngày chênh lệch
 
+    // Nếu quá 7 ngày, hiển thị định dạng ngày tháng (DD/MM/YYYY)
+    if (diffInDays > 7) {
+        const day = String(inputDate.getDate()).padStart(2, '0');
+        const month = String(inputDate.getMonth() + 1).padStart(2, '0'); // Tháng bắt đầu từ 0
+        const year = inputDate.getFullYear();
+        return `${day}-${month}-${year}`;
+    }
+
+    // Nếu chưa quá 7 ngày, hiển thị thời gian tương đối
     const intervals: TimeInterval[] = [
         { label: "năm", seconds: 31536000 },
         { label: "tháng", seconds: 2592000 },
@@ -76,8 +98,16 @@ export const tempArr = [
     { id: 5 },
     { id: 6 },
     { id: 7 },
+    { id: 8 },
+    { id: 9 },
+    { id: 10 },
+    { id: 11 },
+    { id: 12 },
+    { id: 13 },
+    { id: 14 },
+    { id: 15 },
 ];
-
+export const PUBLIC_ROUTES = ["/login", "/register", "/auth/google-callback"];
 export const handleLikePost = async (post: IPost) => {
     try {
         const data: updatePost = await apiClient.fetchApi(
@@ -172,7 +202,7 @@ export const handleGetParentCmtByPostId = async (
 ) => {
     try {
         const data: getParentCmtByPostId = await apiClient.fetchApi(
-            `http://localhost:5000/api/posts/${postId}/comments?page=${page}&limit=3`
+            `${envConfig.BACKEND_URL}/api/posts/${postId}/comments?page=${page}&limit=3`
         );
         if (data.code) {
             return data.result;
@@ -214,8 +244,8 @@ export const handleUploadMediaFile = async (
             return response.data;
         }
         return null;
-    } catch (error) {
-        handleError("handleUploadMedia", error);
+    } catch (error: any) {
+        toast.error(error.response.data.message);
         return null;
     }
 };
@@ -233,8 +263,32 @@ export const handleDeletePost = async (postId: string) => {
         handleError("handleDeletePost", error);
     }
 };
+export const handleUpdateGroup = async (
+    groupId: string,
+    data: {
+        groupAvt?: string;
+        groupName?: string;
+        lastMessage?: string | null;
+    }
+) => {
+    try {
+        const response: IGroupResponse = await apiClient.fetchApi(
+            `/groups/${groupId}/update`,
+            {
+                method: "PUT",
+                data,
+            }
+        );
+        if (response.code === 200) {
+            console.log(`Update successfuly groupID : ${groupId}`);
+        }
+    } catch (error) {
+        handleError("handleUpdateGroup", error);
+    }
+};
+
 export const handleError = (id: string, error: any | unknown) => {
-    toast.error(error?.message + "id:" + id, {
+    toast.error(error?.message + "---id:" + id, {
         duration: 5000,
     });
 };

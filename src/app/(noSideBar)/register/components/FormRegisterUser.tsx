@@ -10,15 +10,15 @@ import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
     Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import envConfig from '@/configs/envConfig';
 import { cn } from '@/lib/utils';
+import { RegisterFormData, RegisterShema } from '@/schemas/RegisterSchema';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Label } from '@radix-ui/react-label';
-
-import { RegisterFormData, RegisterShema } from '../schema/RegisterSchema';
 
 type FormRegisterUser = {
     email: string;
@@ -54,7 +54,7 @@ export default function FormRegisterUser({
     const handleRegister = async (data: RegisterFormData) => {
         try {
             const response = await axios.post(
-                "http://localhost:5000/api/users/",
+                `${envConfig.BACKEND_URL}/api/users/`,
                 data,
                 {
                     withCredentials: true,
@@ -113,7 +113,7 @@ export default function FormRegisterUser({
             formData.append("image", data.avatar[0]);
             try {
                 const res = await fetch(
-                    "http://localhost:5000/api/upload/image",
+                    `${envConfig.BACKEND_URL}/upload/image`,
                     {
                         method: "POST",
                         body: formData,
@@ -137,16 +137,21 @@ export default function FormRegisterUser({
         return (
             <form
                 onSubmit={handleSubmit(onSubmit)}
-                className="mt-10 w-[80%] mx-auto"
+                className="mt-6 md:mt-10 w-full lg:w-[80%] mx-auto"
             >
-                <div className="flex justify-between gap-x-10">
-                    <div className="w-1/2 flex flex-col gap-y-3">
+                <div className="flex justify-between gap-x-10 gap-y-6 flex-col md:flex-row">
+                    <div className="md:w-1/2 flex flex-col gap-y-3">
                         {/* Name */}
                         <div>
-                            <Label htmlFor="name">Name</Label>
+                            <Label className="mb-2" htmlFor="name">
+                                Tên hiển thị{" "}
+                                <span className="text-xs text-red-500">
+                                    ( * )
+                                </span>
+                            </Label>
                             <Input id="name" {...register("name")} />
                             {errors.name && (
-                                <p className="text-sm text-red-500">
+                                <p className="text-sm text-left text-red-500">
                                     {errors.name.message}
                                 </p>
                             )}
@@ -154,10 +159,15 @@ export default function FormRegisterUser({
 
                         {/* Username */}
                         <div>
-                            <Label htmlFor="username">Username</Label>
+                            <Label className="mb-2" htmlFor="username">
+                                Tên đăng nhập{" "}
+                                <span className="text-xs text-red-500">
+                                    ( * )
+                                </span>
+                            </Label>
                             <Input id="username" {...register("username")} />
                             {errors.username && (
-                                <p className="text-sm text-red-500">
+                                <p className="text-sm text-left text-red-500">
                                     {errors.username.message}
                                 </p>
                             )}
@@ -165,14 +175,19 @@ export default function FormRegisterUser({
 
                         {/* Password */}
                         <div>
-                            <Label htmlFor="password">Password</Label>
+                            <Label className="mb-2" htmlFor="password">
+                                Mật khẩu{" "}
+                                <span className="text-xs text-red-500">
+                                    ( * )
+                                </span>
+                            </Label>
                             <Input
                                 id="password"
                                 type="password"
                                 {...register("password")}
                             />
                             {errors.password && (
-                                <p className="text-sm text-red-500">
+                                <p className="text-sm text-left text-red-500">
                                     {errors.password.message}
                                 </p>
                             )}
@@ -180,7 +195,7 @@ export default function FormRegisterUser({
 
                         {/* Gender */}
                         <div>
-                            <Label>Gender</Label>
+                            <Label className="mb-2">Giới tính</Label>
                             <Controller
                                 control={control}
                                 name="gender"
@@ -189,40 +204,49 @@ export default function FormRegisterUser({
                                         onValueChange={field.onChange}
                                         defaultValue={field.value}
                                     >
-                                        <SelectTrigger>
+                                        <SelectTrigger className="!bg-primary-gray">
                                             <SelectValue placeholder="Chọn giới tính" />
                                         </SelectTrigger>
-                                        <SelectContent>
+                                        <SelectContent className="!bg-primary-gray">
                                             <SelectItem value="male">
-                                                Male
+                                                Nam
                                             </SelectItem>
                                             <SelectItem value="female">
-                                                Female
+                                                Nữ
                                             </SelectItem>
                                             <SelectItem value="N/A">
-                                                N/A
+                                                Không chia sẻ
                                             </SelectItem>
                                         </SelectContent>
                                     </Select>
                                 )}
                             />
                             {errors.gender && (
-                                <p className="text-sm text-red-500">
+                                <p className="text-sm text-left text-red-500">
                                     {errors.gender.message}
                                 </p>
                             )}
                         </div>
                         {/* Bio */}
                         <div>
-                            <Label htmlFor="bio">Bio</Label>
-                            <Textarea id="bio" rows={4} {...register("bio")} />
+                            <Label className="mb-2" htmlFor="bio">
+                                Bio
+                            </Label>
+                            <Textarea
+                                id="bio"
+                                className="!bg-primary-gray"
+                                rows={4}
+                                {...register("bio")}
+                            />
                         </div>
                     </div>
 
-                    <div className="w-1/2 flex flex-col gap-y-3">
+                    <div className="md:w-1/2 flex flex-col gap-y-3">
                         {/* Phone number */}
                         <div>
-                            <Label htmlFor="phoneNumber">Phone Number</Label>
+                            <Label className="mb-2" htmlFor="phoneNumber">
+                                Số điện thoại
+                            </Label>
                             <Input
                                 id="phoneNumber"
                                 {...register("phoneNumber")}
@@ -231,7 +255,9 @@ export default function FormRegisterUser({
 
                         {/* Website */}
                         <div>
-                            <Label htmlFor="website">Website</Label>
+                            <Label className="mb-2" htmlFor="website">
+                                Website
+                            </Label>
                             <Input
                                 id="website"
                                 type="text"
@@ -240,11 +266,15 @@ export default function FormRegisterUser({
                         </div>
 
                         {/* Avatar */}
+
                         <Controller
                             name="avatar"
                             control={control}
                             render={({ field }) => (
-                                <>
+                                <div>
+                                    <Label className="mb-2" htmlFor="avatar">
+                                        Avatar
+                                    </Label>
                                     <Input
                                         id="avatar"
                                         type="file"
@@ -262,7 +292,7 @@ export default function FormRegisterUser({
                                         }}
                                     />
                                     {errors.avatar && (
-                                        <p className="text-sm text-red-500">
+                                        <p className="text-sm text-left text-red-500">
                                             {errors.avatar.message as string}
                                         </p>
                                     )}
@@ -275,17 +305,16 @@ export default function FormRegisterUser({
                                             height={100}
                                         />
                                     )}
-                                </>
+                                </div>
                             )}
                         />
                     </div>
-                    <div />
                 </div>
 
-                <div className="flex items-center gap-x-3">
+                <div className="flex items-center justify-center gap-x-3 mt-4">
                     <Button
                         className={cn(
-                            "mt-3 transition-colors",
+                            "transition-colors min-w-[120px] bg-primary-blue text-primary-white hover:bg-second-blue",
                             isLoading && "pointer-events-none opacity-65"
                         )}
                         type="submit"
@@ -295,7 +324,7 @@ export default function FormRegisterUser({
                     <Button
                         variant={"ghost"}
                         onClick={() => onSetStep?.(1)}
-                        className={cn("mt-3 transition-colors")}
+                        className={cn("transition-colors min-w-[120px]")}
                         type="button"
                     >
                         Hủy đăng ký
@@ -305,7 +334,7 @@ export default function FormRegisterUser({
         );
     }
     return (
-        <div className="w-[50%] mx-auto mt-10 flex flex-col items-center">
+        <div className="md:w-[50%] mx-auto mt-10 flex flex-col items-center">
             <CircleCheck className="size-[80px]  text-green-500" />
             <h1 className="text-3xl text-center mt-4">Đăng ký thành công</h1>
             <button

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 
 import { handleGetRepliesByParentCmtId } from '@/lib/utils';
 import { useRepliesStore } from '@/store/repliesStore';
+import { useMyStore } from '@/store/zustand';
 import { IComment, IPost } from '@/types/types';
 
 import ReplyList from './ReplyList';
@@ -23,11 +24,14 @@ const ShowRepliesBtn = ({
     onSetPosts,
     onSetCmtList,
 }: ShowRepliesBtnProp) => {
-    const [showReplies, setShowReplies] = useState(false);
+    // const [showReplies, setShowReplies] = useState(false);
     const [nextPage, setNextPage] = useState(1);
-    const { repliesMap, setReplies } = useRepliesStore();
+    const { repliesMap, setReplies, isShowReplies, setIsShowReplies } =
+        useRepliesStore();
+    const { newCmt, setNewCmt } = useMyStore();
     const handleGetReplies = async (parentCmtId: string, page: number) => {
         const data = await handleGetRepliesByParentCmtId(parentCmtId, page);
+
         if (data) {
             if (!Object.entries(repliesMap).length) {
                 setReplies(parentCmt._id, data.replies);
@@ -37,23 +41,35 @@ const ShowRepliesBtn = ({
                 [...repliesMap[parentCmt._id], ...data.replies],
                 "_id"
             );
-
+            if (newCmt?._id) {
+                const newList = newReplies.filter(
+                    (reply) => reply._id !== newCmt._id
+                );
+                setReplies(parentCmt._id, [...newList, newCmt]);
+                return;
+            }
             setReplies(parentCmt._id, newReplies);
         }
     };
     const handleBtnShowListClick = async () => {
-        setShowReplies(true);
         await handleGetReplies(parentCmt._id, nextPage);
+
         if (
             repliesMap[parentCmt._id].length === parentCmt.replies.length ||
             repliesMap[parentCmt._id]?.length > parentCmt.replies.length
         ) {
-            setNextPage(0);
-            setShowReplies(false);
+            setNextPage(1);
+            setIsShowReplies(false);
             setReplies(parentCmt._id, []);
+            setNewCmt(null);
             return;
         }
+
+        setIsShowReplies(true);
         setNextPage((prev) => prev + 1);
+    };
+    const handleSetRepleisPage = (page: number) => {
+        setNextPage(page);
     };
     useEffect(() => {
         setReplies(parentCmt._id, []);
@@ -64,14 +80,12 @@ const ShowRepliesBtn = ({
                 !!Object.entries(repliesMap).length && (
                     <button
                         onClick={handleBtnShowListClick}
-                        className="flex items-center gap-x-2 mt-1"
+                        className="flex items-center mt-1 gap-x-2"
                     >
                         <div className="h-0.25 w-5 bg-second-gray rounded-full"></div>
-                        <p className="text-second-gray text-xs">
-                            {repliesMap[parentCmt._id]?.length ===
-                                parentCmt.replies.length ||
-                            repliesMap[parentCmt._id]?.length >
-                                parentCmt.replies.length
+                        <p className="text-xs text-second-gray">
+                            {repliesMap[parentCmt._id]?.length >=
+                            parentCmt.replies.length
                                 ? "Ẩn các câu trả lời"
                                 : `Xem thêm ${
                                       parentCmt.replies.length -
@@ -80,7 +94,7 @@ const ShowRepliesBtn = ({
                         </p>
                     </button>
                 )}
-            {showReplies && Object.entries(repliesMap).length && (
+            {isShowReplies && Object.entries(repliesMap).length && (
                 <ReplyList
                     repliesCmt={repliesMap[parentCmt._id]}
                     post={post}
@@ -88,6 +102,7 @@ const ShowRepliesBtn = ({
                     listPosts={listPosts}
                     onSetPosts={onSetPosts}
                     onSetCmtList={onSetCmtList}
+                    onSetRepliesPage={handleSetRepleisPage}
                 ></ReplyList>
             )}
         </>

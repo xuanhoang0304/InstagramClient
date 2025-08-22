@@ -42,13 +42,13 @@ const CommentList = ({
     };
     if (parentList.length > 0)
         return (
-            <ul className={cn("px-4 pt-4 pb-10  flex flex-col gap-y-3  ")}>
+            <ul className={cn("px-4 pt-4 pb-10 h-auto  flex flex-col gap-y-3  ")}>
                 <PostCaption showAvt item={post}></PostCaption>
 
                 {parentList.map((cmt) => (
                     <CommentItem
                         key={cmt._id}
-                        item={post}
+                        post={post}
                         cmt={cmt}
                         list={parentList}
                         listPosts={listPosts}
@@ -60,7 +60,7 @@ const CommentList = ({
                 {/* Load more */}
                 {parentList.length > 0 && parentList.length < totalCmt && (
                     <button
-                        className="w-full mt-2 flex items-center justify-center py-1 "
+                        className="flex items-center justify-center w-full py-1 mt-2 "
                         onClick={handleLoadMore}
                     >
                         <CirclePlus />
@@ -69,7 +69,7 @@ const CommentList = ({
             </ul>
         );
     return (
-        <div className="border-y border-primary-gray p-4 h-full">
+        <div className="h-full p-4 border-y border-primary-gray">
             <PostCaption showAvt item={post}></PostCaption>
             <div className=" flex flex-col h-[90%] items-center gap-y-2 justify-center">
                 <p className="text-2xl font-bold">Chưa có bình luận nào</p>

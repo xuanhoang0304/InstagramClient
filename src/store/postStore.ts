@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
 
 import { IPost } from '@/types/types';
 
@@ -12,8 +13,10 @@ interface PostState {
     resetTargetPost: () => void;
 }
 
-export const usePostStore = create<PostState>((set) => ({
-    targetPost: null,
-    setTargetPost: (targetPost: PostAction) => set({ targetPost }),
-    resetTargetPost: () => set({ targetPost: null }),
-}));
+export const usePostStore = create<PostState>()(
+    devtools((set) => ({
+        targetPost: null,
+        setTargetPost: (targetPost: PostAction) => set({ targetPost }),
+        resetTargetPost: () => set({ targetPost: null }),
+    }))
+);

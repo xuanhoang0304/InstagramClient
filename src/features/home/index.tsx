@@ -3,27 +3,18 @@
 import ListPosts from '@/features/home/components/posts/ListPosts';
 import SuggesstionWrapper from '@/features/home/components/SuggesstionWrapper';
 import SwitchUser from '@/features/home/components/SwitchUser';
-import { useMyStore } from '@/store/zustand';
-
-import FollowMoreUser from './components/FollowMoreUser';
 
 const HomePage = () => {
-    const { myUser } = useMyStore();
     return (
-        <div className=" flex-1 flex justify-center gap-x-[64px] pb-10 lg:px-0 px-3">
+        <div className=" flex-1 w-full flex justify-center gap-x-[64px] pb-10 lg:px-0 px-3 md:pt-0 pt-[57px]">
             {/* Content */}
-            <div className="w-full max-w-[630px]">
+            <div className="w-full md:max-w-[630px]">
                 {/* Stories */}
                 {/* {myUser?.followings?.length ? (
-                    <StoriesWrapper></StoriesWrapper>
-                ) : null} */}
+                            <StoriesWrapper></StoriesWrapper>
+                        ) : null} */}
                 {/* Posts */}
-                {myUser &&
-                    (myUser.followings.length ? (
-                        <ListPosts></ListPosts>
-                    ) : (
-                        <FollowMoreUser></FollowMoreUser>
-                    ))}
+                <ListPosts></ListPosts>
             </div>
             {/* Suggestion */}
             <div className="w-full max-w-[320px] hidden lg:block">

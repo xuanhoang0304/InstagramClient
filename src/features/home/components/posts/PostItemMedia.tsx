@@ -36,7 +36,7 @@ const PostItemMedia = ({
                         <SwiperSlide className="rounded-[4px]" key={item.path}>
                             <figure
                                 className={cn(
-                                    "w-[468px] h-[585px] rounded-[4px]",
+                                    "md:w-[468px] md:h-[585px] aspect-square rounded-[4px]",
                                     figureClassName
                                 )}
                             >
@@ -55,20 +55,16 @@ const PostItemMedia = ({
                     ))}
                 </Swiper>
             ) : (
-                <div
+                <video
                     className={cn(
-                        "w-[468px]  dark:border border-[#262626] mt-3",
+                        "md:w-[468px] md:h-[585px] aspect-square object-cover rounded-[4px] dark:border border-[#262626] mt-3",
                         videoClassName
                     )}
-                >
-                    <video
-                        className={" rounded-[4px] size-full object-contain "}
-                        src={item.media[0].path}
-                        controls
-                        autoPlay={true}
-                        muted={true}
-                    ></video>
-                </div>
+                    src={item.media[0].path}
+                    controls
+                    autoPlay={true}
+                    muted={true}
+                ></video>
             )}
         </>
     );

@@ -1,17 +1,20 @@
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
+import { useMediaQuery } from 'usehooks-ts';
 
 import envConfig from '@/configs/envConfig';
 import CommentList from '@/features/home/components/comments/CommentList';
 import PostItemHeading from '@/features/home/components/posts/PostItemHeading';
 import PostItemMedia from '@/features/home/components/posts/PostItemMedia';
 import { useApi } from '@/hooks/useApi';
+import { cn } from '@/lib/utils';
 import { HttpResponse, IComment, IPost } from '@/types/types';
 
 import { CommentInput } from '../../comments/CommentInput';
 import PostButtons from '../PostButtons';
 
 type PostModalContentProps = {
+    isModal?: boolean;
     listPosts?: IPost[];
     item: IPost | null;
     onSetPosts?: (posts: IPost[] | []) => void;
@@ -24,20 +27,21 @@ type getParentCmtByPostId = {
     };
 } & HttpResponse;
 const PostModalContent = ({
+    isModal,
     item,
     listPosts,
     onSetPosts,
     onSetNewPost,
 }: PostModalContentProps) => {
     const [commentList, setCommentList] = useState<IComment[] | []>([]);
+    const isMobile = useMediaQuery("(max-width: 767px)");
     const [page, setPage] = useState(1);
     const [totalCmt, setTotalCmt] = useState(0);
-    const { data, mutate } = useApi<getParentCmtByPostId>(
-        `${envConfig.BACKEND_URL}/posts/${item?._id}/comments?page=${page}&limit=3`
+    const { data } = useApi<getParentCmtByPostId>(
+        `${envConfig.BACKEND_URL}/api/posts/${item?._id}/comments?page=${page}&limit=3`
     );
     const handleSetCommentist = (list: IComment[] | []) => {
         setCommentList(list);
-        mutate();
     };
     const handleSetNextPage = () => {
         setPage((prev) => prev + 1);
@@ -55,40 +59,69 @@ const PostModalContent = ({
                 [...commentList, ...data?.result.comments],
                 "_id"
             );
+
             setCommentList(arr);
             setTotalCmt(data?.result.totalComments as number);
         }
     }, [data]);
+
     return (
         <>
             <PostItemMedia
-                className="max-w-[468px] h-auto rounded-bl-lg rounded-tl-lg rounded-tr-none rounded-br-none"
+                className={cn(
+                    "h-auto rounded-bl-lg !m-0 rounded-tl-lg rounded-tr-none rounded-br-none w-[325px] lg:w-[400px]",
+                    isModal && "!hidden lg:!block"
+                )}
                 item={item}
-                figureClassName="rounded-none h-full"
+                figureClassName={cn(
+                    "rounded-none h-full md:w-[325px] lg:w-full",
+                    isModal && "hidden lg:block"
+                )}
                 imageClassName="rounded-none block h-full"
-                videoClassName="m-0 border-none rounded-tl-lg rounded-bl-lg bg-black  "
+                videoClassName={cn(
+                    "m-0 border-none !rounded-tl-lg !rounded-bl-lg bg-black lg:w-[400px] lg:h-[585px] md:w-[325px]",
+                    isModal && "hidden lg:block"
+                )}
             ></PostItemMedia>
-            <div className=" w-[485px] h-auto bg-black rounded-tr-lg rounded-br-lg">
-                <PostItemHeading
-                    isShowTime={false}
-                    item={item}
-                    className="p-4"
-                    modal
-                ></PostItemHeading>
+            <div
+                className={cn(
+                    " lg:max-w-[485px] flex-1 w-full h-auto bg-black rounded-tr-lg rounded-br-lg flex shrink-0 flex-col justify-between md:block",
+                    isModal && "size-full"
+                )}
+            >
+                <div
+                    className={cn(
+                        "overflow-y-auto hidden-scrollbar",
+                        isMobile && "mb-[220px] h-full "
+                    )}
+                >
+                    <PostItemHeading
+                        isShowTime={false}
+                        item={item}
+                        className="p-4"
+                        modal
+                    ></PostItemHeading>
 
-                <div className="bg-black h-[400px] border-t border-primary-gray overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-                    <CommentList
-                        post={item}
-                        parentList={commentList}
-                        totalCmt={totalCmt}
-                        page={page}
-                        listPosts={listPosts}
-                        onSetNextPage={handleSetNextPage}
-                        onSetCmtList={handleSetCommentist}
-                        onSetPosts={onSetPosts}
-                    ></CommentList>
+                    <div
+                        className={cn(
+                            "bg-black h-[400px]  lg:h-[400px] border-t border-primary-gray overflow-y-auto hidden-scrollbar",
+                            isModal && "h-[600px]",
+                            isMobile && "h-full"
+                        )}
+                    >
+                        <CommentList
+                            post={item}
+                            parentList={commentList}
+                            totalCmt={totalCmt}
+                            page={page}
+                            listPosts={listPosts}
+                            onSetNextPage={handleSetNextPage}
+                            onSetCmtList={handleSetCommentist}
+                            onSetPosts={onSetPosts}
+                        ></CommentList>
+                    </div>
                 </div>
-                <div className="w-full p-2 border-t border-primary-gray">
+                <div className="w-full  border-t rounded-br-lg border-primary-gray bg-black fixed bottom-0 left-0 z-[80] md:static">
                     <PostButtons
                         item={item}
                         modal

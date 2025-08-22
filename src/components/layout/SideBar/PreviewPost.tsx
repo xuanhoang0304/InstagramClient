@@ -15,7 +15,7 @@ const PreviewPost = ({
     onSetFiles,
 }: PreviewPostProps) => {
     return (
-        <div className="max-w-[400px]">
+        <div className="w-full md:max-w-[400px]  ">
             {imageUrls.length > 0 && (
                 <StepControl
                     step={step}

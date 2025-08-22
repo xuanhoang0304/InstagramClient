@@ -21,7 +21,7 @@ export function PreviewMediaPost({
     const mappingMedia: Record<string, ReactNode> = useMemo(
         () => ({
             image: (
-                <figure className="size-[400px] ">
+                <figure className="md:size-[400px] w-full mx-auto">
                     <Image
                         src={imageUrls[0]?.path || ""}
                         alt={`Preview media`}
@@ -48,7 +48,7 @@ export function PreviewMediaPost({
                     }}
                     navigation={true}
                     modules={[Pagination, Navigation]}
-                    className="PreviewMediaPostSwiper w-full max-h-[500px]"
+                    className="PreviewMediaPostSwiper md:w-full max-h-[500px] w-[280px] !m-0"
                 >
                     {imageUrls.map((item) => (
                         <SwiperSlide
@@ -93,7 +93,7 @@ export function PreviewMediaPost({
         [imageUrls, onSetStep]
     );
     const handlePreviewMedia = useCallback(() => {
-        if (imageUrls.length === 0 ) return mappingMedia.invalid;
+        if (imageUrls.length === 0) return mappingMedia.invalid;
         if (imageUrls.length > 1) return mappingMedia.images;
         return mappingMedia[imageUrls[0]?.type || ""];
     }, [imageUrls, mappingMedia]);

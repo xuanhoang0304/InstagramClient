@@ -3,9 +3,10 @@ import './globals.css';
 
 import { Geist, Geist_Mono } from 'next/font/google';
 
+import OfferComponent from '@/components/layout/OfferComponent';
+import MobieSideBar from '@/components/layout/SideBar/MobieSideBar';
+import SocketProvider from '@/components/layout/SocketProvider';
 import { Toaster } from '@/components/ui/sonner';
-
-import DarkMode from '../components/layout/DarkMode';
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -39,9 +40,10 @@ export default async function RootLayout({
                     closeButton={true}
                 />
 
-                {children}
-
-                <DarkMode></DarkMode>
+                <SocketProvider>{children}</SocketProvider>
+                {/* <DarkMode></DarkMode> */}
+                <OfferComponent></OfferComponent>
+                <MobieSideBar></MobieSideBar>
             </body>
         </html>
     );

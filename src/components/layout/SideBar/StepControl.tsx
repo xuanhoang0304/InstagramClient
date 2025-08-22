@@ -1,7 +1,7 @@
 import { ArrowLeft } from 'lucide-react';
 
+import { DialogTitle } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
-import { DialogTitle } from '@radix-ui/react-dialog';
 
 type StepControlProps = {
     step: number;

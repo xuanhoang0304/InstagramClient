@@ -1,4 +1,5 @@
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
+
 type StepContentType = {
     isActive: boolean;
     stepNumber: number;
@@ -18,7 +19,7 @@ const StepContent = ({
         >
             <div
                 className={cn(
-                    "flex items-center justify-center size-10 border-black border-2  rounded-full group-hover:border-red-400 transition-colors",
+                    "flex items-center justify-center size-10 border-primary-gray border-2  rounded-full group-hover:border-red-400 transition-colors",
                     isActive && "border-red-400"
                 )}
             >

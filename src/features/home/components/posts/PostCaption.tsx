@@ -9,6 +9,7 @@ type PostCaptionProps = {
 } & PostProp;
 const PostCaption = ({ item, showAvt }: PostCaptionProps) => {
     const [showCaption, setShowCaption] = useState(false);
+    if (!item?.caption) return null;
     return (
         <div
             className={cn(
@@ -49,20 +50,23 @@ const PostCaption = ({ item, showAvt }: PostCaptionProps) => {
                 >
                     {showCaption
                         ? item?.caption
-                        : item?.caption.slice(0, 100) +
-                          (item?.caption && item?.caption?.length < 100
+                        : item?.caption.slice(0, 50) +
+                          (item?.caption && item?.caption?.length < 50
                               ? ""
                               : "...")}
                 </p>
-                <button
-                    onClick={() => setShowCaption((prev) => !prev)}
-                    className={cn(
-                        "text-sm text-second-gray",
-                        item?.caption && item?.caption.length < 100 && "hidden"
-                    )}
-                >
-                    {showCaption ? "ẩn bớt" : "xem thêm"}
-                </button>
+                {item?.caption && (
+                    <button
+                        onClick={() => setShowCaption((prev) => !prev)}
+                        className={cn(
+                            "text-sm text-second-gray",
+
+                            item?.caption.length < 50 && "hidden"
+                        )}
+                    >
+                        {showCaption ? "ẩn bớt" : "xem thêm"}
+                    </button>
+                )}
             </div>
         </div>
     );

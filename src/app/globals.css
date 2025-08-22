@@ -128,6 +128,9 @@
     body {
         @apply bg-background text-foreground;
     }
+    .hidden-scrollbar {
+        @apply [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden;
+    }
 }
 
 .input-group input:focus ~ label,
@@ -164,3 +167,4 @@ button {
     background-color: #1877f2 !important;
     border-radius: 8px;
 }
+/* custom css */

@@ -1,7 +1,11 @@
-import { z } from "zod";
+import { z } from 'zod';
+
 export const RegisterShema = () =>
     z.object({
-        email: z.string().email("Email invalid"),
+        email: z
+            .string()
+            .email("Email không đúng định dạng")
+            .min(1, "Vui lòng nhập email"),
         username: z
             .string()
             .trim()

@@ -2,7 +2,7 @@
 
 import { cn } from '@/lib/utils';
 
-export default function Loading({ className }: { className?: string }) {
+export default function Loading({ className , text}: { className?: string , text?: string }) {
     return (
         <div
             className={cn(
@@ -12,7 +12,7 @@ export default function Loading({ className }: { className?: string }) {
         >
             <div className="flex flex-col items-center">
                 <div className="animate-spin ease-linear rounded-full border-8 border-t-8 border-b-red-600 border-transparent  h-16 w-16 mb-4"></div>
-                <p className="text-gray-400 animate-bounce">Loading...</p>
+                <p className="text-gray-400 animate-bounce">{text || "Loading..."}</p>
             </div>
         </div>
     );

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import MiniUserProfile from '@/features/home/components/posts/miniUser/MiniUserProfile';
 import PostReportModal from '@/features/home/components/posts/PostReportModal';
 import { PostProp } from '@/features/home/components/posts/type';
-import { cn, getRelativeTime, handleFollowingUser } from '@/lib/utils';
+import { cn, getRelativeTime, handleFollowingUser, handleMutateWithKey } from '@/lib/utils';
 import { useMyStore } from '@/store/zustand';
 
 import ModalReportBtn from './postModal/ModalReportBtn';
@@ -24,6 +24,7 @@ const PostItemHeading = ({
     const hanndleFollowUser = async (userId: string) => {
         const data = await handleFollowingUser(userId);
         if (data?.code === 200) {
+            handleMutateWithKey("/users");
             setMyUser(data?.data);
         }
     };
@@ -39,7 +40,7 @@ const PostItemHeading = ({
                 <MiniUserProfile user={item?.createdBy}></MiniUserProfile>
                 {/* name */}
                 <div className="flex items-center gap-x-1">
-                    <Link href={`/${item?.createdBy._id}`}>
+                    <Link href={`/${item?.createdBy._id}`} scroll={true}>
                         <h3 className="text-sm font-semibold">
                             {item?.createdBy.name}
                         </h3>
@@ -67,7 +68,7 @@ const PostItemHeading = ({
                     <div className="flex items-center">
                         <Dot className="size-4" />
 
-                        <p className="text-sm text-second-gray">
+                        <p className="text-xs md:text-sm text-second-gray">
                             {getRelativeTime(String(item?.createdAt))}
                         </p>
                     </div>

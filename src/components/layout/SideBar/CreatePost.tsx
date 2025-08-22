@@ -2,8 +2,8 @@ import { PlusSquare } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
-import { DialogTitle } from '@radix-ui/react-dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 import CancelCreatePostDialog from './CancelCreatePostDialog';
 import FormCreatePost from './FormCreatePost';
@@ -11,7 +11,11 @@ import PreviewPost from './PreviewPost';
 import { Media } from './type';
 
 const UploadFile = dynamic(() => import("./UploadFile"), { ssr: false });
-export function CreatePost() {
+export function CreatePost({
+    sideBarType,
+}: {
+    sideBarType: "short" | "normal";
+}) {
     const [step, setStep] = useState(0);
     const [files, setFiles] = useState<FileList | null>(null);
     const [imageUrls, setImageUrls] = useState<Media[] | []>([]);
@@ -79,13 +83,28 @@ export function CreatePost() {
     return (
         <>
             <Dialog open={open} onOpenChange={handleOpenChange}>
-                <DialogTrigger asChild>
-                    <button className="flex items-center p-3 gap-x-2 w-full">
-                        <PlusSquare />
-                        <p className="line-clamp-1 hidden lg:block">Tạo</p>
-                    </button>
-                </DialogTrigger>
-                <DialogContent className="!bg-primary-gray !max-w-fit">
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger
+                            onClick={() => setOpen(true)}
+                            className="flex items-center p-3 gap-x-2 w-full"
+                        >
+                            <PlusSquare />
+                            {sideBarType === "normal" && (
+                                <p className="line-clamp-1 hidden lg:block">
+                                    Tạo
+                                </p>
+                            )}
+                        </TooltipTrigger>
+
+                        {sideBarType === "short" && (
+                            <TooltipContent side="right">
+                                <p>Tạo bài viết mới</p>
+                            </TooltipContent>
+                        )}
+                    </Tooltip>
+                </TooltipProvider>
+                <DialogContent className="!bg-primary-gray md:!max-w-fit w-[90%] mx-auto">
                     <DialogTitle className="hidden"></DialogTitle>
                     {step === 0 && (
                         <UploadFile
