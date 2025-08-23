@@ -18,6 +18,7 @@ const MiniUserActions = ({
     onFollowOrUnFollow,
 }: MiniUserActionsProps) => {
     const { myUser } = useMyStore();
+
     const router = useRouter();
     const handleCreateGroupChat = async (partnerId: string) => {
         try {

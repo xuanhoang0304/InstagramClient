@@ -19,6 +19,8 @@ export type Store = {
     settargetCmt: (targetCmtId: IComment | null) => void;
     newCmt: IComment | null;
     setNewCmt: (newCmt: IComment | null) => void;
+    isCall: boolean;
+    setIsCall: (isCall: boolean) => void;
 };
 
 const customStorage = {
@@ -78,6 +80,8 @@ export const useMyStore = create<Store>()(
                     set(() => ({ targetCmt })),
                 newCmt: null,
                 setNewCmt: (newCmt: IComment | null) => set(() => ({ newCmt })),
+                isCall: false,
+                setIsCall: (isCall: boolean) => set(() => ({ isCall })),
             }),
             {
                 name: "my-store",

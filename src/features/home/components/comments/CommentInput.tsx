@@ -35,8 +35,8 @@ export function CommentInput({
     onSetPosts,
 }: CommentInputProps) {
     const { targetCmt, setNewCmt, settargetCmt } = useMyStore();
-    const { repliesMap, setReplies , setIsShowReplies} = useRepliesStore();
-   
+    const { repliesMap, setReplies, setIsShowReplies } = useRepliesStore();
+
     const {
         control,
         handleSubmit,
@@ -94,7 +94,10 @@ export function CommentInput({
                     onSetCmtList?.(newList);
                     settargetCmt(null);
                     setNewCmt(newCmt);
-                    setReplies(parentCmtId, [...repliesMap[parentCmtId], newCmt]);
+                    setReplies(parentCmtId, [
+                        ...repliesMap[parentCmtId],
+                        newCmt,
+                    ]);
                     setIsShowReplies(true);
                     return;
                 }

@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { authClient } from '@/configs/axios';
+import { apiClient } from '@/configs/axios';
 import envConfig from '@/configs/envConfig';
 import { socket } from '@/configs/socket';
 import { handleError } from '@/lib/utils';
@@ -22,6 +22,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 interface LoginResponse extends HttpResponse {
     result: {
         user: User;
+        accessToken: string;
+        refreshToken: string;
     };
 }
 interface Props {
@@ -30,6 +32,7 @@ interface Props {
 }
 export function SwitchUserContent({ trigger, onClose }: Props) {
     const { setMyUser } = useMyStore();
+
     const [isOpen, setIsOpen] = useState(false);
     const router = useRouter();
     const {
@@ -46,12 +49,21 @@ export function SwitchUserContent({ trigger, onClose }: Props) {
     });
     const handleLogin = async (data: LoginFormData) => {
         try {
-            const res: LoginResponse = await authClient.fetchApi("/login", {
+            const res: LoginResponse = await apiClient.fetchApi("/auth/login", {
                 method: "POST",
                 data,
             });
             if (res.code === 200) {
                 toast.success("Đăng nhập thành công");
+                await fetch("/api/setCookie", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include",
+                    body: JSON.stringify({
+                        accessToken: res.result.accessToken,
+                        refreshToken: res.result.refreshToken,
+                    }),
+                });
                 socket.disconnect();
                 socket.connect();
                 socket.on("connect", () => {});
@@ -66,7 +78,7 @@ export function SwitchUserContent({ trigger, onClose }: Props) {
         }
     };
     const handleGoogleLogin = () => {
-        window.location.href = `${envConfig.BACKEND_URL}/auth/google`;
+        window.location.href = `${envConfig.BACKEND_URL}/api/auth/google`;
     };
     const handleDialogChange = () => {
         reset();

@@ -38,7 +38,11 @@ const PostModalContent = ({
     const [page, setPage] = useState(1);
     const [totalCmt, setTotalCmt] = useState(0);
     const { data } = useApi<getParentCmtByPostId>(
-        `${envConfig.BACKEND_URL}/api/posts/${item?._id}/comments?page=${page}&limit=3`
+        `${envConfig.BACKEND_URL}/api/posts/${item?._id}/comments?page=${page}&limit=3`,
+        undefined,
+        {
+            revalidateOnMount: true
+        }
     );
     const handleSetCommentist = (list: IComment[] | []) => {
         setCommentList(list);

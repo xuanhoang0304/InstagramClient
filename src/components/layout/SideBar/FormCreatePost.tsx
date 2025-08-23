@@ -38,6 +38,7 @@ const FormCreatePost = ({
 }: FormCreatePostProps) => {
     const { setTargetPost } = usePostStore();
     const [isLoading, setLoading] = useState(false);
+
     const { handleSubmit, control, watch } = useForm<FormCreatePost>({
         defaultValues: {
             caption: "",

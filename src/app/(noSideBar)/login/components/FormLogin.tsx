@@ -49,6 +49,15 @@ const FormLogin = () => {
             );
             if (response.data) {
                 toast.success("Đăng nhập thành công");
+                await fetch("/api/setCookie", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include",
+                    body: JSON.stringify({
+                        accessToken: response.data.result.accessToken,
+                        refreshToken: response.data.result.refreshToken,
+                    }),
+                });
                 setStatus("");
                 setMyUser(response.data.result.user);
                 router.push("/");

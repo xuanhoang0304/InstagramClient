@@ -31,6 +31,7 @@ export function CommentActions({
     onSetRepliesPage,
 }: CommentActions) {
     const { myUser } = useMyStore();
+
     const { setReplies } = useRepliesStore();
     const [isShow, setIsShow] = useState(false);
     const [showConfirm, setShowComfirm] = useState(false);
@@ -98,7 +99,7 @@ export function CommentActions({
                         );
                         onSetPosts?.(newListPost);
                     }
-                    onSetRepliesPage?.(1)
+                    onSetRepliesPage?.(1);
                 }
                 setIsShow(false);
                 handleMutateWithKey(`posts/${result.data.post}/comments?`);

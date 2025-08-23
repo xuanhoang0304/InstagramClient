@@ -112,7 +112,7 @@ const OfferComponent = () => {
                 newPeers.push({
                     peer: peerInit,
                     userId: initUser._id,
-                    stream: undefined,
+                    stream,
                 });
                 return;
             }
@@ -125,7 +125,7 @@ const OfferComponent = () => {
                     iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
                 },
             });
-            newPeers.push({ peer: peer, userId: item, stream: undefined });
+            newPeers.push({ peer: peer, userId: item, stream });
         });
         const other = usersRoom.filter(
             (u) => u.userId !== (initUser?._id as string)
@@ -149,6 +149,7 @@ const OfferComponent = () => {
         setPeers((prev) => [...prev, ...newPeers]);
         setStatus("isCalling");
         setOffer(undefined);
+        setAllowMic(true);
     };
     const handleCallGroup = () => {
         socket.emit("join-room", { group, userId: myUser?._id });
@@ -162,6 +163,7 @@ const OfferComponent = () => {
             }
         });
         setStatus("isOffering");
+        setAllowMic(true);
     };
     const handleLeaveRoom = () => {
         socket.emit("user-leave", { groupId: group?._id, uId: myUser?._id });
@@ -260,12 +262,12 @@ const OfferComponent = () => {
             "user-in-room",
             (data: { result: UserInRoom[]; group: string }) => {
                 if (group?._id !== data.group || !status) return;
-                if (data.result.length < 2) {
+                if (data.result.length < 2 && status) {
                     socket.emit("user-leave", {
                         groupId: group?._id,
-                        uId: data.result[0].userId,
+                        uId: myUser?._id,
                     });
-                    toast.info("Cuộc gọi đã kết thúc !");
+                    toast.error("Cuộc gọi đã kết thúc !", { duration: 4000 });
                     handleReset();
                     return;
                 }
@@ -360,7 +362,10 @@ const OfferComponent = () => {
         socket.on("user-leave", (data: { groupId: string; uId: string }) => {
             if (!status) return;
             if (myUser?._id !== data.uId) {
-                toast.info(`${data.uId} đã rời khỏi cuộc gọi`);
+                const userLeave = group?.members.find(
+                    (u) => u._id === data.uId
+                );
+                toast.info(`${userLeave?.name} đã rời khỏi cuộc gọi`);
                 setPeers((prev) => prev.filter((p) => p.userId !== data.uId));
                 setUsersRoom((prev) =>
                     prev.filter((u) => u.userId !== data.uId)
@@ -368,6 +373,7 @@ const OfferComponent = () => {
                 return;
             }
         });
+
         return () => {
             socket.off("offer");
             socket.off("answer");
@@ -455,6 +461,7 @@ const OfferComponent = () => {
                         "bg-second-button-background w-full flex-1 flex items-center justify-center max-h-[100vh] hidden-scrollbar overflow-y-auto",
                         !group?.isGroup && "p-0",
                         usersRoom.find((u) => u.userId === myUser?._id) &&
+                            usersRoom.length > 1 &&
                             "items-start bg-primary-white"
                     )}
                 >

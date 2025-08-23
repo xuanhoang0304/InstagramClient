@@ -90,7 +90,7 @@ const ListPosts = () => {
     return (
         <>
             <MobileHeaderListPost></MobileHeaderListPost>
-            <InfiniteScroll 
+            <InfiniteScroll
                 dataLength={listPosts.length}
                 next={fetchData}
                 className="mt-5"

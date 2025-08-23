@@ -3,8 +3,8 @@ import { toast } from 'sonner';
 import { mutate } from 'swr';
 import { twMerge } from 'tailwind-merge';
 
+import { apiClient } from '@/configs/axios';
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { apiClient, authClient } from '@/configs/axios';
 import envConfig from '@/configs/envConfig';
 import { IGroupResponse } from '@/features/chats/type';
 import {
@@ -56,8 +56,8 @@ export function getRelativeTime(isoTime: string): string {
 
     // Nếu quá 7 ngày, hiển thị định dạng ngày tháng (DD/MM/YYYY)
     if (diffInDays > 7) {
-        const day = String(inputDate.getDate()).padStart(2, '0');
-        const month = String(inputDate.getMonth() + 1).padStart(2, '0'); // Tháng bắt đầu từ 0
+        const day = String(inputDate.getDate()).padStart(2, "0");
+        const month = String(inputDate.getMonth() + 1).padStart(2, "0"); // Tháng bắt đầu từ 0
         const year = inputDate.getFullYear();
         return `${day}-${month}-${year}`;
     }
@@ -108,6 +108,7 @@ export const tempArr = [
     { id: 15 },
 ];
 export const PUBLIC_ROUTES = ["/login", "/register", "/auth/google-callback"];
+
 export const handleLikePost = async (post: IPost) => {
     try {
         const data: updatePost = await apiClient.fetchApi(
@@ -213,7 +214,7 @@ export const handleGetParentCmtByPostId = async (
 };
 export const handleGetMe = async () => {
     try {
-        const data: getMe = await authClient.fetchApi("/@me");
+        const data: getMe = await apiClient.fetchApi("/auth/@me");
         return data;
     } catch (error: any) {
         handleError("handleGetMe", error);

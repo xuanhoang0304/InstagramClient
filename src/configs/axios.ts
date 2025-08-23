@@ -47,10 +47,10 @@ class AxiosClient {
     private setupInterceptors(): void {
         this.instance.interceptors.request.use(
             async (config) => {
-                const { accessToken } = await this.getTokens();
-                if (accessToken) {
-                    config.headers.Authorization = `Bearer ${accessToken}`;
-                }
+                // const { accessToken } = await this.getTokens();
+                // if (accessToken) {
+                //     config.headers.Authorization = `Bearer ${accessToken}`;
+                // }
                 return config;
             },
             (error) => Promise.reject(error)
@@ -93,9 +93,9 @@ class AxiosClient {
                 .get<RefreshTokenResponse>(
                     `${envConfig.BACKEND_URL}/api/auth/refresh-token`,
                     {
-                        headers: {
-                            Authorization: `Bearer ${refreshToken}`,
-                        },
+                        // headers: {
+                        //     Authorization: `Bearer ${refreshToken}`,
+                        // },
                         withCredentials: true,
                     }
                 )

@@ -34,7 +34,6 @@ const GroupIdContent = ({
     const [scrollY, setScrollY] = useState(0);
     const debounceScrollY = useDebounce(scrollY, 300);
     const fetchMoreMessage = async () => {
-        console.log(`fetch`);
         onSetNextPage(page + 1);
     };
 

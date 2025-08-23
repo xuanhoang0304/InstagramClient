@@ -7,7 +7,7 @@ import {
     DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuSeparator,
     DropdownMenuShortcut, DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { authClient } from '@/configs/axios';
+import { apiClient } from '@/configs/axios';
 import { SwitchUserContent } from '@/features/home/components/SwitchUserContent';
 import { cn, handleError } from '@/lib/utils';
 import { HttpResponse } from '@/types/types';
@@ -17,6 +17,7 @@ interface Props {
 }
 export function MoreBtn({ type }: Props) {
     const router = useRouter();
+
     const [isOpen, setIsOpen] = useState(false);
     const handleChange = () => {
         setIsOpen(!isOpen);
@@ -26,7 +27,7 @@ export function MoreBtn({ type }: Props) {
     };
     const handleLogout = async () => {
         try {
-            const res: HttpResponse = await authClient.fetchApi("/logout", {
+            const res: HttpResponse = await apiClient.fetchApi("/auth/logout", {
                 method: "GET",
             });
             if (res.code === 200) {

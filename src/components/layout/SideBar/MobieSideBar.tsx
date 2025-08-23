@@ -9,11 +9,16 @@ import { useMyStore } from '@/store/zustand';
 
 import CreatePost from './CreatePost';
 
-const hiddenPathName = ["/chats", "/login", "/register"];
+const hiddenPathName = [
+    "/chats",
+    "/login",
+    "/register",
+    "/auth/google-callback",
+];
 const MobieSideBar = () => {
     const { myUser } = useMyStore();
     const pathname = usePathname();
-    if (hiddenPathName.some(path => pathname.startsWith(path))) return null;
+    if (hiddenPathName.some((path) => pathname.includes(path))) return null;
 
     const arr = [
         {
