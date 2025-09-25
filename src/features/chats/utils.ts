@@ -1,6 +1,12 @@
-import envConfig from '@/configs/envConfig';
+import { toast } from "sonner";
+import { mutate } from "swr";
 
-import { IMessageFE } from './type';
+import { apiClient } from "@/configs/axios";
+import envConfig from "@/configs/envConfig";
+import { handleError } from "@/lib/utils";
+import { HttpResponse, User } from "@/types/types";
+
+import { IGroup, IMessageFE } from "./type";
 
 export const getTimeDifference = (time1: string, time2: string): number => {
     const date1 = new Date(time1);
@@ -45,3 +51,51 @@ export function scrollToMessage(messageId: string) {
         element.scrollIntoView({ behavior: "smooth", block: "center" });
     }
 }
+export const handleDeleteMemberInGroupChat = async (
+    data: {
+        members: string[];
+        action: "leave-group" | "delete-member";
+    },
+    groupId: string,
+    memberId: string,
+    onSetMembers?: (members: User[] | ((prev: User[]) => User[])) => void
+) => {
+    try {
+        const res: HttpResponse = await apiClient.fetchApi(
+            `/groups/${groupId}/delete-members`,
+            {
+                data,
+                method: "PUT",
+            }
+        );
+
+        if (res.code === 200) {
+            toast.success(
+                data.action === "delete-member"
+                    ? "Thành viên đã bị xóa khỏi nhóm"
+                    : "Bạn đã rời nhóm"
+            );
+            onSetMembers?.((prev: User[]) =>
+                prev.filter((u) => u._id !== memberId)
+            );
+            mutate(
+                `${envConfig.BACKEND_URL}/api/groups/${groupId}`,
+                (prev: (HttpResponse & { result: IGroup }) | undefined) => {
+                    if (!prev) return prev;
+                    return {
+                        ...prev,
+                        result: {
+                            ...prev.result,
+                            members: prev.result.members.filter(
+                                (u) => u._id !== memberId
+                            ),
+                        },
+                    };
+                },
+                false
+            );
+        }
+    } catch (e) {
+        handleError("handleDeleteMember", e);
+    }
+};

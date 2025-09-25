@@ -1,13 +1,20 @@
-import { Dot } from 'lucide-react';
-import Link from 'next/link';
+import { Dot } from "lucide-react";
+import Link from "next/link";
 
-import MiniUserProfile from '@/features/home/components/posts/miniUser/MiniUserProfile';
-import PostReportModal from '@/features/home/components/posts/PostReportModal';
-import { PostProp } from '@/features/home/components/posts/type';
-import { cn, getRelativeTime, handleFollowingUser, handleMutateWithKey } from '@/lib/utils';
-import { useMyStore } from '@/store/zustand';
+import MiniUserProfile from "@/features/home/components/posts/miniUser/MiniUserProfile";
+import PostReportModal from "@/features/home/components/posts/PostReportModal";
+import { PostProp } from "@/features/home/components/posts/type";
+import {
+    cn,
+    getRelativeTime,
+    handleFollowingUser,
+    handleMutateWithKey,
+} from "@/lib/utils";
+import { useMyStore } from "@/store/zustand";
+import { User } from "@/types/types";
 
-import ModalReportBtn from './postModal/ModalReportBtn';
+import ModalMiniUserProfile from "./miniUser/ModalMiniUserProfile";
+import ModalReportBtn from "./postModal/ModalReportBtn";
 
 type PostItemHeadingProps = {
     isShowTime: boolean;
@@ -37,7 +44,14 @@ const PostItemHeading = ({
                 )}
             >
                 {/* avt */}
-                <MiniUserProfile user={item?.createdBy}></MiniUserProfile>
+
+                {modal ? (
+                    <ModalMiniUserProfile
+                        user={item?.createdBy as User}
+                    ></ModalMiniUserProfile>
+                ) : (
+                    <MiniUserProfile user={item?.createdBy}></MiniUserProfile>
+                )}
                 {/* name */}
                 <div className="flex items-center gap-x-1">
                     <Link href={`/${item?.createdBy._id}`} scroll={true}>
@@ -45,7 +59,7 @@ const PostItemHeading = ({
                             {item?.createdBy.name}
                         </h3>
                     </Link>
-                    {item?.isReel && (
+                    {item?.createdBy.isReal && (
                         <svg
                             aria-label="Đã xác minh"
                             className="x1lliihq x1n2onr6"

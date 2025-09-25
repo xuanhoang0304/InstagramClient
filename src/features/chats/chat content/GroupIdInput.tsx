@@ -130,7 +130,7 @@ const GroupIdInput = ({ onSetInputWrapperHeight }: Props) => {
             <div
                 ref={ref}
                 className={cn(
-                    "w-full absolute bottom-0 left-0 z-10 bg-black p-4",
+                    "w-full sticky bottom-0 left-0 z-10 bg-black p-4",
                     targetMessage && "border-t border-primary-gray"
                 )}
             >

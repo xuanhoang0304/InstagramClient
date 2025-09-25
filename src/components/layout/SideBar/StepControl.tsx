@@ -1,7 +1,7 @@
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft } from "lucide-react";
 
-import { DialogTitle } from '@/components/ui/dialog';
-import { cn } from '@/lib/utils';
+import { DialogTitle } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 
 type StepControlProps = {
     step: number;
@@ -20,7 +20,7 @@ const StepControl = ({
     return (
         <div
             className={cn(
-                "flex justify-between px-4 mb-4",
+                "flex justify-between px-4 mb-2 md:mb-4",
                 !step && "justify-center"
             )}
         >
@@ -31,23 +31,33 @@ const StepControl = ({
                     }
                     onSetStep(step - 1);
                 }}
-                className={cn("hover:fill-primary-white", step == 0 && "hidden")}
+                className={cn(
+                    "hover:fill-primary-white",
+                    step == 0 && "hidden"
+                )}
             >
-               <ArrowLeft />
+                <ArrowLeft />
             </button>
             <DialogTitle>{title}</DialogTitle>
             <button
                 onClick={() => {
                     onSetStep(step + 1);
                 }}
-                className={cn("hover:text-primary-blue text-second-blue font-semibold transition-colors", (step == 0 || step == 2) && "hidden")}
+                className={cn(
+                    "hover:text-primary-blue text-second-blue font-semibold transition-colors",
+                    (step == 0 || step == 2) && "hidden"
+                )}
             >
                 Tiếp
             </button>
             <button
                 type="submit"
                 onClick={onSubmit}
-                className={cn("hidden", step == 2 && "block text-primary-blue hover:text-second-blue font-semibold transition-colors")}
+                className={cn(
+                    "hidden",
+                    step == 2 &&
+                        "block text-primary-blue hover:text-second-blue font-semibold transition-colors"
+                )}
             >
                 Chia sẻ
             </button>

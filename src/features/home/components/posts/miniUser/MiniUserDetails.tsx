@@ -1,4 +1,4 @@
-import { cn, formatNumber } from '@/lib/utils';
+import { cn, formatNumber } from "@/lib/utils";
 
 type MiniUserDetailsProps = {
     quantity: number;
@@ -13,7 +13,7 @@ const MiniUserDetails = ({
     return (
         <div className={cn("flex flex-col items-center text-sm ", className)}>
             <p className="font-bold">{formatNumber(quantity)}</p>
-            <p>{desc}</p>
+            <p className="text-nowrap">{desc}</p>
         </div>
     );
 };

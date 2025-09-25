@@ -13,7 +13,9 @@ interface MobileCmtDrawerProps {
 const MobileCmtDrawer = ({ triger, post }: MobileCmtDrawerProps) => {
     return (
         <Drawer>
-            <DrawerTrigger asChild className="md:hidden">{triger}</DrawerTrigger>
+            <DrawerTrigger asChild className="md:hidden">
+                {triger}
+            </DrawerTrigger>
             <DrawerContent className="!mt-0 inset-0 h-full !max-h-full !bg-primary-gray pb-4 !rounded-none">
                 <DrawerClose>
                     <div className="bg-gray-100 mx-auto my-2 hidden h-2 w-[100px] shrink-0 rounded-full group-data-[vaul-drawer-direction=bottom]/drawer-content:block dark:bg-second-gray/50"></div>

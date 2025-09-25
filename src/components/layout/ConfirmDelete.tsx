@@ -1,9 +1,5 @@
-import { RefObject, useRef } from 'react';
-import { useOnClickOutside } from 'usehooks-ts';
-
-import {
-    Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle
-} from '@/components/ui/dialog';
+import { RefObject, useRef } from "react";
+import { useOnClickOutside } from "usehooks-ts";
 
 type ConfirmDeleteProps = {
     isOpen: boolean;
@@ -11,7 +7,6 @@ type ConfirmDeleteProps = {
     actionTitle: string;
     actionDescription: string;
     trigger?: React.ReactNode | string;
-    inModal?: boolean;
     onDelete: () => void;
     onCancel: () => void;
     onOpenChange: () => void;
@@ -22,7 +17,6 @@ const ConfirmDelete = ({
     actionTitle,
     actionDescription,
     trigger,
-    inModal,
     onDelete,
     onCancel,
     onOpenChange,
@@ -44,13 +38,13 @@ const ConfirmDelete = ({
                 </button>
             )}
 
-            {isOpen && inModal ? (
+            {isOpen && (
                 <div className="bg-black/50 fixed inset-0 z-[50] flex items-center justify-center">
                     <div
                         ref={ref}
-                        className="sm:max-w-[400px] px-2  dark:!bg-[#262626] focus-visible:outline-none flex rounded-lg flex-col gap-y-0 border-none outline-none text-sm text-center"
+                        className="sm:max-w-[400px]  dark:!bg-[#262626] focus-visible:outline-none flex rounded-lg flex-col gap-y-0 border-none outline-none text-sm text-center"
                     >
-                        <div className="mt-6">
+                        <div className="mt-6 px-2 ">
                             <h3 className="text-xl font-bold dark:text-white">
                                 {actionTitle}
                             </h3>
@@ -60,42 +54,19 @@ const ConfirmDelete = ({
                         </div>
                         <button
                             onClick={onDelete}
-                            className="px-2 py-[13.6px] mt-6 font-bold text-[#ed4956] border-y dark:border-[#363636] border-solid"
+                            className="px-2 py-[13.6px] mt-6 font-bold text-[#ed4956] border-y dark:border-[#363636] border-solid hover:bg-second-button-background transition-colors"
                         >
                             {action}
                         </button>
 
-                        <button onClick={onCancel} className="px-2 py-[14px]">
+                        <button
+                            onClick={onCancel}
+                            className="px-2 py-[14px] hover:bg-second-button-background transition-colors rounded-b-lg"
+                        >
                             Hủy
                         </button>
                     </div>
                 </div>
-            ) : (
-                <Dialog open={isOpen} onOpenChange={onOpenChange}>
-                    <DialogContent
-                        showclose="false"
-                        className="sm:max-w-[400px]  dark:!bg-[#262626] focus-visible:outline-none flex p-0 flex-col gap-y-0 border-none outline-none text-sm text-center"
-                    >
-                        <DialogHeader className="mt-6">
-                            <DialogTitle className="text-center">
-                                {actionTitle}
-                            </DialogTitle>
-                            <DialogDescription className="text-center">
-                                {actionDescription}
-                            </DialogDescription>
-                        </DialogHeader>
-                        <button
-                            onClick={onDelete}
-                            className="px-2 py-[13.6px] mt-6 font-bold text-[#ed4956] border-y dark:border-[#363636] border-solid"
-                        >
-                            {action}
-                        </button>
-
-                        <button onClick={onCancel} className="px-2 py-[14px]">
-                            Hủy
-                        </button>
-                    </DialogContent>
-                </Dialog>
             )}
         </>
     );

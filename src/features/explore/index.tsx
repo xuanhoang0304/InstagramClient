@@ -1,5 +1,5 @@
 "use client";
-import _ from 'lodash';
+import chunk from 'lodash/chunk';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -36,14 +36,14 @@ const ExplorePage = () => {
     useEffect(() => {
         if (data) {
             if (!list?.length) {
-                const chunkArr = _.chunk(data.result, 5);
+                const chunkArr = chunk(data.result, 5);
                 setList(chunkArr);
                 setOldPosts(data.result);
                 setTotal(data.total);
                 return;
             }
 
-            const chunkArr = _.chunk([...oldPosts, ...data.result], 5);
+            const chunkArr = chunk([...oldPosts, ...data.result], 5);
             setList(chunkArr);
             setOldPosts((prev) => [...prev, ...data.result]);
         }

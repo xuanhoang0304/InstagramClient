@@ -1,12 +1,12 @@
-import { Media } from '@/components/layout/SideBar/type';
-import { HttpResponse, IMongosee, User } from '@/types/types';
+import { Media } from "@/components/layout/SideBar/type";
+import { HttpResponse, IMongosee, User } from "@/types/types";
 
 export interface IGroup extends IMongosee {
     members: User[];
     isGroup: boolean;
     createdBy: User;
     groupAvt: string;
-    groupAdmin: string[];
+    groupAdmin: User[];
     lastMessage: string | null;
     groupName: string;
     _id: string;

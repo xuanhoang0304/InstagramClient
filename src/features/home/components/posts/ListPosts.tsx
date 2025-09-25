@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import _ from 'lodash';
+import uniqBy from 'lodash/uniqBy';
+import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
@@ -13,8 +14,29 @@ import { IPost } from '@/types/types';
 
 import FollowMoreUser from '../FollowMoreUser';
 import MobileHeaderListPost from './MobileHeaderListPost';
-import PostItems from './PostItems';
 
+const PostItems = dynamic(() => import("./PostItems"), {
+    loading: () => (
+        <>
+            <MobileHeaderListPost></MobileHeaderListPost>
+            <ul className="flex flex-col gap-y-5 max-w-[468px] ">
+                {tempArr.map((item) => (
+                    <li key={item.id}>
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-x-2">
+                                <Skeleton className="size-8 rounded-full cursor-pointer"></Skeleton>
+                                <Skeleton className="w-[130px] h-3"></Skeleton>
+                            </div>
+                            <Skeleton className="size-6"></Skeleton>
+                        </div>
+                        <Skeleton className="w-full md:w-[468px] md:h-[585px] aspect-square rounded-lg mt-3"></Skeleton>
+                        <Skeleton className="w-full h-[118px] mt-1 rounded-[2px] mt-tega1"></Skeleton>
+                    </li>
+                ))}
+            </ul>
+        </>
+    ),
+});
 const ListPosts = () => {
     const [listPosts, setListPosts] = useState<IPost[]>([]);
     const [flPage, setFlPage] = useState(1);
@@ -41,7 +63,7 @@ const ListPosts = () => {
             ...prev,
             ...explore.result.map((item: IPost) => `"${item._id}"`),
         ]);
-        setListPosts((prev) => _.unionBy([...prev, ...explore.result], "_id"));
+        setListPosts((prev) => uniqBy([...prev, ...explore.result], "_id"));
         if (
             following &&
             explore &&
@@ -55,14 +77,15 @@ const ListPosts = () => {
     const handleSetPosts = (post: IPost[] | []) => {
         setListPosts(post);
     };
+
     useEffect(() => {
         if (following && listPosts.length < following.total) {
-            const arr = _.uniqBy([...listPosts, ...following.result], "_id");
+            const arr = uniqBy([...listPosts, ...following.result], "_id");
             setListPosts(arr);
             setHasMore(true);
         }
     }, [following, explore]);
-    if (isLoadingFollowing || isLoadingExplore) {
+    if ((isLoadingFollowing || isLoadingExplore) && !listPosts.length) {
         return (
             <>
                 <MobileHeaderListPost></MobileHeaderListPost>
@@ -76,7 +99,7 @@ const ListPosts = () => {
                                 </div>
                                 <Skeleton className="size-6"></Skeleton>
                             </div>
-                            <Skeleton className="w-full md:w-[468px] md:h-[585px] aspect-square rounded-[4px] mt-3"></Skeleton>
+                            <Skeleton className="w-full md:w-[468px] md:h-[585px] aspect-square rounded-lg mt-3"></Skeleton>
                             <Skeleton className="w-full h-[118px] mt-1 rounded-[2px] mt-tega1"></Skeleton>
                         </li>
                     ))}
@@ -93,12 +116,12 @@ const ListPosts = () => {
             <InfiniteScroll
                 dataLength={listPosts.length}
                 next={fetchData}
-                className="mt-5"
                 hasMore={hasMore}
+                scrollThreshold={0.9}
                 loader={
                     (isLoadingFollowing || isLoadingExplore) && (
-                        <ul className="flex flex-col gap-y-5 max-w-[468px] mx-auto lg:mt-6">
-                            {tempArr.map((item) => (
+                        <ul className="flex flex-col gap-y-5 max-w-[468px] mx-auto mt-5 lg:mt-11">
+                            {tempArr.slice(0, 4).map((item) => (
                                 <li key={item.id}>
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-x-2">
@@ -107,15 +130,15 @@ const ListPosts = () => {
                                         </div>
                                         <Skeleton className="size-6"></Skeleton>
                                     </div>
-                                    <Skeleton className="w-[468px] h-[585px] aspect-square rounded-[4px] mt-3"></Skeleton>
-                                    <Skeleton className="w-full h-[118px] rounded-[2px] mt-1"></Skeleton>
+                                    <Skeleton className="w-full md:w-[468px] md:h-[585px] aspect-square rounded-lg mt-3"></Skeleton>
+                                    <Skeleton className="w-full h-[118px] mt-1 rounded-[2px] mt-tega1"></Skeleton>
                                 </li>
                             ))}
                         </ul>
                     )
                 }
             >
-                <ul className="flex flex-col gap-y-5 md:max-w-[468px] mx-auto lg:mt-6">
+                <ul className="flex flex-col gap-y-5 md:max-w-[468px] mx-auto mt-5 lg:mt-11">
                     {listPosts.map((item) => (
                         <PostItems
                             key={item._id}

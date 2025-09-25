@@ -1,15 +1,19 @@
-import { Ellipsis } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { RefObject, useEffect, useRef, useState } from 'react';
-import { useOnClickOutside } from 'usehooks-ts';
+import { Ellipsis } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { RefObject, useEffect, useRef, useState } from "react";
+import { useOnClickOutside } from "usehooks-ts";
 
-import ConfirmDelete from '@/components/layout/ConfirmDelete';
-import { handleDeletePost, handleFollowingUser, handleMutateWithKey } from '@/lib/utils';
-import { usePostStore } from '@/store/postStore';
-import { useMyStore } from '@/store/zustand';
-import { IPost } from '@/types/types';
+import ConfirmDelete from "@/components/layout/ConfirmDelete";
+import {
+    handleDeletePost,
+    handleFollowingUser,
+    handleMutateWithKey,
+} from "@/lib/utils";
+import { usePostStore } from "@/store/postStore";
+import { useMyStore } from "@/store/zustand";
+import { IPost } from "@/types/types";
 
-import ModalUnfollowBtn from './ModalUnfollowBtn';
+import ModalUnfollowBtn from "./ModalUnfollowBtn";
 
 type ModalReportBtnProps = {
     post: IPost | null;
@@ -51,6 +55,7 @@ const ModalReportBtn = ({ post }: ModalReportBtnProps) => {
                 post: result.data,
                 action: "delete",
             });
+            handleMutateWithKey(`posts/?filters={"createdBy`);
             router.push(`/${myUser?._id}/${result.data.isReel ? "reel" : ""}`);
         }
     };
@@ -83,7 +88,6 @@ const ModalReportBtn = ({ post }: ModalReportBtnProps) => {
                                 onDelete={handleDeletePostById}
                                 onCancel={handleCancel}
                                 onOpenChange={handleOpenConfirmDelete}
-                                inModal
                             ></ConfirmDelete>
                         ) : (
                             <button className="px-2 py-[13.6px] font-bold text-[#ed4956] border-b dark:border-[#363636] border-solid">

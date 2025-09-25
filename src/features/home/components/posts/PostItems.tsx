@@ -1,18 +1,18 @@
-import { RefObject, useState } from 'react';
-import { useMediaQuery } from 'usehooks-ts';
+import { RefObject, useState } from "react";
+import { useMediaQuery } from "usehooks-ts";
 
-import PostCaption from '@/features/home/components/posts/PostCaption';
-import PostItemHeading from '@/features/home/components/posts/PostItemHeading';
-import PostItemMedia from '@/features/home/components/posts/PostItemMedia';
-import { PostProp } from '@/features/home/components/posts/type';
-import { cn } from '@/lib/utils';
-import { IPost } from '@/types/types';
+import PostCaption from "@/features/home/components/posts/PostCaption";
+import PostItemHeading from "@/features/home/components/posts/PostItemHeading";
+import PostItemMedia from "@/features/home/components/posts/PostItemMedia";
+import { PostProp } from "@/features/home/components/posts/type";
+import { cn } from "@/lib/utils";
+import { IPost } from "@/types/types";
 
-import { CommentInput } from '../comments/CommentInput';
-import MobileCmtDrawer from '../comments/moblie/MobileCmtDrawer';
-import PostButtons from './PostButtons';
-import PostModal from './PostModal';
-import PostModalContent from './postModal/PostModalContent';
+import { CommentInput } from "../comments/CommentInput";
+import MobileCmtDrawer from "../comments/moblie/MobileCmtDrawer";
+import PostButtons from "./PostButtons";
+import PostModal from "./postModal/PostModal";
+import PostModalContent from "./postModal/PostModalContent";
 
 type PostItemsProps = {
     onSetPosts: (post: IPost[] | []) => void;
@@ -39,7 +39,7 @@ const PostItems = ({
         <li
             id={`${item?._id}`}
             ref={PostRef}
-            className={cn("", PostRef && "scroll-mt-[74px]")}
+            className={cn(PostRef && "scroll-mt-[74px]")}
         >
             {/* heading */}
             <PostItemHeading
@@ -51,8 +51,9 @@ const PostItems = ({
             <PostItemMedia
                 item={item}
                 className="mt-3"
-                figureClassName="w-full"
-                videoClassName="w-full"
+                figureClassName="w-full !rounded-lg"
+                imageClassName="!rounded-lg"
+                videoClassName="w-full rounded-lg md:h-[585px] !border-none"
             ></PostItemMedia>
             {/*Post Buttons */}
             <PostButtons
@@ -61,6 +62,7 @@ const PostItems = ({
                 listPosts={listPosts}
                 onSetPosts={onSetPosts}
             ></PostButtons>
+
             {item?.likes.length ? (
                 <p className="text-sm font-semibold">
                     {parseInt(item.likes.length.toString())

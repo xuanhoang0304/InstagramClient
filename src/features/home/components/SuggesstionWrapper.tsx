@@ -37,7 +37,7 @@ const SuggesstionWrapper = () => {
                             className=" flex justify-between items-center"
                         >
                             <div className=" flex items-center gap-x-2">
-                                <Skeleton className="size-11 rounded-full"></Skeleton>
+                                <Skeleton className="size-8 rounded-full"></Skeleton>
 
                                 <div className="flex flex-col gap-y-1">
                                     <Skeleton className="h-[10px] w-20"></Skeleton>

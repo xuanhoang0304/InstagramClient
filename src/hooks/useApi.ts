@@ -1,13 +1,15 @@
-import { AxiosRequestConfig } from 'axios';
-import useSWR, { SWRConfiguration, SWRResponse } from 'swr';
+import { AxiosRequestConfig } from "axios";
+import { getCookie } from "cookies-next";
+import useSWR, { SWRConfiguration, SWRResponse } from "swr";
 
-import { apiClient } from '@/configs/axios';
+import { apiClient } from "@/configs/axios";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 interface ApiResponse<T> extends SWRResponse<T, any> {
     isLoading: boolean;
     error: any;
 }
+const accessToken = getCookie("accessToken");
 export function useApi<T>(
     url: string | null,
     config: AxiosRequestConfig = {},
@@ -16,7 +18,9 @@ export function useApi<T>(
     const fetcherConfig = async <T>(
         url: string,
         config: AxiosRequestConfig = {
-            withCredentials: true,
+            headers: {
+                Authorization: `Beaerer ${accessToken}`,
+            },
         }
     ): Promise<T> => {
         return apiClient.fetchApi<T>(url, config);

@@ -1,6 +1,7 @@
 "use client";
 
 import axios from 'axios';
+import { getCookie } from 'cookies-next';
 import { CircleCheck, CircleX, LogIn, OctagonAlert } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -112,11 +113,16 @@ export default function FormRegisterUser({
             const formData = new FormData();
             formData.append("image", data.avatar[0]);
             try {
+                const token = getCookie("accessToken");
                 const res = await fetch(
                     `${envConfig.BACKEND_URL}/upload/image`,
                     {
                         method: "POST",
                         body: formData,
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${token}`,
+                        },
                     }
                 );
                 const result = await res.json();

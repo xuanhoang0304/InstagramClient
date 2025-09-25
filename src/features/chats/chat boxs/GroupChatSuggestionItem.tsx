@@ -1,8 +1,8 @@
-import { Check } from 'lucide-react';
-import Image from 'next/image';
+import { Check } from "lucide-react";
+import Image from "next/image";
 
-import { cn } from '@/lib/utils';
-import { User } from '@/types/types';
+import { cn } from "@/lib/utils";
+import { User } from "@/types/types";
 
 type GroupChatSuggestionItemProps = {
     user: User;
@@ -30,7 +30,7 @@ const GroupChatSuggestionItem = ({
             )}
         >
             <div className="flex items-center gap-x-3">
-                <figure className="size-11 rounded-full">
+                <figure className="size-11 rounded-full shrink-0">
                     <Image
                         src={user.avatar || "/images/default.jpg"}
                         alt="user avt"
@@ -39,11 +39,12 @@ const GroupChatSuggestionItem = ({
                         className="size-full object-cover rounded-full"
                     ></Image>
                 </figure>
-                <h3 className="text-sm">{user.name}</h3>
+
+                <h3 className="text-sm line-clamp-1">{user.name}</h3>
             </div>
             <button
                 className={cn(
-                    "size-6 rounded-full border border-primary-white text-transparent flex items-center justify-center",
+                    "size-6 rounded-full shrink-0 border border-primary-white text-transparent flex items-center justify-center",
                     selectedList.find((item) => item._id === user._id) &&
                         "bg-primary-white text-primary-gray"
                 )}

@@ -1,20 +1,29 @@
-import dayjs from 'dayjs';
-import { Copy, EllipsisVertical, Send, Trash } from 'lucide-react';
-import { RefObject, useRef, useState } from 'react';
-import { toast } from 'sonner';
-import { useOnClickOutside } from 'usehooks-ts';
+import dayjs from "dayjs";
+import { Copy, EllipsisVertical, Send, Trash } from "lucide-react";
+import { RefObject, useRef, useState } from "react";
+import { toast } from "sonner";
+import { useOnClickOutside } from "usehooks-ts";
 
-import ConfirmDelete from '@/components/layout/ConfirmDelete';
+import ConfirmDelete from "@/components/layout/ConfirmDelete";
 import {
-    DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel,
-    DropdownMenuPortal, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuSub,
-    DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
-import { socket } from '@/configs/socket';
-import { useMyStore } from '@/store/zustand';
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuPortal,
+    DropdownMenuSeparator,
+    DropdownMenuShortcut,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { socket } from "@/configs/socket";
+import { useMyStore } from "@/store/zustand";
 
-import { useMessageStore } from '../MessageStore';
-import { IMessageFE } from '../type';
+import { useMessageStore } from "../MessageStore";
+import { IMessageFE } from "../type";
 
 interface Props {
     message: IMessageFE;
@@ -35,13 +44,15 @@ export function MessageActionBtns({ message, isCurUser }: Props) {
         setOpenDialog(!openDialog);
     };
     const handleDeleteMessage = async (messageId: string) => {
-        const isLatest = messageList.length > 1 && messageList[0]._id === messageId;
+        const isLatest =
+            messageList.length > 1 && messageList[0]._id === messageId;
         socket.emit("delete-message", {
             messageId,
             curUserId: myUser?._id,
             groupId: msgGroupId,
             lastMessage: isLatest ? messageList[1]._id : null,
-            isFristMessage: messageList.length == 1 && messageList[0]._id === messageId,
+            isFristMessage:
+                messageList.length == 1 && messageList[0]._id === messageId,
         });
         setOpenDialog(false);
     };
@@ -157,7 +168,6 @@ export function MessageActionBtns({ message, isCurUser }: Props) {
                     onCancel={handleCloseDialog}
                     onDelete={() => handleDeleteMessage(message._id)}
                     onOpenChange={handleOpenChangeDialog}
-                    inModal
                 ></ConfirmDelete>
             )}
         </div>

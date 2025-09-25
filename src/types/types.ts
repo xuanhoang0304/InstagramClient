@@ -14,6 +14,7 @@ export type User = {
     followings: string[];
     saved: string[];
     isReal: boolean;
+    name_normailized: string;
 } & IMongosee;
 
 export type IPost = {

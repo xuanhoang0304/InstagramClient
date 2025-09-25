@@ -57,13 +57,17 @@ const PostItemMedia = ({
             ) : (
                 <video
                     className={cn(
-                        "md:w-[468px] md:h-[585px] aspect-square object-cover rounded-[4px] dark:border border-[#262626] mt-3",
+                        "md:w-[468px] aspect-square object-cover  dark:border border-[#262626] mt-3",
                         videoClassName
                     )}
-                    src={item.media[0].path}
+                    src={`${item.media[0].path}?w=400&q=auto&f=auto`}
                     controls
-                    autoPlay={true}
-                    muted={true}
+                    preload="metadata"
+                    muted
+                    playsInline
+                    poster={item.media[0].thumbnailUrl}
+                    width={468}
+                    height={585}
                 ></video>
             )}
         </>

@@ -1,19 +1,32 @@
 "use client";
-import { Clapperboard, Compass, Heart, Home, Instagram, MessageCircle, Search } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useEffect } from 'react';
+import {
+    Clapperboard,
+    Compass,
+    Heart,
+    Home,
+    Instagram,
+    MessageCircle,
+    Search,
+} from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect } from "react";
 
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import envConfig from '@/configs/envConfig';
-import { useApi } from '@/hooks/useApi';
-import { cn } from '@/lib/utils';
-import { useMyStore } from '@/store/zustand';
-import { getMe } from '@/types/types';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
+import envConfig from "@/configs/envConfig";
+import { useApi } from "@/hooks/useApi";
+import { cn } from "@/lib/utils";
+import { useMyStore } from "@/store/zustand";
+import { getMe } from "@/types/types";
 
-import CreatePost from './CreatePost';
-import { MoreBtn } from './MoreBtn';
+import CreatePost from "./CreatePost";
+import { MoreBtn } from "./MoreBtn";
 
 const SideBar = ({ type }: { type: "short" | "normal" }) => {
     const pathname = usePathname();
@@ -71,7 +84,10 @@ const SideBar = ({ type }: { type: "short" | "normal" }) => {
         >
             <div className="">
                 {type === "normal" ? (
-                    <Link href={"/"} className="pt-[25px] pb-[38px] block sticky top-0 bg-black">
+                    <Link
+                        href={"/"}
+                        className="pt-[25px] pb-[38px] block sticky top-0 bg-black"
+                    >
                         <figure>
                             <svg
                                 aria-label="Instagram"

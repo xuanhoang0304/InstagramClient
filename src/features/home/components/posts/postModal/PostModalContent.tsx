@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import uniqBy from 'lodash/uniqBy';
 import { useEffect, useState } from 'react';
 import { useMediaQuery } from 'usehooks-ts';
 
@@ -41,7 +41,7 @@ const PostModalContent = ({
         `${envConfig.BACKEND_URL}/api/posts/${item?._id}/comments?page=${page}&limit=3`,
         undefined,
         {
-            revalidateOnMount: true
+            revalidateOnMount: true,
         }
     );
     const handleSetCommentist = (list: IComment[] | []) => {
@@ -59,7 +59,7 @@ const PostModalContent = ({
                 setTotalCmt(data.result.totalComments);
                 return;
             }
-            const arr = _.unionBy(
+            const arr = uniqBy(
                 [...commentList, ...data?.result.comments],
                 "_id"
             );
@@ -83,22 +83,18 @@ const PostModalContent = ({
                 )}
                 imageClassName="rounded-none block h-full"
                 videoClassName={cn(
-                    "m-0 border-none !rounded-tl-lg !rounded-bl-lg bg-black lg:w-[400px] lg:h-[585px] md:w-[325px]",
+                    "m-0 border-none rounded-tl-lg rounded-bl-lg bg-black lg:w-[400px]  md:w-[325px]",
                     isModal && "hidden lg:block"
                 )}
             ></PostItemMedia>
+
             <div
                 className={cn(
-                    " lg:max-w-[485px] flex-1 w-full h-auto bg-black rounded-tr-lg rounded-br-lg flex shrink-0 flex-col justify-between md:block",
+                    " lg:w-[485px] lg:max-w-[485px] flex-1 w-full  h-auto bg-black rounded-tr-lg rounded-br-lg flex shrink-0 flex-col justify-between md:block",
                     isModal && "size-full"
                 )}
             >
-                <div
-                    className={cn(
-                        "overflow-y-auto hidden-scrollbar",
-                        isMobile && "mb-[220px] h-full "
-                    )}
-                >
+                <div className={cn("", isMobile && "pb-[220px] h-full ")}>
                     <PostItemHeading
                         isShowTime={false}
                         item={item}

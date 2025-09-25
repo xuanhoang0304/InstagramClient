@@ -1,14 +1,14 @@
-import 'swiper/css';
-import 'swiper/css/pagination';
-import 'swiper/css/navigation';
+import "swiper/css";
+import "swiper/css/pagination";
+import "swiper/css/navigation";
 
-import { CircleAlert } from 'lucide-react';
-import Image from 'next/image';
-import { ReactNode, useCallback, useMemo } from 'react';
-import { Navigation, Pagination } from 'swiper/modules';
-import { Swiper, SwiperSlide } from 'swiper/react';
+import { CircleAlert } from "lucide-react";
+import Image from "next/image";
+import { ReactNode, useCallback, useMemo } from "react";
+import { Navigation, Pagination } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
 
-import { Media } from './type';
+import { Media } from "./type";
 
 type PreviewMediaPostProps = {
     imageUrls: Media[];
@@ -32,13 +32,15 @@ export function PreviewMediaPost({
                 </figure>
             ),
             video: (
-                <video
-                    className="w-full h-auto object-cover rounded"
-                    src={imageUrls[0]?.path || ""}
-                    controls
-                    autoPlay
-                    muted
-                ></video>
+                <div className="w-full min-w-[400px] h-[400px]">
+                    <video
+                        className="w-full h-full object-cover rounded"
+                        src={imageUrls[0]?.path || ""}
+                        controls
+                        autoPlay
+                        muted
+                    ></video>
+                </div>
             ),
             images: (
                 <Swiper
@@ -48,7 +50,7 @@ export function PreviewMediaPost({
                     }}
                     navigation={true}
                     modules={[Pagination, Navigation]}
-                    className="PreviewMediaPostSwiper md:w-full max-h-[500px] w-[280px] !m-0"
+                    className="PreviewMediaPostSwiper w-full max-h-[500px]  !m-0"
                 >
                     {imageUrls.map((item) => (
                         <SwiperSlide

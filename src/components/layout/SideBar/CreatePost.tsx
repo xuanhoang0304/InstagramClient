@@ -1,14 +1,19 @@
-import { PlusSquare } from 'lucide-react';
-import dynamic from 'next/dynamic';
-import { useEffect, useState } from 'react';
+import { PlusSquare } from "lucide-react";
+import dynamic from "next/dynamic";
+import { useEffect, useState } from "react";
 
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
 
-import CancelCreatePostDialog from './CancelCreatePostDialog';
-import FormCreatePost from './FormCreatePost';
-import PreviewPost from './PreviewPost';
-import { Media } from './type';
+import CancelCreatePostDialog from "./CancelCreatePostDialog";
+import FormCreatePost from "./FormCreatePost";
+import PreviewPost from "./PreviewPost";
+import { Media } from "./type";
 
 const UploadFile = dynamic(() => import("./UploadFile"), { ssr: false });
 export function CreatePost({
@@ -104,7 +109,7 @@ export function CreatePost({
                         )}
                     </Tooltip>
                 </TooltipProvider>
-                <DialogContent className="!bg-primary-gray md:!max-w-fit w-[90%] mx-auto">
+                <DialogContent className="!bg-primary-gray md:!max-w-fit w-[90%] mx-auto !p-2 md:!p-6 flex flex-col">
                     <DialogTitle className="hidden"></DialogTitle>
                     {step === 0 && (
                         <UploadFile

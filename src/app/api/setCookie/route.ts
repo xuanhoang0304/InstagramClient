@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
     const { accessToken, refreshToken } = await request.json();
@@ -6,7 +6,7 @@ export async function POST(request: Request) {
 
     if (accessToken) {
         res.cookies.set("accessToken", accessToken, {
-            httpOnly: true,
+            // httpOnly: true,
             secure: true,
             sameSite: "none",
             maxAge: 60 * 15,
@@ -16,7 +16,7 @@ export async function POST(request: Request) {
 
     if (refreshToken) {
         res.cookies.set("refreshToken", refreshToken, {
-            httpOnly: true,
+            // httpOnly: true,
             secure: true,
             sameSite: "none",
             maxAge: 60 * 60 * 24 * 7, // 7 ngày

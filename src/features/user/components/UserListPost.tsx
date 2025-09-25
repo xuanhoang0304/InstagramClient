@@ -1,10 +1,9 @@
 "use client";
-import _, { debounce } from 'lodash';
+import uniqBy from 'lodash/uniqBy';
 import { Grid3x3 } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { mutate } from 'swr';
 import { useMediaQuery } from 'usehooks-ts';
 
 import { Skeleton } from '@/components/ui/skeleton';
@@ -23,14 +22,16 @@ const UserListPost = () => {
     const [page, setPage] = useState(1);
     const { userId } = useParams();
     const scrollPositionRef = useRef<number>(0);
+    const [loadingMore, setLoadingMore] = useState(false);
     const limit = isPC ? 6 : 9;
     const postKey = `${envConfig.BACKEND_URL}/api/posts/?filters={"createdBy": ["${userId}"],"isReel":"false"}&limit=${limit}&page=${page}&sorts={ "pinned": -1, "createdAt":-1}`;
     const { data, isLoading } = useApi<getPostsByCreated>(postKey);
 
-    const fetchData = debounce(() => {
+    const fetchData = () => {
+        setLoadingMore(true);
         scrollPositionRef.current = window.scrollY;
         setPage((prev) => prev + 1);
-    }, 500);
+    };
 
     const actionHandlers: Record<
         string,
@@ -53,14 +54,14 @@ const UserListPost = () => {
                 return prev;
             }
             const newPosts = handler(prev, post);
-            return _.uniqBy(newPosts, "_id");
+            return uniqBy(newPosts, "_id");
         });
-        mutate(postKey, true);
     }, [targetPost, postKey]);
 
     useEffect(() => {
         if (data?.result?.length) {
-            setPosts((prev) => _.uniqBy([...prev, ...data.result], "_id"));
+            setPosts((prev) => uniqBy([...prev, ...data.result], "_id"));
+            setLoadingMore(false);
         }
     }, [data]);
     useEffect(() => {
@@ -81,7 +82,7 @@ const UserListPost = () => {
             </div>
         );
     }
-    if (isLoading) {
+    if (isLoading && !posts.length) {
         return (
             <div className="grid grid-cols-3 gap-0.5 mt-5">
                 {Array(limit)
@@ -102,7 +103,7 @@ const UserListPost = () => {
             className="mt-5"
             hasMore={posts.length < Number(data?.total)}
             loader={
-                isLoading && (
+                loadingMore && (
                     <div className="grid grid-cols-3 gap-0.5">
                         {Array(3)
                             .fill(0)
@@ -118,7 +119,11 @@ const UserListPost = () => {
         >
             <ul className="grid grid-cols-3 gap-0.5">
                 {posts.map((item) => (
-                    <UserPostItem post={item} key={item._id} imageWrapClass='md:aspect-[3/4]' />
+                    <UserPostItem
+                        post={item}
+                        key={item._id}
+                        imageWrapClass="md:aspect-[3/4]"
+                    />
                 ))}
             </ul>
         </InfiniteScroll>

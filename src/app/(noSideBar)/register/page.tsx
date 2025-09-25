@@ -1,5 +1,6 @@
-import Register from "./components/Register";
+import Register from './components/Register';
 
+// export const dynamic = "force-dynamic";
 const page = () => {
     return <Register></Register>;
 };
