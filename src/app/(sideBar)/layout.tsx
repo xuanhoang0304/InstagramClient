@@ -1,16 +1,16 @@
-import '../globals.css';
+import "../globals.css";
 
-import SideBar from '../../components/layout/SideBar/SideBar';
+import SideBar from "../../components/layout/SideBar/SideBar";
 
 export default async function SideBarLayout({
-    children,
+  children,
 }: Readonly<{
-    children: React.ReactNode;
+  children: React.ReactNode;
 }>) {
-    return (
-        <main className="flex">
-            <SideBar type="normal"></SideBar>
-            {children}
-        </main>
-    );
+  return (
+    <main className="flex">
+      <SideBar type="normal"></SideBar>
+      {children}
+    </main>
+  );
 }

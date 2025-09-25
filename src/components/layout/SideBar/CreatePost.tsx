@@ -1,20 +1,27 @@
-import { PlusSquare } from 'lucide-react';
-import dynamic from 'next/dynamic';
-import { useEffect, useState } from 'react';
+import { PlusSquare } from "lucide-react";
+import dynamic from "next/dynamic";
+import { useEffect, useState } from "react";
 
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
 
-import CancelCreatePostDialog from './CancelCreatePostDialog';
-import FormCreatePost from './FormCreatePost';
-import PreviewPost from './PreviewPost';
-import { Media } from './type';
+import CancelCreatePostDialog from "./CancelCreatePostDialog";
+import FormCreatePost from "./FormCreatePost";
+import PreviewPost from "./PreviewPost";
+import { Media } from "./type";
 
 const UploadFile = dynamic(() => import("./UploadFile"), { ssr: false });
 export function CreatePost({
     sideBarType,
+    showDialog,
 }: {
     sideBarType: "short" | "normal";
+    showDialog?: boolean;
 }) {
     const [step, setStep] = useState(0);
     const [files, setFiles] = useState<FileList | null>(null);
@@ -90,7 +97,7 @@ export function CreatePost({
                             className="flex items-center p-3 gap-x-2 w-full"
                         >
                             <PlusSquare />
-                            {sideBarType === "normal" && (
+                            {sideBarType === "normal" && !showDialog && (
                                 <p className="line-clamp-1 hidden lg:block">
                                     Tạo
                                 </p>
@@ -104,7 +111,7 @@ export function CreatePost({
                         )}
                     </Tooltip>
                 </TooltipProvider>
-                <DialogContent className="!bg-primary-gray md:!max-w-fit w-[90%] mx-auto">
+                <DialogContent className="!bg-primary-gray md:!max-w-fit w-[90%] mx-auto !p-2 md:!p-6 flex flex-col">
                     <DialogTitle className="hidden"></DialogTitle>
                     {step === 0 && (
                         <UploadFile

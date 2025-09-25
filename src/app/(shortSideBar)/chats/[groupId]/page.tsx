@@ -1,7 +1,7 @@
-import GroupIdPage from '@/features/chats/chat content/GroupIdPage';
+import GroupIdPage from "@/features/chats/chat content/GroupIdPage";
 
 const page = () => {
-    return <GroupIdPage></GroupIdPage>;
+  return <GroupIdPage></GroupIdPage>;
 };
 
 export default page;

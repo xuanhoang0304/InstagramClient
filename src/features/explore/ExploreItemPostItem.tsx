@@ -1,9 +1,7 @@
-import React from 'react';
+import React from "react";
 
 const ExploreItemPostItem = () => {
-  return (
-    <div>ExploreItemPostItem</div>
-  )
-}
+  return <div>ExploreItemPostItem</div>;
+};
 
-export default ExploreItemPostItem
+export default ExploreItemPostItem;

@@ -1,7 +1,7 @@
-import ExplorePage from '@/features/explore';
+import ExplorePage from "@/features/explore";
 
 const page = () => {
-    return <ExplorePage></ExplorePage>;
+  return <ExplorePage></ExplorePage>;
 };
 
 export default page;

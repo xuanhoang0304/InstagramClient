@@ -1,295 +1,293 @@
-import { ClassValue, clsx } from 'clsx';
-import { toast } from 'sonner';
-import { mutate } from 'swr';
-import { twMerge } from 'tailwind-merge';
+import { ClassValue, clsx } from "clsx";
+import { toast } from "sonner";
+import { mutate } from "swr";
+import { twMerge } from "tailwind-merge";
 
-import { apiClient } from '@/configs/axios';
+import { apiClient } from "@/configs/axios";
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import envConfig from '@/configs/envConfig';
-import { IGroupResponse } from '@/features/chats/type';
+import envConfig from "@/configs/envConfig";
+import { IGroupResponse } from "@/features/chats/type";
+import { CommentInputFormData } from "@/features/home/components/comments/schema/CommentInputSchema";
 import {
-    CommentInputFormData
-} from '@/features/home/components/comments/schema/CommentInputSchema';
-import {
-    getMe, getParentCmtByPostId, getRepleisResponse, IPost, TimeInterval, updateComment, updatePost,
-    updateUser, UploadMedia
-} from '@/types/types';
+  getParentCmtByPostId,
+  getRepleisResponse,
+  IPost,
+  TimeInterval,
+  updateComment,
+  updatePost,
+  updateUser,
+  UploadMedia,
+} from "@/types/types";
 
+export function normalizeString(str: string) {
+  return str
+    .normalize("NFD") // tách ký tự có dấu thành ký tự + dấu
+    .replace(/[\u0300-\u036f]/g, "") // xóa toàn bộ dấu
+    .toLowerCase(); // về chữ thường
+}
 export function cn(...inputs: ClassValue[]) {
-    return twMerge(clsx(inputs));
+  return twMerge(clsx(inputs));
 }
 export function handleMutateWithKey(keyword: string) {
-    mutate(
-        (key) => {
-            return typeof key === "string" && key.includes(keyword);
-        },
-        undefined,
-        { revalidate: true }
-    );
+  mutate(
+    (key) => {
+      return typeof key === "string" && key.includes(keyword);
+    },
+    undefined,
+    { revalidate: true },
+  );
 }
 export function formatNumber(num: number): string {
-    if (!num || num < 0) return "0";
-    const units = [
-        { threshold: 1_000_000_000, divisor: 1_000_000_000, suffix: "M" },
-        { threshold: 1_000_000, divisor: 1_000_000, suffix: "M" },
-        { threshold: 1_000, divisor: 1_000, suffix: "N" },
-    ];
+  if (!num || num < 0) return "0";
+  const units = [
+    { threshold: 1_000_000_000, divisor: 1_000_000_000, suffix: "M" },
+    { threshold: 1_000_000, divisor: 1_000_000, suffix: "M" },
+    { threshold: 1_000, divisor: 1_000, suffix: "N" },
+  ];
 
-    for (const unit of units) {
-        if (num >= unit.threshold) {
-            return `${(num / unit.divisor).toFixed(1)}${unit.suffix}`;
-        }
+  for (const unit of units) {
+    if (num >= unit.threshold) {
+      return `${(num / unit.divisor).toFixed(1)}${unit.suffix}`;
     }
+  }
 
-    return num.toString();
+  return num.toString();
 }
 export function getRelativeTime(isoTime: string): string {
-    const inputDate = new Date(isoTime);
-    if (isNaN(inputDate.getTime())) {
-        return "Invalid ISO time format";
+  const inputDate = new Date(isoTime);
+  if (isNaN(inputDate.getTime())) {
+    return "Invalid ISO time format";
+  }
+  const now = new Date();
+  const diffInSeconds = Math.floor(
+    (now.getTime() - inputDate.getTime()) / 1000,
+  );
+  const diffInDays = diffInSeconds / (60 * 60 * 24); // Tính số ngày chênh lệch
+
+  // Nếu quá 7 ngày, hiển thị định dạng ngày tháng (DD/MM/YYYY)
+  if (diffInDays > 7) {
+    const day = String(inputDate.getDate()).padStart(2, "0");
+    const month = String(inputDate.getMonth() + 1).padStart(2, "0"); // Tháng bắt đầu từ 0
+    const year = inputDate.getFullYear();
+    return `${day}-${month}-${year}`;
+  }
+
+  // Nếu chưa quá 7 ngày, hiển thị thời gian tương đối
+  const intervals: TimeInterval[] = [
+    { label: "năm", seconds: 31536000 },
+    { label: "tháng", seconds: 2592000 },
+    { label: "tuần", seconds: 604800 },
+    { label: "ngày", seconds: 86400 },
+    { label: "giờ", seconds: 3600 },
+    { label: "phút", seconds: 60 },
+  ];
+
+  for (const interval of intervals) {
+    const count = Math.floor(diffInSeconds / interval.seconds);
+    if (count >= 1) {
+      return `${count} ${interval.label}`;
     }
-    const now = new Date();
-    const diffInSeconds = Math.floor(
-        (now.getTime() - inputDate.getTime()) / 1000
-    );
-    const diffInDays = diffInSeconds / (60 * 60 * 24); // Tính số ngày chênh lệch
+  }
 
-    // Nếu quá 7 ngày, hiển thị định dạng ngày tháng (DD/MM/YYYY)
-    if (diffInDays > 7) {
-        const day = String(inputDate.getDate()).padStart(2, "0");
-        const month = String(inputDate.getMonth() + 1).padStart(2, "0"); // Tháng bắt đầu từ 0
-        const year = inputDate.getFullYear();
-        return `${day}-${month}-${year}`;
-    }
-
-    // Nếu chưa quá 7 ngày, hiển thị thời gian tương đối
-    const intervals: TimeInterval[] = [
-        { label: "năm", seconds: 31536000 },
-        { label: "tháng", seconds: 2592000 },
-        { label: "tuần", seconds: 604800 },
-        { label: "ngày", seconds: 86400 },
-        { label: "giờ", seconds: 3600 },
-        { label: "phút", seconds: 60 },
-    ];
-
-    for (const interval of intervals) {
-        const count = Math.floor(diffInSeconds / interval.seconds);
-        if (count >= 1) {
-            return `${count} ${interval.label}`;
-        }
-    }
-
-    return "vừa xong";
+  return "vừa xong";
 }
 export function textWithLinks(input: string) {
-    return input
-        .replaceAll(`\\n`, "</br>")
-        .replaceAll(
-            /[^: \n]+:([^ \n]+)/g,
-            (match, url) =>
-                `<a href="${url}" class="text-primary-blue hover:text-primary-blue-hover" target="_blank">${match}</a>`
-        );
+  return input
+    .replaceAll(`\\n`, "</br>")
+    .replaceAll(
+      /[^: \n]+:([^ \n]+)/g,
+      (match, url) =>
+        `<a href="${url}" class="text-primary-blue hover:text-primary-blue-hover" target="_blank">${match}</a>`,
+    );
 }
 export const tempArr = [
-    { id: 1 },
-    { id: 2 },
-    { id: 3 },
-    { id: 4 },
-    { id: 5 },
-    { id: 6 },
-    { id: 7 },
-    { id: 8 },
-    { id: 9 },
-    { id: 10 },
-    { id: 11 },
-    { id: 12 },
-    { id: 13 },
-    { id: 14 },
-    { id: 15 },
+  { id: 1 },
+  { id: 2 },
+  { id: 3 },
+  { id: 4 },
+  { id: 5 },
+  { id: 6 },
+  { id: 7 },
+  { id: 8 },
+  { id: 9 },
+  { id: 10 },
+  { id: 11 },
+  { id: 12 },
+  { id: 13 },
+  { id: 14 },
+  { id: 15 },
 ];
 export const PUBLIC_ROUTES = ["/login", "/register", "/auth/google-callback"];
 
 export const handleLikePost = async (post: IPost) => {
-    try {
-        const data: updatePost = await apiClient.fetchApi(
-            `/users/${post._id}/like`,
-            {
-                method: "PUT",
-            }
-        );
-        return data;
-    } catch (error: any) {
-        toast.error(error.message);
-    }
+  try {
+    const data: updatePost = await apiClient.fetchApi(
+      `/users/${post._id}/like`,
+      {
+        method: "PUT",
+      },
+    );
+
+    return data;
+  } catch (error: any) {
+    toast.error(error.message);
+  }
 };
 export const handleSavePost = async (post: IPost) => {
-    try {
-        const data: updatePost = await apiClient.fetchApi(
-            `/users/${post._id}/save`,
-            {
-                method: "PUT",
-            }
-        );
-        return data;
-    } catch (error: any) {
-        toast.error(error.message);
-    }
+  try {
+    const data: updatePost = await apiClient.fetchApi(
+      `/users/${post._id}/save`,
+      {
+        method: "PUT",
+      },
+    );
+    return data;
+  } catch (error: any) {
+    toast.error(error.message);
+  }
 };
 export const handleFollowingUser = async (id: string) => {
-    try {
-        const data: updateUser = await apiClient.fetchApi(
-            `/users/${id}/follow`,
-            {
-                method: "PUT",
-            }
-        );
-        return data;
-    } catch (error: any) {
-        toast.error(error.message);
-    }
+  try {
+    const data: updateUser = await apiClient.fetchApi(`/users/${id}/follow`, {
+      method: "PUT",
+    });
+    return data;
+  } catch (error: any) {
+    toast.error(error.message);
+  }
 };
 export const handleCmtPost = async (data: CommentInputFormData) => {
-    try {
-        const result: updateComment = await apiClient.fetchApi("/comments/", {
-            method: "POST",
-            data,
-        });
-        if (result.code === 201) {
-            toast.success("Đã đăng comment!");
-            return result.data;
-        }
-    } catch (error: any) {
-        toast.error(error.message);
+  try {
+    const result: updateComment = await apiClient.fetchApi("/comments/", {
+      method: "POST",
+      data,
+    });
+    if (result.code === 201) {
+      toast.success("Đã đăng comment!");
+      return result.data;
     }
+  } catch (error: any) {
+    toast.error(error.message);
+  }
 };
 export const handleReplyCmtPost = async (
-    parentId: string,
-    data: CommentInputFormData
+  parentId: string,
+  data: CommentInputFormData,
 ) => {
-    try {
-        const result: updateComment = await apiClient.fetchApi(
-            `comments/${parentId}/reply`,
-            {
-                method: "POST",
-                data,
-            }
-        );
-        if (result.code === 201) {
-            toast.success("Đã đăng câu trả lời!");
-            return result.data;
-        }
-    } catch (error: any) {
-        toast.error(error.message);
+  try {
+    const result: updateComment = await apiClient.fetchApi(
+      `comments/${parentId}/reply`,
+      {
+        method: "POST",
+        data,
+      },
+    );
+    if (result.code === 201) {
+      toast.success("Đã đăng câu trả lời!");
+      return result.data;
     }
+  } catch (error: any) {
+    toast.error(error.message);
+  }
 };
 export const handleGetRepliesByParentCmtId = async (
-    parentId: string,
-    page: number
+  parentId: string,
+  page: number,
 ) => {
-    try {
-        const res: getRepleisResponse = await apiClient.fetchApi(
-            `/comments/${parentId}/replies?${page && `page=${page}`}&limit=3`
-        );
-        if (res.replies.length) {
-            return res;
-        }
-    } catch (error: any) {
-        handleError("handleGetRepliesByParentCmtId", error);
+  try {
+    const res: getRepleisResponse = await apiClient.fetchApi(
+      `/comments/${parentId}/replies?${page && `page=${page}`}&limit=3`,
+    );
+    if (res.replies.length) {
+      return res;
     }
+  } catch (error: any) {
+    handleError("handleGetRepliesByParentCmtId", error);
+  }
 };
 export const handleGetParentCmtByPostId = async (
-    postId: string,
-    page: number
+  postId: string,
+  page: number,
 ) => {
-    try {
-        const data: getParentCmtByPostId = await apiClient.fetchApi(
-            `${envConfig.BACKEND_URL}/api/posts/${postId}/comments?page=${page}&limit=3`
-        );
-        if (data.code) {
-            return data.result;
-        }
-    } catch (error: any) {
-        handleError("handleGetParentCmtByPostId", error);
+  try {
+    const data: getParentCmtByPostId = await apiClient.fetchApi(
+      `${envConfig.BACKEND_URL}/api/posts/${postId}/comments?page=${page}&limit=3`,
+    );
+    if (data.code) {
+      return data.result;
     }
+  } catch (error: any) {
+    handleError("handleGetParentCmtByPostId", error);
+  }
 };
-export const handleGetMe = async () => {
-    try {
-        const data: getMe = await apiClient.fetchApi("/auth/@me");
-        return data;
-    } catch (error: any) {
-        handleError("handleGetMe", error);
-    }
-};
+
 export const handleGetPostByPostId = async (postId: string) => {
-    try {
-        const data: IPost = await apiClient.fetchApi(`/posts/${postId}`);
-        return data;
-    } catch (error: any) {
-        handleError("handleGetPostByPostId", error);
-    }
+  try {
+    const data: IPost = await apiClient.fetchApi(`/posts/${postId}`);
+    return data;
+  } catch (error: any) {
+    handleError("handleGetPostByPostId", error);
+  }
 };
 export const handleUploadMediaFile = async (
-    data: FormData,
-    type: "video" | "image"
+  data: FormData,
+  type: "video" | "image",
 ) => {
-    try {
-        const response: UploadMedia = await apiClient.fetchApi(
-            `upload/${type}`,
-            {
-                method: "POST",
-                data,
-                headers: { "Content-Type": "multipart/form-data" },
-            }
-        );
-        if (response.data && response.code === 201) {
-            return response.data;
-        }
-        return null;
-    } catch (error: any) {
-        toast.error(error.response.data.message);
-        return null;
+  try {
+    const response: UploadMedia = await apiClient.fetchApi(`upload/${type}`, {
+      method: "POST",
+      data,
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    if (response.data && response.code === 201) {
+      return response.data;
     }
+    return null;
+  } catch (error: any) {
+    toast.error(error.response.data.message);
+    return null;
+  }
 };
 export const handleDeletePost = async (postId: string) => {
-    try {
-        const data: updatePost = await apiClient.fetchApi(`/posts/${postId}`, {
-            method: "DELETE",
-        });
-        if (data.code === 204) {
-            toast.success("Đã xóa bài viết!");
-            return data;
-        }
-        return null;
-    } catch (error: any) {
-        handleError("handleDeletePost", error);
+  try {
+    const data: updatePost = await apiClient.fetchApi(`/posts/${postId}`, {
+      method: "DELETE",
+    });
+    if (data.code === 204) {
+      toast.success("Đã xóa bài viết!");
+      return data;
     }
+    return null;
+  } catch (error: any) {
+    handleError("handleDeletePost", error);
+  }
 };
 export const handleUpdateGroup = async (
-    groupId: string,
-    data: {
-        groupAvt?: string;
-        groupName?: string;
-        lastMessage?: string | null;
-    }
+  groupId: string,
+  data: {
+    groupAvt?: string;
+    groupName?: string;
+    lastMessage?: string | null;
+  },
 ) => {
-    try {
-        const response: IGroupResponse = await apiClient.fetchApi(
-            `/groups/${groupId}/update`,
-            {
-                method: "PUT",
-                data,
-            }
-        );
-        if (response.code === 200) {
-            console.log(`Update successfuly groupID : ${groupId}`);
-        }
-    } catch (error) {
-        handleError("handleUpdateGroup", error);
+  try {
+    const response: IGroupResponse = await apiClient.fetchApi(
+      `/groups/${groupId}/update`,
+      {
+        method: "PUT",
+        data,
+      },
+    );
+    if (response.code === 200) {
+      console.log(`Update successfuly groupID : ${groupId}`);
     }
+  } catch (error) {
+    handleError("handleUpdateGroup", error);
+  }
 };
 
 export const handleError = (id: string, error: any | unknown) => {
-    toast.error(error?.message + "---id:" + id, {
-        duration: 5000,
-    });
+  toast.error(error?.message + "---id:" + id, {
+    duration: 5000,
+  });
 };

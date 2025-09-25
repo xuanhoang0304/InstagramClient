@@ -1,7 +1,7 @@
-import ChatPage from '@/features/chats';
+import ChatPage from "@/features/chats";
 
 const page = () => {
-    return <ChatPage></ChatPage>;
+  return <ChatPage></ChatPage>;
 };
 
 export default page;

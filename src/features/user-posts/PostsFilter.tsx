@@ -1,9 +1,7 @@
-import React from 'react';
+import React from "react";
 
 const PostsFilter = () => {
-  return (
-    <div>PostsFilter</div>
-  )
-}
+  return <div>PostsFilter</div>;
+};
 
-export default PostsFilter
+export default PostsFilter;

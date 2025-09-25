@@ -1,8 +1,18 @@
-import PostPage from '@/features/PostPage';
+import PostPage from "@/features/PostPage";
 
-const page = async ({ params }: { params: Promise<{ postId: string }> }) => {
-    const { postId } = await params
-    return <PostPage postId={postId}></PostPage>;
+const page = async ({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ postId: string }>;
+  searchParams: Promise<{ commentId: string; parentId: string }>;
+}) => {
+  const [{ commentId, parentId }, { postId }] = await Promise.all([
+    searchParams,
+    params,
+  ]);
+  const urlKey = `${postId}-${commentId}-${parentId}`;
+  return <PostPage key={urlKey} postId={postId}></PostPage>;
 };
 
 export default page;
