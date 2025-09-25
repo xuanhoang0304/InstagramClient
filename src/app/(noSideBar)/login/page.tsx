@@ -1,5 +1,6 @@
-import FormLogin from "./components/FormLogin";
+import FormLogin from './components/FormLogin';
 
+// export const dynamic = "force-dynamic";
 const LoginPage = () => {
     return <FormLogin></FormLogin>;
 };

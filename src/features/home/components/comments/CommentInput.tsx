@@ -1,22 +1,27 @@
 "use client";
 
-import { Smile } from 'lucide-react';
-import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { Smile } from "lucide-react";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 
-import InputForm from '@/app/(noSideBar)/register/components/InputForm';
-import { Button } from '@/components/ui/button';
-import { apiClient } from '@/configs/axios';
+import InputForm from "@/app/(noSideBar)/register/components/InputForm";
+import { Button } from "@/components/ui/button";
+import { apiClient } from "@/configs/axios";
 import {
-    CommentFormSchema, CommentInputFormData
-} from '@/features/home/components/comments/schema/CommentInputSchema';
+    CommentFormSchema,
+    CommentInputFormData,
+} from "@/features/home/components/comments/schema/CommentInputSchema";
 import {
-    cn, handleCmtPost, handleGetPostByPostId, handleMutateWithKey, handleReplyCmtPost
-} from '@/lib/utils';
-import { useRepliesStore } from '@/store/repliesStore';
-import { useMyStore } from '@/store/zustand';
-import { IComment, IPost } from '@/types/types';
-import { zodResolver } from '@hookform/resolvers/zod';
+    cn,
+    handleCmtPost,
+    handleGetPostByPostId,
+    handleMutateWithKey,
+    handleReplyCmtPost,
+} from "@/lib/utils";
+import { useRepliesStore } from "@/store/repliesStore";
+import { useMyStore } from "@/store/zustand";
+import { IComment, IPost } from "@/types/types";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 type CommentInputProps = {
     cmtList?: IComment[];
@@ -58,12 +63,17 @@ export function CommentInput({
         } else setValue("content", "");
     }, [targetCmt?._id]);
     const content = watch("content");
+    useEffect(() => {
+        if (!content) {
+            settargetCmt(null);
+        }
+    }, [content]);
     async function onSubmit(data: CommentInputFormData) {
         if (cmtList?.length) {
             if (targetCmt?._id) {
                 const newContet = data.content.replace(
                     `@${targetCmt.createdBy.name}`,
-                    `<a href="/users/${targetCmt.createdBy._id}" class="text-[#708dff]">@${targetCmt.createdBy.name}</a>`
+                    `<a href="/${targetCmt.createdBy._id}" class="text-[#708dff]">@${targetCmt.createdBy.name}</a>`
                 );
                 const newData = { ...data, content: newContet };
                 const parentCmtId = targetCmt.parentCommentId

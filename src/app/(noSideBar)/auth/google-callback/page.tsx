@@ -1,13 +1,15 @@
+// export const dynamic = "force-dynamic";
+
 import { Suspense } from 'react';
 
 import LoginGoogleCallBack from './LoginGoogleCallBack';
 
-const page = () => {
+const Page = () => {
     return (
         <Suspense>
-            <LoginGoogleCallBack></LoginGoogleCallBack>
+            <LoginGoogleCallBack />
         </Suspense>
     );
 };
 
-export default page;
+export default Page;

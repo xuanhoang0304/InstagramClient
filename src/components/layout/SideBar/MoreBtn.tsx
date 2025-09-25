@@ -1,16 +1,22 @@
-import { AlignJustify } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { toast } from 'sonner';
+import { deleteCookie, getCookie } from "cookies-next";
+import { AlignJustify } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 
 import {
-    DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuSeparator,
-    DropdownMenuShortcut, DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
-import { apiClient } from '@/configs/axios';
-import { SwitchUserContent } from '@/features/home/components/SwitchUserContent';
-import { cn, handleError } from '@/lib/utils';
-import { HttpResponse } from '@/types/types';
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuShortcut,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { apiClient } from "@/configs/axios";
+import { SwitchUserContent } from "@/features/home/components/SwitchUserContent";
+import { cn, handleError } from "@/lib/utils";
+import { HttpResponse } from "@/types/types";
 
 interface Props {
     type: "normal" | "short";
@@ -27,10 +33,14 @@ export function MoreBtn({ type }: Props) {
     };
     const handleLogout = async () => {
         try {
-            const res: HttpResponse = await apiClient.fetchApi("/auth/logout", {
-                method: "GET",
-            });
+            const accessToken = getCookie("accessToken");
+            const refreshToken = getCookie("refreshToken");
+            const res: HttpResponse = await apiClient.fetchApi(
+                `/auth/logout?accessToken=${accessToken}&refreshToken=${refreshToken}`
+            );
             if (res.code === 200) {
+                deleteCookie("accessToken");
+                deleteCookie("refreshToken");
                 toast.success("Đăng xuất thành công");
                 router.push("/login");
             }
@@ -53,7 +63,7 @@ export function MoreBtn({ type }: Props) {
                 align="end"
                 alignOffset={50}
                 sideOffset={type == "normal" ? -10 : -30}
-                side="right"
+                side="left"
             >
                 <DropdownMenuGroup>
                     <DropdownMenuItem className="py-4 lg:py-2 hover:!bg-second-button-background">

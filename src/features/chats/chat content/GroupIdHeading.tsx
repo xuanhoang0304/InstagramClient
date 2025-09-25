@@ -1,11 +1,13 @@
-import { ArrowLeft, CircleAlert, Phone } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
+import { ArrowLeft, Phone } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 
-import { socket } from '@/configs/socket';
-import { useMyStore } from '@/store/zustand';
+import { socket } from "@/configs/socket";
+import { cn } from "@/lib/utils";
+import { useMyStore } from "@/store/zustand";
 
-import { IGroup } from '../type';
+import { IGroup } from "../type";
+import { GroupIdHeadingBtn } from "./GroupIdHeadingBtn";
 
 type Props = {
     group: IGroup | undefined;
@@ -16,10 +18,10 @@ const GroupIdHeading = ({ group }: Props) => {
         ? group?.members.find((item) => item._id !== myUser?._id)
         : null;
     const handleCallVideo = () => {
-        socket.emit("calling", { user: myUser, group });
+        socket.emit("init-call", { sender: myUser, group });
     };
     return (
-        <header className="flex justify-between items-center p-4 border-b bg-black border-primary-gray absolute top-0 left-0 right-0 z-10">
+        <header className="flex justify-between items-center p-4 border-b bg-black border-primary-gray sticky top-0 left-0 right-0 z-10">
             <div className="flex items-center gap-x-2">
                 <button
                     onClick={() => {
@@ -49,10 +51,39 @@ const GroupIdHeading = ({ group }: Props) => {
                     </figure>
                 </Link>
                 <div>
-                    <h2 className="font-semibold line-clamp-1 ">
+                    <h2
+                        className={cn(
+                            "font-semibold line-clamp-1",
+                            group?.isGroup === false &&
+                                "flex items-center gap-x-1"
+                        )}
+                    >
                         {group?.groupName || (!group?.isGroup && partner?.name)}
+                        {partner?.isReal && (
+                            <svg
+                                aria-label="Đã xác minh"
+                                className="x1lliihq x1n2onr6"
+                                fill="rgb(0, 149, 246)"
+                                height="12"
+                                role="img"
+                                viewBox="0 0 40 40"
+                                width="12"
+                            >
+                                <title>Đã xác minh</title>
+                                <path
+                                    d="M19.998 3.094 14.638 0l-2.972 5.15H5.432v6.354L0 14.64 3.094 20 0 25.359l5.432 3.137v5.905h5.975L14.638 40l5.36-3.094L25.358 40l3.232-5.6h6.162v-6.01L40 25.359 36.905 20 40 14.641l-5.248-3.03v-6.46h-6.419L25.358 0l-5.36 3.094Zm7.415 11.225 2.254 2.287-11.43 11.5-6.835-6.93 2.244-2.258 4.587 4.581 9.18-9.18Z"
+                                    fillRule="evenodd"
+                                ></path>
+                            </svg>
+                        )}
                     </h2>
-                    {group?.isGroup ?<p className="text-xs text-second-gray">{group.members.length} thành viên</p> : <p className="text-xs text-second-gray">Hoạt động</p>}
+                    {group?.isGroup ? (
+                        <p className="text-xs text-second-gray">
+                            {group.members.length} thành viên
+                        </p>
+                    ) : (
+                        <p className="text-xs text-second-gray">Hoạt động</p>
+                    )}
                 </div>
             </div>
             <div className="flex items-center gap-x-2">
@@ -62,9 +93,7 @@ const GroupIdHeading = ({ group }: Props) => {
                 >
                     <Phone className="hover:fill-primary-white transition-colors" />
                 </button>
-                <button className="size-10 flex items-center justify-center">
-                    <CircleAlert className="hover:fill-primary-white transition-colors hover:text-primary-gray" />
-                </button>
+                <GroupIdHeadingBtn group={group as IGroup}></GroupIdHeadingBtn>
             </div>
         </header>
     );

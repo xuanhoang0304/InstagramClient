@@ -1,20 +1,30 @@
-import { ClassValue, clsx } from 'clsx';
-import { toast } from 'sonner';
-import { mutate } from 'swr';
-import { twMerge } from 'tailwind-merge';
+import { ClassValue, clsx } from "clsx";
+import { toast } from "sonner";
+import { mutate } from "swr";
+import { twMerge } from "tailwind-merge";
 
-import { apiClient } from '@/configs/axios';
+import { apiClient } from "@/configs/axios";
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import envConfig from '@/configs/envConfig';
-import { IGroupResponse } from '@/features/chats/type';
+import envConfig from "@/configs/envConfig";
+import { IGroupResponse } from "@/features/chats/type";
+import { CommentInputFormData } from "@/features/home/components/comments/schema/CommentInputSchema";
 import {
-    CommentInputFormData
-} from '@/features/home/components/comments/schema/CommentInputSchema';
-import {
-    getMe, getParentCmtByPostId, getRepleisResponse, IPost, TimeInterval, updateComment, updatePost,
-    updateUser, UploadMedia
-} from '@/types/types';
+    getParentCmtByPostId,
+    getRepleisResponse,
+    IPost,
+    TimeInterval,
+    updateComment,
+    updatePost,
+    updateUser,
+    UploadMedia,
+} from "@/types/types";
 
+export function normalizeString(str: string) {
+    return str
+        .normalize("NFD") // tách ký tự có dấu thành ký tự + dấu
+        .replace(/[\u0300-\u036f]/g, "") // xóa toàn bộ dấu
+        .toLowerCase(); // về chữ thường
+}
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
@@ -212,14 +222,7 @@ export const handleGetParentCmtByPostId = async (
         handleError("handleGetParentCmtByPostId", error);
     }
 };
-export const handleGetMe = async () => {
-    try {
-        const data: getMe = await apiClient.fetchApi("/auth/@me");
-        return data;
-    } catch (error: any) {
-        handleError("handleGetMe", error);
-    }
-};
+
 export const handleGetPostByPostId = async (postId: string) => {
     try {
         const data: IPost = await apiClient.fetchApi(`/posts/${postId}`);

@@ -1,6 +1,6 @@
-import { IComment, IPost } from '@/types/types';
+import { IComment, IPost } from "@/types/types";
 
-import ReplyItem from './ReplyItem';
+import ReplyItem from "./ReplyItem";
 
 type ReplyListProps = {
     repliesCmt: IComment[];
@@ -20,7 +20,7 @@ const ReplyList = ({
     onSetCmtList,
     onSetRepliesPage,
 }: ReplyListProps) => {
-    // if(!repliesCmt.length) return null;
+    if (!repliesCmt.length) return null;
     return (
         <ul className="flex flex-col mt-4 gap-y-4">
             {repliesCmt &&

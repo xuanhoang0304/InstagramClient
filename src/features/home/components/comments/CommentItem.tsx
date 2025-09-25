@@ -1,16 +1,16 @@
 "use client";
-import DOMPurify from 'dompurify';
-import parse from 'html-react-parser';
-import { Heart } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import DOMPurify from "dompurify";
+import parse from "html-react-parser";
+import { Heart } from "lucide-react";
+import { useMemo, useState } from "react";
 
-import MiniUserProfile from '@/features/home/components/posts/miniUser/MiniUserProfile';
-import { formatNumber, getRelativeTime } from '@/lib/utils';
-import { useMyStore } from '@/store/zustand';
-import { IComment, IPost } from '@/types/types';
+import { formatNumber, getRelativeTime } from "@/lib/utils";
+import { useMyStore } from "@/store/zustand";
+import { IComment, IPost } from "@/types/types";
 
-import { CommentActions } from './CommentActions';
-import ShowRepliesBtn from './ShowRepliesBtn';
+import ModalMiniUserProfile from "../posts/miniUser/ModalMiniUserProfile";
+import { CommentActions } from "./CommentActions";
+import ShowRepliesBtn from "./ShowRepliesBtn";
 
 type CommentItemProps = {
     cmt: IComment;
@@ -41,12 +41,31 @@ const CommentItem = ({
     const isOwner = cmt.createdBy._id === post?.createdBy._id;
 
     return (
-        <li className="flex justify-between gap-x-4 group">
-            <div className="flex flex-1 gap-x-2">
-                <MiniUserProfile user={cmt.createdBy}></MiniUserProfile>
+        <li className="flex justify-between relative gap-x-4 group">
+            <div className="flex flex-1 gap-x-2 ">
+                <ModalMiniUserProfile
+                    user={cmt.createdBy}
+                ></ModalMiniUserProfile>
                 <div className="flex-1">
                     <p className="text-sm font-semibold flex-wrap max-w-[300px] line-clamp-2 flex items-center gap-x-2 text-primary-white">
                         {cmt.createdBy.name}
+                        {cmt.createdBy.isReal && (
+                            <svg
+                                aria-label="Đã xác minh"
+                                className="x1lliihq x1n2onr6"
+                                fill="rgb(0, 149, 246)"
+                                height="12"
+                                role="img"
+                                viewBox="0 0 40 40"
+                                width="12"
+                            >
+                                <title>Đã xác minh</title>
+                                <path
+                                    d="M19.998 3.094 14.638 0l-2.972 5.15H5.432v6.354L0 14.64 3.094 20 0 25.359l5.432 3.137v5.905h5.975L14.638 40l5.36-3.094L25.358 40l3.232-5.6h6.162v-6.01L40 25.359 36.905 20 40 14.641l-5.248-3.03v-6.46h-6.419L25.358 0l-5.36 3.094Zm7.415 11.225 2.254 2.287-11.43 11.5-6.835-6.93 2.244-2.258 4.587 4.581 9.18-9.18Z"
+                                    fillRule="evenodd"
+                                ></path>
+                            </svg>
+                        )}
                         {isOwner && (
                             <span className="italic font-semibold text-second-blue">
                                 tác giả
@@ -58,7 +77,7 @@ const CommentItem = ({
                             {contentParsed.toString().length > 100 && (
                                 <button
                                     onClick={() => setShowFullCmt(!showFullCmt)}
-                                    className='text-xs text-second-gray ml-1'
+                                    className="text-xs text-second-gray ml-1"
                                 >
                                     {showFullCmt ? "ẩn bớt" : "xem thêm"}
                                 </button>

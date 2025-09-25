@@ -3,7 +3,7 @@ import './globals.css';
 
 import { Geist, Geist_Mono } from 'next/font/google';
 
-import OfferComponent from '@/components/layout/OfferComponent';
+import OfferComponent from '@/components/layout/CallVideo/OfferComponent';
 import MobieSideBar from '@/components/layout/SideBar/MobieSideBar';
 import SocketProvider from '@/components/layout/SocketProvider';
 import { Toaster } from '@/components/ui/sonner';
@@ -30,10 +30,20 @@ export default async function RootLayout({
 }>) {
     return (
         <html lang="en" className="dark">
-            <head>
+            <head suppressHydrationWarning>
                 <meta
                     name="viewport"
                     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+                />
+                <link
+                    rel="preconnect"
+                    href="https://res.cloudinary.com"
+                    crossOrigin=""
+                />
+                <link
+                    rel="preconnect"
+                    href="https://localhost:5000"
+                    crossOrigin=""
                 />
             </head>
             <body

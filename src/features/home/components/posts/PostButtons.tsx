@@ -1,16 +1,23 @@
-import { Bookmark, CircleX, Heart, MessageCircle, OctagonAlert, Send } from 'lucide-react';
-import { useState } from 'react';
-import { toast } from 'sonner';
-import { useMediaQuery } from 'usehooks-ts';
+import {
+    Bookmark,
+    CircleX,
+    Heart,
+    MessageCircle,
+    OctagonAlert,
+    Send,
+} from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import { useMediaQuery } from "usehooks-ts";
 
-import { PostProp } from '@/features/home/components/posts/type';
-import { cn, handleSavePost } from '@/lib/utils';
-import { useMyStore } from '@/store/zustand';
-import { IPost } from '@/types/types';
+import { PostProp } from "@/features/home/components/posts/type";
+import { cn, handleSavePost } from "@/lib/utils";
+import { useMyStore } from "@/store/zustand";
+import { IPost } from "@/types/types";
 
-import MobileCmtDrawer from '../comments/moblie/MobileCmtDrawer';
-import PostModal from './PostModal';
-import PostModalContent from './postModal/PostModalContent';
+import MobileCmtDrawer from "../comments/moblie/MobileCmtDrawer";
+import PostModal from "./postModal/PostModal";
+import PostModalContent from "./postModal/PostModalContent";
 
 type PostButtonsProps = {
     listPosts?: IPost[];
@@ -100,6 +107,7 @@ const PostButtons = ({
                         <MessageCircle className="-rotate-90" />
                     </button>
                 )}
+
                 {!isMobile && showModal && (
                     <PostModal
                         Content={

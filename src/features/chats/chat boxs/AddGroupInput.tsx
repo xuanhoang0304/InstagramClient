@@ -9,10 +9,12 @@ import { User } from '@/types/types';
 type AddGroupInputProps = {
     searchTxt: string;
     selectedList: User[] | [];
+    action?: "add-chat" | "add-member";
     onSetSelectedList: (list: User[] | []) => void;
     onSetSearchTxt: (txt: string) => void;
 };
 const AddGroupInput = ({
+    action,
     searchTxt,
     selectedList,
     onSetSelectedList,
@@ -26,9 +28,16 @@ const AddGroupInput = ({
         onSetSelectedList(newList);
     };
     return (
-        <div className={cn("border-y  flex items-center mt-3 flex-wrap px-2 py-1", !!selectedList.length && "py-2")}>
-            <p className="pr-2 font-semibold">Tới:</p>
-            <ul className="flex items-center gap-x-2">
+        <div
+            className={cn(
+                "border-y  flex items-center mt-3 flex-wrap px-2 py-1",
+                !!selectedList.length && "py-2"
+            )}
+        >
+            <p className="pr-2 font-semibold">
+                {action === "add-chat" ? "Tới:" : "Thêm:"}
+            </p>
+            <ul className="flex items-center gap-2 flex-wrap">
                 {selectedList.map((user) => (
                     <div
                         key={user._id}
@@ -61,6 +70,7 @@ const AddGroupInput = ({
                 className="!max-w-[80%] focus-visible:ring-0 border-none !pl-0 !bg-transparent text-sm h-[38px] rounded-none"
                 value={searchTxt}
                 onChange={handleChange}
+                name="add-group-input"
             ></Input>
         </div>
     );

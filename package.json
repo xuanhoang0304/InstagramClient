@@ -7,8 +7,15 @@
         "build": "next build",
         "start": "next start",
         "lint": "next lint",
-        "format": "prettier . --write"
+        "format": "prettier . --write",
+        "size": "size-limit"
     },
+    "size-limit": [
+        {
+            "path": ".next/static/chunks/*.js",
+            "limit": "170 KB"
+        }
+    ],
     "headwind.classRegex": {
         "html": "\\bclass\\s*=\\s*[\\\"\\'](https://github.com/heybourn/headwind/blob/master/[_a-zA-Z0-9\\s\\-\\:\\/]+)[\\\"\\']",
         "javascriptreact": "(?:\\bclassName\\s*=\\s*[\\\"\\'](https://github.com/heybourn/headwind/blob/master/[_a-zA-Z0-9\\s\\-\\:\\/]+)[\\\"\\'])|(?:\\btw\\s*`([_a-zA-Z0-9\\s\\-\\:\\/]*)`)"
@@ -25,7 +32,6 @@
         "@radix-ui/react-separator": "^1.1.7",
         "@radix-ui/react-slot": "^1.2.3",
         "@radix-ui/react-tooltip": "^1.2.7",
-        "@types/simple-peer": "^9.11.8",
         "axios": "^1.8.4",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
@@ -38,6 +44,7 @@
         "jsonwebtoken": "^9.0.2",
         "lodash": "^4.17.21",
         "lucide-react": "^0.487.0",
+        "motion": "^12.23.12",
         "next": "15.2.4",
         "next-themes": "^0.4.6",
         "react": "^19.1.0",
@@ -59,6 +66,7 @@
     },
     "devDependencies": {
         "@eslint/eslintrc": "^3",
+        "@size-limit/preset-app": "^11.2.0",
         "@tailwindcss/postcss": "^4",
         "@types/cookie-parser": "^1.4.9",
         "@types/jsonwebtoken": "^9.0.9",
@@ -66,11 +74,13 @@
         "@types/node": "^20",
         "@types/react": "^19",
         "@types/react-dom": "^19",
+        "@types/simple-peer": "^9.11.8",
         "@types/tailwindcss": "^3.0.11",
         "autoprefixer": "^10.4.21",
         "eslint": "^9",
         "eslint-config-next": "15.2.4",
         "postcss": "^8.5.3",
+        "size-limit": "^11.2.0",
         "tailwindcss": "^4.1.3",
         "typescript": "^5"
     }

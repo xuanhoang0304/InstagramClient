@@ -1,24 +1,30 @@
-import { AxiosError } from 'axios';
-import { useRouter } from 'next/navigation';
-import { ReactNode, RefObject, useEffect, useRef, useState } from 'react';
-import { toast } from 'sonner';
-import { useOnClickOutside } from 'usehooks-ts';
+import { AxiosError } from "axios";
+import { useRouter } from "next/navigation";
+import { ReactNode, RefObject, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+import { mutate } from "swr";
+import { useOnClickOutside } from "usehooks-ts";
 
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { apiClient } from '@/configs/axios';
-import envConfig from '@/configs/envConfig';
-import { useApi } from '@/hooks/useApi';
-import { useDebounce } from '@/hooks/useDebounce';
-import { cn, handleError } from '@/lib/utils';
-import { useMyStore } from '@/store/zustand';
-import { HttpResponse, User } from '@/types/types';
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { apiClient } from "@/configs/axios";
+import envConfig from "@/configs/envConfig";
+import { useApi } from "@/hooks/useApi";
+import { useDebounce } from "@/hooks/useDebounce";
+import { cn, handleError, handleMutateWithKey } from "@/lib/utils";
+import { useMyStore } from "@/store/zustand";
+import { HttpResponse, User } from "@/types/types";
 
-import { IGroupResponse } from '../type';
-import AddGroupInput from './AddGroupInput';
-import GroupChatSuggestion from './GroupChatSuggestion';
+import { IGroup, IGroupResponse } from "../type";
+import AddGroupInput from "./AddGroupInput";
+import GroupChatSuggestion from "./GroupChatSuggestion";
 
 type SuggestionUserResponse = {
     result: {
@@ -29,8 +35,19 @@ type SuggestionUserResponse = {
 type AddGroupsChatBtnProps = {
     trigger: ReactNode;
     side?: "right" | "top" | "bottom" | "left";
+    action?: "add-chat" | "add-member";
+    members?: string[];
+    group?: IGroup;
+    onSetMembers?: (members: User[]) => void;
 };
-const AddGroupsChatBtn = ({ trigger, side }: AddGroupsChatBtnProps) => {
+const AddGroupsChatBtn = ({
+    trigger,
+    side,
+    action = "add-chat",
+    members,
+    group,
+    onSetMembers,
+}: AddGroupsChatBtnProps) => {
     const [open, setOpen] = useState(false);
     const [suggestionList, setSuggestionList] = useState<User[] | []>([]);
     const [searchTxt, setSearchTxt] = useState("");
@@ -41,9 +58,10 @@ const AddGroupsChatBtn = ({ trigger, side }: AddGroupsChatBtnProps) => {
     const ref = useRef<HTMLDivElement>(null);
     const { myUser } = useMyStore();
     const router = useRouter();
+    const excludes = action === "add-chat" ? [`"${myUser?._id}"`] : members;
     const { data } = useApi<SuggestionUserResponse>(
         debouncedSearchTxt &&
-            `${envConfig.BACKEND_URL}/api/users/?filters={"keyword": "${debouncedSearchTxt}","excludes": ["${myUser?._id}"]}&page=${page}&limit=3`
+            `${envConfig.BACKEND_URL}/api/users/?filters={"keyword": "${debouncedSearchTxt}","excludes": [${excludes}]}&page=${page}&limit=3`
     );
 
     const handleClose = () => {
@@ -89,6 +107,47 @@ const AddGroupsChatBtn = ({ trigger, side }: AddGroupsChatBtnProps) => {
             }
         }
     };
+    const handleAddMember = async () => {
+        const members = selectedList.map((item) => item._id);
+        try {
+            const res: HttpResponse & { data: IGroup } =
+                await apiClient.fetchApi(`/groups/${group?._id}/members`, {
+                    method: "PUT",
+                    data: {
+                        members,
+                        action: "add-member",
+                    },
+                });
+            if (res.code === 200) {
+                toast.success("Thành viên mới đã được thêm vào nhóm");
+                mutate(
+                    `${envConfig.BACKEND_URL}/api/groups/${group?._id}`,
+                    (prev: (HttpResponse & { result: IGroup }) | undefined) => {
+                        if (!prev) return prev;
+                        onSetMembers?.([
+                            ...prev.result.members,
+                            ...selectedList,
+                        ]);
+                        return {
+                            ...prev,
+                            result: {
+                                ...prev.result,
+                                members: [
+                                    ...prev.result.members,
+                                    ...selectedList,
+                                ],
+                            },
+                        };
+                    },
+                    false
+                );
+                handleMutateWithKey(`groups/?filter={"userId":"${myUser?._id}`);
+                handleClose();
+            }
+        } catch (error) {
+            handleError("handleAddMember", error);
+        }
+    };
     useOnClickOutside(ref as RefObject<HTMLDivElement>, handleClose);
     useEffect(() => {
         if (data?.code == 200) {
@@ -102,11 +161,20 @@ const AddGroupsChatBtn = ({ trigger, side }: AddGroupsChatBtnProps) => {
         <Dialog open={open}>
             <TooltipProvider>
                 <Tooltip>
-                    <TooltipTrigger onClick={() => setOpen(true)}>
+                    <TooltipTrigger
+                        autoFocus={false}
+                        asChild
+                        onClick={() => setOpen(true)}
+                        className="cursor-pointer"
+                    >
                         {trigger}
                     </TooltipTrigger>
                     <TooltipContent side={side || "right"}>
-                        <p>Tin nhắn mới</p>
+                        <p>
+                            {action === "add-chat"
+                                ? "Tin nhắn mới"
+                                : "Thêm thành viên"}
+                        </p>
                     </TooltipContent>
                 </Tooltip>
             </TooltipProvider>
@@ -115,7 +183,7 @@ const AddGroupsChatBtn = ({ trigger, side }: AddGroupsChatBtnProps) => {
                 className="!bg-primary-gray border-none !px-0 !pt-2 pb-4 !block"
             >
                 <DialogTitle className="text-center py-2">
-                    Tin nhắn mới
+                    {action === "add-chat" ? "Tin nhắn mới" : "Thêm thành viên"}
                 </DialogTitle>
 
                 <AddGroupInput
@@ -123,9 +191,10 @@ const AddGroupsChatBtn = ({ trigger, side }: AddGroupsChatBtnProps) => {
                     selectedList={selectedList}
                     onSetSelectedList={handleSetSelectedList}
                     onSetSearchTxt={handleSetSearchTxt}
+                    action={action}
                 ></AddGroupInput>
 
-                <div className="h-[300px] pt-3  ">
+                <div className="h-[300px] pt-3 border  overflow-y-auto ">
                     {debouncedSearchTxt && (
                         <GroupChatSuggestion
                             list={suggestionList}
@@ -136,8 +205,8 @@ const AddGroupsChatBtn = ({ trigger, side }: AddGroupsChatBtnProps) => {
                     )}
                 </div>
 
-                {selectedList.length > 0 && (
-                    <div className="flex items-center gap-x-2 ml-4">
+                {selectedList.length > 0 && action == "add-chat" && (
+                    <div className="flex items-center mt-3 gap-x-2 ml-4">
                         <Checkbox
                             id="isGroup"
                             onClick={() => setIsGroup(!isGroup)}
@@ -153,14 +222,18 @@ const AddGroupsChatBtn = ({ trigger, side }: AddGroupsChatBtnProps) => {
                 )}
                 <div className="px-4 mt-3">
                     <Button
-                        onClick={handleCreateGroupChat}
+                        onClick={
+                            action === "add-chat"
+                                ? handleCreateGroupChat
+                                : handleAddMember
+                        }
                         className={cn(
                             "bg-second-blue hover:bg-primary-blue w-full text-primary-white",
                             !selectedList.length &&
                                 "pointer-events-none opacity-30"
                         )}
                     >
-                        Chat
+                        {action === "add-chat" ? "Chat" : "Thêm thành viên"}
                     </Button>
                 </div>
             </DialogContent>

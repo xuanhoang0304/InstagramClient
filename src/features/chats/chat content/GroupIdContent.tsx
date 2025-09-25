@@ -1,16 +1,15 @@
 "use client";
-import { ArrowDown } from 'lucide-react';
-import { UIEvent, useEffect, useRef, useState } from 'react';
-import InfiniteScroll from 'react-infinite-scroll-component';
+import { ArrowDown } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import InfiniteScroll from "react-infinite-scroll-component";
 
-import { useDebounce } from '@/hooks/useDebounce';
-import { cn } from '@/lib/utils';
+import { cn } from "@/lib/utils";
 
-import { useMessageStore } from '../MessageStore';
-import { IGroup, IMessageFE } from '../type';
-import { handleGroupMessages } from '../utils';
-import GroupMessageList from './GroupMessageList';
-import MessageProfile from './MessageProfile';
+import { useMessageStore } from "../MessageStore";
+import { IGroup, IMessageFE } from "../type";
+import { handleGroupMessages } from "../utils";
+import GroupMessageList from "./GroupMessageList";
+import MessageProfile from "./MessageProfile";
 
 type Props = {
     msgList: IMessageFE[];
@@ -31,15 +30,22 @@ const GroupIdContent = ({
 }: Props) => {
     const { isNewMessage, setIsNewMessage } = useMessageStore();
     const scrollableDivRef = useRef<HTMLDivElement>(null);
-    const [scrollY, setScrollY] = useState(0);
-    const debounceScrollY = useDebounce(scrollY, 300);
+    const [showBtn, setShowBtn] = useState(false);
     const fetchMoreMessage = async () => {
         onSetNextPage(page + 1);
     };
-
-    const handleScroll = (e: UIEvent<HTMLDivElement>) => {
-        setScrollY(e.currentTarget.scrollTop);
-    };
+    const handleScroll = useCallback(() => {
+        if (showBtn) {
+            if (scrollableDivRef.current?.scrollTop === 0) {
+                setShowBtn(false);
+                return;
+            }
+            return;
+        }
+        if ((scrollableDivRef.current?.scrollTop as number) < -100) {
+            setShowBtn(true);
+        }
+    }, [showBtn]);
     const handleScrollToTop = () => {
         if (scrollableDivRef.current) {
             scrollableDivRef.current.scrollTo({
@@ -59,20 +65,20 @@ const GroupIdContent = ({
     return (
         <div
             style={{ bottom: `${inputWrapperHeight}px` }}
-            className="inset-0 overflow-y-auto absolute top-[77px] left-0"
+            className=" overflow-y-auto relative top-0 left-0 h-[calc(100vh-160px)] w-full"
         >
             <button
                 onClick={handleScrollToTop}
                 className={cn(
                     "absolute bottom-[30px]  hidden left-1/2  -translate-x-1/2 z-30 bg-primary-gray p-2 rounded-full",
-                    debounceScrollY < -50 && "block"
+                    showBtn && "block"
                 )}
             >
                 <ArrowDown />
             </button>
             <div
                 id="scrollableDiv"
-                onScroll={(e) => handleScroll(e)}
+                onScroll={handleScroll}
                 ref={scrollableDivRef}
                 className={cn(
                     "h-full overflow-y-auto relative flex flex-col-reverse pt-6 pb-4 px-3",

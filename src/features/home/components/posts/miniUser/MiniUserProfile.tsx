@@ -1,16 +1,16 @@
-import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
+import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
-import envConfig from '@/configs/envConfig';
-import MiniUserActions from '@/features/home/components/posts/miniUser/MiniUserActions';
-import MiniUserDetails from '@/features/home/components/posts/miniUser/MiniUserDetails';
-import MiniUserInfo from '@/features/home/components/posts/miniUser/MiniUserInfo';
-import MiniUserPosts from '@/features/home/components/posts/miniUser/MiniUserPosts';
-import { useApi } from '@/hooks/useApi';
-import { handleFollowingUser, handleMutateWithKey } from '@/lib/utils';
-import { useMyStore } from '@/store/zustand';
-import { getPostsByCreated, IPost, User } from '@/types/types';
+import envConfig from "@/configs/envConfig";
+import MiniUserActions from "@/features/home/components/posts/miniUser/MiniUserActions";
+import MiniUserDetails from "@/features/home/components/posts/miniUser/MiniUserDetails";
+import MiniUserInfo from "@/features/home/components/posts/miniUser/MiniUserInfo";
+import MiniUserPosts from "@/features/home/components/posts/miniUser/MiniUserPosts";
+import { useApi } from "@/hooks/useApi";
+import { handleFollowingUser, handleMutateWithKey } from "@/lib/utils";
+import { useMyStore } from "@/store/zustand";
+import { getPostsByCreated, IPost, User } from "@/types/types";
 
 type MiniUserProfileProps = {
     user: User | undefined;
@@ -22,7 +22,11 @@ const MiniUserProfile = ({ user }: MiniUserProfileProps) => {
     const [posts, setPosts] = useState<IPost[]>([]);
     const figureRef = useRef<HTMLElement>(null);
     const { data: userPost } = useApi<getPostsByCreated>(
-        `${envConfig.BACKEND_URL}/api/posts/?filters={"createdBy": ["${user?._id}"]}&limit=3&page=1&sorts={ "pinned": -1, "createdAt":-1}`
+        `${envConfig.BACKEND_URL}/api/posts/?filters={"createdBy": ["${user?._id}"]}&limit=3&page=1&sorts={ "pinned": -1, "createdAt":-1}`,
+        undefined,
+        {
+            dedupingInterval: 1000 * 60,
+        }
     );
 
     const handlFollowOrUnFollow = async (id: string) => {
@@ -66,6 +70,7 @@ const MiniUserProfile = ({ user }: MiniUserProfileProps) => {
                     className="size-full object-cover rounded-full"
                 ></Image>
             </figure>
+
             {showMiniUser &&
                 createPortal(
                     <div
@@ -75,7 +80,7 @@ const MiniUserProfile = ({ user }: MiniUserProfileProps) => {
                             top: position.top,
                             left: position.left,
                         }}
-                        className="absolute rounded-lg dark:!bg-black !bg-white py-4 !px-0 z-20 shadow-[0_0_23px_0_rgba(255,255,255,0.2)] !w-auto min-w-[366px] !border-none"
+                        className="absolute max-w-[400px] rounded-lg dark:!bg-black !bg-white py-4 !px-0 z-[51] shadow-[0_0_23px_0_rgba(255,255,255,0.2)] !w-auto min-w-[340px] !border-none"
                     >
                         {/* Info */}
                         <MiniUserInfo user={user}></MiniUserInfo>

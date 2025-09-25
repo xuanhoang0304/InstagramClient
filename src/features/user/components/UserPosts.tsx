@@ -9,7 +9,7 @@ const UserPosts = ({ children }: { children: ReactNode }) => {
     const pathname = usePathname();
     const { userId } = useParams();
     return (
-        <div className="max-w-[935px] mx-auto h-auto w-full min-h-[500px]">
+        <div className="max-w-[975px] mx-auto h-auto w-full min-h-[500px]">
             <div className=" w-full h-full">
                 <div className="w-full h-0.5 bg-primary-gray"></div>
                 <div className="flex items-center md:mt-3 mb-3 justify-center">

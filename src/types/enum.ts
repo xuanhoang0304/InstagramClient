@@ -10,12 +10,13 @@ export enum EPostMediaType {
 export interface IPostMedia {
     type: EPostMediaType;
     path: string;
+    thumbnailUrl?: string;
 }
 export enum EMessageReaction {
-    LIKE = 'LIKE',
-    HAHA = 'HAHA',
-    SAD = 'SAD',
-    ANGRY = 'ANGRY',
-    LOVE = 'LOVE',
-    NORMAL = '',
-  }
+    LIKE = "LIKE",
+    HAHA = "HAHA",
+    SAD = "SAD",
+    ANGRY = "ANGRY",
+    LOVE = "LOVE",
+    NORMAL = "",
+}

@@ -75,6 +75,7 @@
 }
 
 @theme inline {
+    --breakpoint-xs: 30rem;
     --color-second-button-background: #363636;
     --color-primary-dark-hover: #ffffff1a;
     --color-primary-white: #f5f5f5;
@@ -130,6 +131,9 @@
     }
     .hidden-scrollbar {
         @apply [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden;
+    }
+    .abs-center {
+        @apply top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2;
     }
 }
 

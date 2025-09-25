@@ -1,9 +1,9 @@
-import { CirclePlus } from 'lucide-react';
+import { CirclePlus } from "lucide-react";
 
-import CommentItem from '@/features/home/components/comments/CommentItem';
-import PostCaption from '@/features/home/components/posts/PostCaption';
-import { cn, handleGetParentCmtByPostId } from '@/lib/utils';
-import { IComment, IPost } from '@/types/types';
+import CommentItem from "@/features/home/components/comments/CommentItem";
+import PostCaption from "@/features/home/components/posts/PostCaption";
+import { cn, handleGetParentCmtByPostId } from "@/lib/utils";
+import { IComment, IPost } from "@/types/types";
 
 type CommentListProps = {
     post: IPost | null;
@@ -42,7 +42,11 @@ const CommentList = ({
     };
     if (parentList.length > 0)
         return (
-            <ul className={cn("px-4 pt-4 pb-10 h-auto  flex flex-col gap-y-3  ")}>
+            <ul
+                className={cn(
+                    "px-4 pt-4 pb-10 h-auto  flex flex-col gap-y-3  "
+                )}
+            >
                 <PostCaption showAvt item={post}></PostCaption>
 
                 {parentList.map((cmt) => (
@@ -69,11 +73,13 @@ const CommentList = ({
             </ul>
         );
     return (
-        <div className="h-full p-4 border-y border-primary-gray">
+        <div className="h-full p-4 ">
             <PostCaption showAvt item={post}></PostCaption>
             <div className=" flex flex-col h-[90%] items-center gap-y-2 justify-center">
                 <p className="text-2xl font-bold">Chưa có bình luận nào</p>
-                <p className="text-sm ">Bắt đầu trò chuyện</p>
+                <p className="text-sm ">
+                    Hãy bình luận để tương tác với bài viết
+                </p>
             </div>
         </div>
     );

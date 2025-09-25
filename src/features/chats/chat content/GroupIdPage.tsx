@@ -1,22 +1,22 @@
 "use client";
-import _ from 'lodash';
-import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import uniqBy from "lodash/uniqBy";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
-import Loading from '@/components/layout/loading';
-import NotFound from '@/components/layout/NotFound';
-import { Skeleton } from '@/components/ui/skeleton';
-import envConfig from '@/configs/envConfig';
-import { socket } from '@/configs/socket';
-import { useApi } from '@/hooks/useApi';
-import { handleMutateWithKey } from '@/lib/utils';
-import { useMyStore } from '@/store/zustand';
+import Loading from "@/components/layout/loading";
+import NotFound from "@/components/layout/NotFound";
+import { Skeleton } from "@/components/ui/skeleton";
+import envConfig from "@/configs/envConfig";
+import { socket } from "@/configs/socket";
+import { useApi } from "@/hooks/useApi";
+import { handleMutateWithKey } from "@/lib/utils";
+import { useMyStore } from "@/store/zustand";
 
-import { useMessageStore } from '../MessageStore';
-import { IGroupResponse, IMessageFE, IMessageResponse } from '../type';
-import GroupIdContent from './GroupIdContent';
-import GroupIdHeading from './GroupIdHeading';
-import GroupIdInput from './GroupIdInput';
+import { useMessageStore } from "../MessageStore";
+import { IGroupResponse, IMessageFE, IMessageResponse } from "../type";
+import GroupIdContent from "./GroupIdContent";
+import GroupIdHeading from "./GroupIdHeading";
+import GroupIdInput from "./GroupIdInput";
 
 const GroupIdPage = () => {
     // --State--
@@ -33,7 +33,6 @@ const GroupIdPage = () => {
 
     // --State--
     const { groupId } = useParams();
-
     const { data, isLoading } = useApi<IGroupResponse>(
         `${envConfig.BACKEND_URL}/api/groups/${groupId}`
     );
@@ -68,7 +67,7 @@ const GroupIdPage = () => {
         }
         if (content?.result && msgGroupId === groupId) {
             setMessageList(
-                _.uniqBy([...messageList, ...content?.result?.result], "_id")
+                uniqBy([...messageList, ...content?.result?.result], "_id")
             );
         }
     }, [content, msgGroupId]);
@@ -117,25 +116,28 @@ const GroupIdPage = () => {
                         <Skeleton className="size-10"></Skeleton>
                     </div>
                 </div>
-                <div className="absolute size-full z-10">
+                <div className="relative h-[calc(100vh-160px)] w-full z-10">
                     <Loading
                         text="Đang tải tin nhắn"
                         className="absolute pb-[83px]"
                     ></Loading>
                 </div>
-                <div className="h-[83px] w-full absolute bottom-0 left-0 z-20 p-4 ">
+                <div className="h-[83px] w-full sticky bottom-0 left-0 z-20 p-4 ">
                     <Skeleton className="h-[52px] w-full rounded-full "></Skeleton>
                 </div>
             </div>
         );
     }
-    if (!data?.result?._id) {
+    if (
+        !data?.result?._id ||
+        !data.result.members.find((u) => u._id === String(myUser?._id))
+    ) {
         return <NotFound></NotFound>;
     }
 
     return (
         <>
-            <div className="flex-1 h-full relative">
+            <div className="flex-1 h-full">
                 <GroupIdHeading group={data?.result}></GroupIdHeading>
 
                 <GroupIdContent

@@ -1,5 +1,5 @@
 "use client";
-import _ from 'lodash';
+import uniqBy from 'lodash/uniqBy';
 import { ArrowLeft } from 'lucide-react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -21,7 +21,7 @@ const UserPostsPage = () => {
     const postRef = useRef<HTMLLIElement>(null);
     const { data, isLoading } = useApi<getPostsByCreated>(
         userId
-            ? `/api/posts/?filters={"createdBy": ["${userId}"]}&sorts={ "pinned": -1, "createdAt":-1}&page=${page}&limit=6`
+            ? `/posts/?filters={"createdBy": ["${userId}"]}&sorts={ "pinned": -1, "createdAt":-1}&page=${page}&limit=6`
             : null
     );
     const [listPosts, setListPosts] = useState<IPost[]>([]);
@@ -31,7 +31,7 @@ const UserPostsPage = () => {
 
     useEffect(() => {
         if (data) {
-            setListPosts((prev) => _.unionBy([...prev, ...data.result], "_id"));
+            setListPosts((prev) => uniqBy([...prev, ...data.result], "_id"));
         }
     }, [data]);
     useEffect(() => {
@@ -51,7 +51,7 @@ const UserPostsPage = () => {
         if (!isMobile) {
             router.push(`/post/${postId}`);
         }
-    },[isMobile])
+    }, [isMobile]);
     if (isLoading) {
         return (
             <ul className="flex flex-col gap-y-5 max-w-[468px] mx-auto mt-5 lg:mt-11">

@@ -2,11 +2,12 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
     /* config options here */
-    reactStrictMode: true,
+    reactStrictMode: false,
     devIndicators: false,
     experimental: {
         scrollRestoration: true, // Tự động cuộn lên đầu khi điều hướng
-      },
+        // optimizeCss: true,
+    },
     images: {
         remotePatterns: [
             {

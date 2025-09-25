@@ -3,4 +3,5 @@ export type Media = {
     isValid?: boolean;
     type: "video" | "image";
     path: string;
+    thumbnailUrl?: string;
 };

@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import uniqBy from 'lodash/uniqBy';
 import { useEffect, useState } from 'react';
 
 import { handleGetRepliesByParentCmtId } from '@/lib/utils';
@@ -37,7 +37,7 @@ const ShowRepliesBtn = ({
                 setReplies(parentCmt._id, data.replies);
                 return;
             }
-            const newReplies = _.uniqBy(
+            const newReplies = uniqBy(
                 [...repliesMap[parentCmt._id], ...data.replies],
                 "_id"
             );
