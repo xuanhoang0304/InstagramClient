@@ -67,7 +67,7 @@ const UserListReel = () => {
 
   if (isLoading && !posts.length) {
     return (
-      <div className="grid grid-cols-3 gap-0.5 mt-5">
+      <div className="grid grid-cols-4 gap-0.5 mt-5">
         {Array(limit)
           .fill(0)
           .map((_, index) => (
@@ -96,7 +96,7 @@ const UserListReel = () => {
       hasMore={posts.length < Number(data?.total)}
       loader={
         loadingMore && (
-          <div className="grid grid-cols-3 gap-0.5">
+          <div className="grid grid-cols-4 gap-0.5">
             {tempArr.slice(0, 4).map((item) => (
               <Skeleton
                 key={item.id}
@@ -107,7 +107,7 @@ const UserListReel = () => {
         )
       }
     >
-      <ul className="grid grid-cols-3 gap-0.5 pb-10">
+      <ul className="grid grid-cols-4 gap-0.5 pb-10">
         {posts.map((item) => (
           <UserPostItem
             post={item}

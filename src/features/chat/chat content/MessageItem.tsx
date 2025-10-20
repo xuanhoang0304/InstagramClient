@@ -45,7 +45,7 @@ const MessageItem = ({ item, isCurUser, isParent, parentMessage }: Props) => {
     >
       <div
         className={cn(
-          "flex flex-col relative gap-y-1",
+          "flex flex-col relative gap-y-1 w-[70%] md:w-full max-w-fit",
           item.reaction && "pb-3",
           item.parentMessage && "px-3 bg-second-button-background rounded-lg",
         )}
@@ -62,11 +62,11 @@ const MessageItem = ({ item, isCurUser, isParent, parentMessage }: Props) => {
           <p
             key={item._id}
             className={cn(
-              "px-3 min-w-10 py-2 rounded-lg bg-primary-gray w-fit",
+              "px-3 min-w-10 py-2 rounded-lg bg-primary-gray max-w-fit whitespace-pre-line break-words w-full",
               isCurUser && "bg-primary-blue self-end",
               !isParent &&
                 "bg-primary-gray/50 text-xs max-w-[400px] pb-2 line-clamp-2 ",
-              item.text.length > 50 && !isParent && "pb-0",
+              item.text.length > 200 && !isParent && "pb-0",
             )}
           >
             {item.text.length < 200
@@ -77,7 +77,7 @@ const MessageItem = ({ item, isCurUser, isParent, parentMessage }: Props) => {
             <span
               className={cn(
                 "hidden text-second-blue ml-1 text-xs font-semibold cursor-pointer",
-                item.text.length > 50 && "inline",
+                item.text.length > 200 && "inline",
                 isCurUser && "text-primary-gray",
               )}
               onClick={handleShowTxt}
@@ -99,11 +99,11 @@ const MessageItem = ({ item, isCurUser, isParent, parentMessage }: Props) => {
               <p
                 key={item._id}
                 className={cn(
-                  "px-3 min-w-10 py-2 rounded-lg  bg-primary-gray w-fit",
+                  "px-3 min-w-10 py-2 rounded-lg  bg-primary-gray max-w-fit whitespace-pre-line break-words w-full",
                   isCurUser && "bg-primary-blue self-end",
                   !isParent &&
                     "bg-primary-gray/50 text-xs max-w-[400px] pb-2 line-clamp-2 ",
-                  item.text.length > 50 && !isParent && "pb-0",
+                  item.text.length > 200 && !isParent && "pb-0",
                 )}
               >
                 {item.text.length < 200
@@ -114,7 +114,7 @@ const MessageItem = ({ item, isCurUser, isParent, parentMessage }: Props) => {
                 <span
                   className={cn(
                     "hidden text-primary-gray ml-1 font-semibold cursor-pointer",
-                    item.text.length > 50 && "inline",
+                    item.text.length > 200 && "inline",
                     !isCurUser && "text-primary-white",
                   )}
                   onClick={handleShowTxt}
@@ -131,7 +131,7 @@ const MessageItem = ({ item, isCurUser, isParent, parentMessage }: Props) => {
           </div>
         )}
         {item.reaction && (
-          <p className="bg-primary-gray text-xs w-fit  py-0.5 px-2 border border-black rounded-lg absolute z-10 bottom-[0px]">
+          <p className="bg-primary-gray text-xs max-w-fit whitespace-pre-line break-words w-full  py-0.5 px-2 border border-black rounded-lg absolute z-10 bottom-[0px]">
             {reactionIconMap[item.reaction]}
           </p>
         )}

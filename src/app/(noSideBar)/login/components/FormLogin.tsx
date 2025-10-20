@@ -180,7 +180,9 @@ const FormLogin = () => {
               </figure>
               <p>Đăng nhập bằng Google</p>
             </button>
-            <button className="font-bold">Quên mật khẩu?</button>
+            <button type="button" className="font-bold">
+              Quên mật khẩu?
+            </button>
           </div>
           <div className="text-center">
             Bạn chưa có tài khoản ư?{" "}

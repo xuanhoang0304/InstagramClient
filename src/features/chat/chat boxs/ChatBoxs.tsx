@@ -16,7 +16,7 @@ const ChatBoxs = () => {
   return (
     <div
       className={cn(
-        "w-full lg:max-w-[397px] lg:pt-9 pt-5 lg:border-r border-primary-gray",
+        "w-full lg:max-w-[397px] lg:pt-9 pt-5 lg:border-r border-primary-gray shrink-0",
         pathname !== "/chats" && "hidden lg:block",
       )}
     >

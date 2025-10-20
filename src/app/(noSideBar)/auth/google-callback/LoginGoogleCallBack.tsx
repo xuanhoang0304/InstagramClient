@@ -8,6 +8,7 @@ import envConfig from "@/configs/envConfig";
 const LoginGoogleCallBack = () => {
   const accessToken = useSearchParams().get("accessToken") as string;
   const refreshToken = useSearchParams().get("refreshToken") as string;
+  const newUser = useSearchParams().get("newUser") as string;
 
   const handleSetCookies = async () => {
     await fetch("/api/setCookie", {
@@ -16,6 +17,10 @@ const LoginGoogleCallBack = () => {
       credentials: "include",
       body: JSON.stringify({ accessToken, refreshToken }),
     });
+    if (newUser) {
+      window.location.href = `${envConfig.FRONTEND_URL}/account/edit`;
+      return;
+    }
     window.location.href = envConfig.FRONTEND_URL;
   };
   useEffect(() => {

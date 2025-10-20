@@ -36,7 +36,7 @@ const UserPostsPage = () => {
   }, [data]);
   useEffect(() => {
     if (postId && listPosts.length) {
-      const postExists = listPosts.some((post) => post._id === postId);
+      const postExists = listPosts.find((post) => post._id === postId);
       if (postExists && postRef.current) {
         postRef.current.scrollIntoView({
           behavior: "smooth",
@@ -46,7 +46,7 @@ const UserPostsPage = () => {
         setPage((prev) => prev + 1);
       }
     }
-  }, [listPosts]);
+  }, [listPosts, postId]);
   useEffect(() => {
     if (!isMobile) {
       router.push(`/post/${postId}`);
@@ -65,7 +65,7 @@ const UserPostsPage = () => {
               <Skeleton className="size-6"></Skeleton>
             </div>
             <Skeleton className="w-full md:w-[468px] md:h-[585px] h-[300px] rounded-[4px] mt-3"></Skeleton>
-            <Skeleton className="w-full h-[118px] mt-1 rounded-[2px] mt-tega1"></Skeleton>
+            <Skeleton className="w-full h-[118px] mt-1 rounded-[2px]"></Skeleton>
           </li>
         ))}
       </ul>

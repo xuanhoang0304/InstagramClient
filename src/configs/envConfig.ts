@@ -7,6 +7,7 @@ interface envConfig {
   JWT_SECRET: string;
   IMAGE_SIZE: number;
   VIDEO_SIZE: number;
+  DEFAULT_IMG_URL: string;
 }
 const envConfig: envConfig = {
   NEXT_PUBLIC_EXPIRES_ACCESSTOKEN:
@@ -20,6 +21,7 @@ const envConfig: envConfig = {
   JWT_SECRET: String(process.env.NEXT_PUBLIC_JWT_SECRET),
   IMAGE_SIZE: Number(process.env.NEXT_PUBLIC_IMAGE_SIZE || 0),
   VIDEO_SIZE: Number(process.env.NEXT_PUBLIC_VIDEO_SIZE || 0),
+  DEFAULT_IMG_URL: String(process.env.NEXT_PUBLIC_VIDEO_SIZE || ""),
 };
 
 export default envConfig;

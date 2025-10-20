@@ -23,7 +23,7 @@ const MiniUserProfile = ({ user }: MiniUserProfileProps) => {
   const { setMyUser } = useMyStore();
   const [posts, setPosts] = useState<IPost[]>([]);
   const { data: userPost } = useApi<getPostsByCreated>(
-    `${envConfig.BACKEND_URL}/api/posts/?filters={"createdBy": ["${user?._id}"]}&limit=3&page=1&sorts={ "pinned": -1, "createdAt":-1}`,
+    `${envConfig.BACKEND_URL}/api/posts?filters={"createdBy": ["${user?._id}"]}&limit=3&page=1&sorts={ "pinned": -1, "createdAt":-1}`,
     undefined,
     {
       dedupingInterval: 1000 * 60,

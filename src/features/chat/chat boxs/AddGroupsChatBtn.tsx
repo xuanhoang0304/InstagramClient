@@ -26,7 +26,7 @@ import { IGroup, IGroupResponse } from "../type";
 import AddGroupInput from "./AddGroupInput";
 import GroupChatSuggestion from "./GroupChatSuggestion";
 
-type SuggestionUserResponse = {
+export type SuggestionUserResponse = {
   result: {
     users: User[];
     totalUser: number;
@@ -150,6 +150,10 @@ const AddGroupsChatBtn = ({
       setSuggestionList([]);
     }
   }, [data]);
+  useEffect(() => {
+    if (!selectedList.length) return;
+    setIsGroup(selectedList.length > 1);
+  }, [selectedList.length]);
   return (
     <Dialog open={open}>
       <TooltipProvider>
@@ -199,6 +203,7 @@ const AddGroupsChatBtn = ({
             <Checkbox
               id="isGroup"
               onClick={() => setIsGroup(!isGroup)}
+              checked={isGroup}
               className="!border-primary-white"
             />
             <label

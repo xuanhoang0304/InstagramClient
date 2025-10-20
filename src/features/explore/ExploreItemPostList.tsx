@@ -27,9 +27,9 @@ const ExploreItemPostList = ({ item, idx }: Props) => {
           <UserPostItem
             key={post._id}
             post={post}
-            imageWrapClass="aspect-square h-full"
-            videoClass="aspect-square h-full"
-            className="h-auto aspect-square"
+            imageWrapClass="!aspect-square h-full"
+            videoClass="!aspect-square h-full"
+            className="h-auto !aspect-square"
           ></UserPostItem>
         ))}
       </div>

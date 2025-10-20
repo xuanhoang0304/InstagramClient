@@ -64,8 +64,10 @@ const GroupIdContent = ({
 
   return (
     <div
-      style={{ bottom: `${inputWrapperHeight}px` }}
-      className=" overflow-y-auto relative top-0 left-0 h-[calc(100vh-160px)] w-full"
+      style={{
+        height: `calc(100% - ${inputWrapperHeight + 77}px)`,
+      }}
+      className=" overflow-y-auto absolute top-[77px] left-0  w-full"
     >
       <button
         onClick={handleScrollToTop}
@@ -81,7 +83,7 @@ const GroupIdContent = ({
         onScroll={handleScroll}
         ref={scrollableDivRef}
         className={cn(
-          "h-full overflow-y-auto relative flex flex-col-reverse pt-6 pb-4 px-3",
+          "h-full overflow-y-auto overflow-x-hidden relative flex flex-col-reverse pt-6 pb-4 px-3",
           !msgList.length && "flex-col",
         )}
       >
@@ -94,7 +96,7 @@ const GroupIdContent = ({
           loader={null}
           scrollThreshold={0.5}
           scrollableTarget="scrollableDiv"
-          className="flex flex-col-reverse gap-y-4 mt-4 "
+          className="flex flex-col-reverse gap-y-4 mt-4 !overflow-x-hidden"
         >
           <GroupMessageList
             groupList={list}

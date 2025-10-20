@@ -1,6 +1,7 @@
 import { Check } from "lucide-react";
 import Image from "next/image";
 
+import RealUsername from "@/components/layout/RealUsername";
 import { cn } from "@/lib/utils";
 import { User } from "@/types/types";
 
@@ -40,7 +41,8 @@ const GroupChatSuggestionItem = ({
           ></Image>
         </figure>
 
-        <h3 className="text-sm line-clamp-1">{user.name}</h3>
+        {/* <h3 className="text-sm line-clamp-1">{user.name}</h3> */}
+        <RealUsername username={user.name} isReal={user.isReal}></RealUsername>
       </div>
       <button
         className={cn(

@@ -2,7 +2,6 @@
 import {
   Clapperboard,
   Compass,
-  Heart,
   Home,
   Instagram,
   MessageCircle,
@@ -12,7 +11,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
 
 import {
   Tooltip,
@@ -29,55 +27,49 @@ import { getMe } from "@/types/types";
 import CreatePost from "./CreatePost";
 import { MoreBtn } from "./MoreBtn";
 import NotifyWrapper from "./NotifyWrapper";
+import SearchWrapper from "./SearchWrapper";
+
+const menuItems = [
+  {
+    icon: <Home />,
+    url: "/",
+    title: "Trang chủ",
+    tooltip: "Trang chủ",
+  },
+  {
+    icon: <Search />,
+    url: "/search",
+    title: "Tìm kiếm",
+    tooltip: "Tìm kiếm",
+  },
+  {
+    icon: <Compass />,
+    url: "/explore",
+    title: "Khám phá",
+    tooltip: "Khám phá",
+  },
+  {
+    icon: <Clapperboard />,
+    url: "/reels",
+    title: "Reels",
+    tooltip: "Reels",
+  },
+  {
+    icon: <MessageCircle />,
+    url: "/chats",
+    title: "Tin nhắn",
+    tooltip: "Tin nhắn",
+  },
+];
 
 const SideBar = ({ type }: { type: "short" | "normal" }) => {
   const pathname = usePathname();
   const { setMyUser, myUser } = useMyStore();
-  const [showDialog, setShowDialog] = useState(false);
+  const [showDialog, setShowDialog] = useState<"" | "notify" | "search">("");
   const { data } = useApi<getMe>(`${envConfig.BACKEND_URL}/api/auth/@me`);
-  const handleCloseNotify = () => {
-    setShowDialog(false);
+  const handleSetShowDialog = (value: "" | "notify" | "search") => {
+    setShowDialog(value);
   };
-
-  const menuItems = [
-    {
-      icon: <Home />,
-      url: "/",
-      title: "Trang chủ",
-      tooltip: "Trang chủ",
-    },
-    {
-      icon: <Search />,
-      url: "/search",
-      title: "Tìm kiếm",
-      tooltip: "Tìm kiếm",
-    },
-    {
-      icon: <Compass />,
-      url: "/explore",
-      title: "Khám phá",
-      tooltip: "Khám phá",
-    },
-    {
-      icon: <Clapperboard />,
-      url: "/reels",
-      title: "Reels",
-      tooltip: "Reels",
-    },
-    {
-      icon: <MessageCircle />,
-      url: "/chats",
-      title: "Tin nhắn",
-      tooltip: "Tin nhắn",
-    },
-    // {
-    //     icon: <Heart />,
-    //     url: "/notifications",
-    //     title: "Thông báo",
-    //     tooltip: "Thông báo",
-    // },
-  ];
-  const isNewNotify = true;
   useEffect(() => {
     if (data) {
       setMyUser(data.result.user);
@@ -91,10 +83,10 @@ const SideBar = ({ type }: { type: "short" | "normal" }) => {
     document.body.style.overflow = "auto";
   }, [showDialog]);
   return (
-    <section className="flex relative ">
+    <section className="md:flex relative hidden ">
       <div
         className={cn(
-          "hidden px-3 shrink-0 py-2 h-[100vh] overflow-y-auto hidden-scrollbar sticky top-0 left-0 gap-y-3  border-r border-[#262626] md:flex flex-col justify-between",
+          " px-3 shrink-0 py-2 h-[100vh] overflow-y-auto hidden-scrollbar sticky top-0 left-0 gap-y-3  border-r border-[#262626] md:flex flex-col justify-between",
           type === "normal" && "lg:w-[246px]",
         )}
       >
@@ -134,24 +126,46 @@ const SideBar = ({ type }: { type: "short" | "normal" }) => {
                 <TooltipTrigger
                   className={cn(
                     "my-[22px] block bg-transparent p-3 dark:hover:bg-primary-dark-hover hover:bg-second-gray rounded-lg",
-                    type === "short" && "mt-0 mb-3",
                   )}
                 >
                   <Link href={"/"}>
                     <Instagram />
                   </Link>
                 </TooltipTrigger>
-                {type === "short" && (
-                  <TooltipContent side="right">
-                    <p>Instagram</p>
-                  </TooltipContent>
-                )}
+                <TooltipContent
+                  side="right"
+                  className={cn(!showDialog && type === "normal" && "hidden")}
+                >
+                  <p>Instagram</p>
+                </TooltipContent>
               </Tooltip>
             </TooltipProvider>
           )}
-          <div className=" left-3 right-3 w-full">
-            <ul className="flex flex-col gap-y-3">
-              {menuItems.map((item, index: number) => (
+
+          <ul className="flex flex-col gap-y-3">
+            {menuItems.map((item, index: number) => {
+              if (item.title === "Tìm kiếm") {
+                return (
+                  <li
+                    key={index}
+                    className={cn(
+                      "bg-transparent dark:hover:bg-primary-dark-hover hover:bg-second-gray cursor-pointer rounded-lg",
+                      (pathname === item.url ||
+                        pathname.startsWith(`${item.url}/`)) &&
+                        "bg-primary-dark-hover",
+                      showDialog && "inline-block w-max",
+                    )}
+                  >
+                    <SearchWrapper
+                      item={item}
+                      type={type}
+                      showDialog={showDialog}
+                      onSetShowDialog={handleSetShowDialog}
+                    ></SearchWrapper>
+                  </li>
+                );
+              }
+              return (
                 <li
                   key={index}
                   className={cn(
@@ -184,122 +198,94 @@ const SideBar = ({ type }: { type: "short" | "normal" }) => {
                         </Link>
                       </TooltipTrigger>
 
-                      {type === "short" && (
-                        <TooltipContent side="right">
-                          <p>{item.tooltip}</p>
-                        </TooltipContent>
-                      )}
+                      <TooltipContent
+                        side="right"
+                        className={cn(
+                          !showDialog && type === "normal" && "hidden",
+                        )}
+                      >
+                        <p>{item.tooltip}</p>
+                      </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
                 </li>
-              ))}
-              <li
-                className={cn(
-                  "bg-transparent dark:hover:bg-primary-dark-hover cursor-pointer hover:bg-second-gray rounded-lg",
-                  showDialog && "inline-block w-max",
-                )}
-              >
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger
-                      onClick={() => {
-                        setShowDialog(true);
-                      }}
-                      className={cn(
-                        "flex items-center p-3 gap-x-2 w-full ",
-                        showDialog && "pointer-events-none",
-                      )}
+              );
+            })}
+            <li
+              className={cn(
+                "bg-transparent dark:hover:bg-primary-dark-hover cursor-pointer hover:bg-second-gray rounded-lg",
+                showDialog && "inline-block w-max",
+              )}
+            >
+              <NotifyWrapper
+                onSetShowDialog={handleSetShowDialog}
+                showDialog={showDialog}
+                type={type}
+              ></NotifyWrapper>
+            </li>
+            <li
+              className={cn(
+                "bg-transparent dark:hover:bg-primary-dark-hover hover:bg-second-gray rounded-lg",
+                showDialog && "inline-block w-max",
+              )}
+            >
+              <CreatePost
+                sideBarType={type}
+                showDialog={showDialog}
+              ></CreatePost>
+            </li>
+            <li
+              className={cn(
+                "bg-transparent dark:hover:bg-primary-dark-hover hover:bg-second-gray rounded-lg",
+                pathname.startsWith(`/${myUser?._id}`) &&
+                  "bg-primary-dark-hover",
+                showDialog && "inline-block w-max",
+              )}
+            >
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger className="w-full">
+                    <Link
+                      href={`/${myUser?._id}`}
+                      className="flex items-center p-3 gap-x-2 w-full"
                     >
-                      <div className="relative">
-                        {isNewNotify && (
-                          <div className="size-2 bg-red-500 rounded-full absolute top-0.5 -right-0.5"></div>
-                        )}
-                        <Heart />
-                      </div>
+                      <figure className="size-6 rounded-full shrink-0">
+                        <Image
+                          className="rounded-full size-full"
+                          src={myUser?.avatar || "/images/default.jpg"}
+                          alt="avt"
+                          width={24}
+                          height={24}
+                        ></Image>
+                      </figure>
+
                       {type === "normal" && !showDialog && (
-                        <p className="line-clamp-1 hidden lg:block">
-                          Thông báo
+                        <p
+                          className={cn(
+                            "line-clamp-1 hidden lg:block",
+                            pathname.startsWith(`/${myUser?._id}`) &&
+                              "font-bold",
+                          )}
+                        >
+                          Trang cá nhân
                         </p>
                       )}
-                    </TooltipTrigger>
+                    </Link>
+                  </TooltipTrigger>
 
-                    {type === "short" && (
-                      <TooltipContent side="right">
-                        <p>Thông báo của bạn</p>
-                      </TooltipContent>
-                    )}
-                  </Tooltip>
-                </TooltipProvider>
-              </li>
-              <li
-                className={cn(
-                  "bg-transparent dark:hover:bg-primary-dark-hover hover:bg-second-gray rounded-lg",
-                  showDialog && "inline-block w-max",
-                )}
-              >
-                <CreatePost
-                  sideBarType={type}
-                  showDialog={showDialog}
-                ></CreatePost>
-              </li>
-              <li
-                className={cn(
-                  "bg-transparent dark:hover:bg-primary-dark-hover hover:bg-second-gray rounded-lg",
-                  pathname.startsWith(`/${myUser?._id}`) &&
-                    "bg-primary-dark-hover",
-                  showDialog && "inline-block w-max",
-                )}
-              >
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger className="w-full">
-                      <Link
-                        href={`/${myUser?._id}`}
-                        className="flex items-center p-3 gap-x-2 w-full"
-                      >
-                        <figure className="size-6 rounded-full shrink-0">
-                          <Image
-                            className="rounded-full size-full"
-                            src={myUser?.avatar || "/images/default.jpg"}
-                            alt="avt"
-                            width={24}
-                            height={24}
-                          ></Image>
-                        </figure>
-
-                        {type === "normal" && !showDialog && (
-                          <p
-                            className={cn(
-                              "line-clamp-1 hidden lg:block",
-                              pathname.startsWith(`/${myUser?._id}`) &&
-                                "font-bold",
-                            )}
-                          >
-                            Trang cá nhân
-                          </p>
-                        )}
-                      </Link>
-                    </TooltipTrigger>
-
-                    {type === "short" && (
-                      <TooltipContent side="right">
-                        <p>Trang cá nhân</p>
-                      </TooltipContent>
-                    )}
-                  </Tooltip>
-                </TooltipProvider>
-              </li>
-            </ul>
-          </div>
+                  <TooltipContent
+                    side="right"
+                    className={cn(!showDialog && type === "normal" && "hidden")}
+                  >
+                    <p>Trang cá nhân</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </li>
+          </ul>
         </div>
         <MoreBtn type={type} showDialog={showDialog}></MoreBtn>
       </div>
-      {showDialog &&
-        createPortal(
-          <NotifyWrapper onCloseNotify={handleCloseNotify}></NotifyWrapper>,
-          document.body,
-          "NotifyWrapper",
-        )}
     </section>
   );
 };

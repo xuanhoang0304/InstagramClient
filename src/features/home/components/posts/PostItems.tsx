@@ -48,7 +48,7 @@ const PostItems = ({
         clearTimeout(timer);
       };
     }
-  }, []);
+  }, [item?._id, postIdParam]);
   return (
     <li
       id={`${item?._id}`}

@@ -11,7 +11,6 @@ type ReplyListProps = {
   listPosts?: IPost[];
   onSetPosts?: (post: IPost[]) => void;
   onSetCmtList: (list: IComment[] | []) => void;
-  onSetRepliesPage: (page: number) => void;
 };
 const ReplyList = ({
   repliesCmt,
@@ -20,9 +19,9 @@ const ReplyList = ({
   listPosts,
   onSetPosts,
   onSetCmtList,
-  onSetRepliesPage,
 }: ReplyListProps) => {
   const { targetCmt } = useMyStore();
+
   if (!repliesCmt?.length) return null;
   return (
     <ul
@@ -46,7 +45,6 @@ const ReplyList = ({
             listPosts={listPosts}
             onSetPosts={onSetPosts}
             onSetCmtList={onSetCmtList}
-            onSetRepliesPage={onSetRepliesPage}
           ></ReplyItem>
         ))}
     </ul>

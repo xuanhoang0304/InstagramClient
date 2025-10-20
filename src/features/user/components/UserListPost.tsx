@@ -24,7 +24,10 @@ const UserListPost = () => {
   const scrollPositionRef = useRef<number>(0);
   const [loadingMore, setLoadingMore] = useState(false);
   const limit = isPC ? 6 : 9;
-  const postKey = `${envConfig.BACKEND_URL}/api/posts/?filters={"createdBy": ["${userId}"],"isReel":"false"}&limit=${limit}&page=${page}&sorts={ "pinned": -1, "createdAt":-1}`;
+  const postKey =
+    userId !== "notifications"
+      ? `${envConfig.BACKEND_URL}/api/posts/?filters={"createdBy": ["${userId}"],"isReel":"false"}&limit=${limit}&page=${page}&sorts={ "pinned": -1, "createdAt":-1}`
+      : "";
   const { data, isLoading } = useApi<getPostsByCreated>(postKey);
 
   const fetchData = () => {
@@ -79,7 +82,7 @@ const UserListPost = () => {
   }
   if (isLoading && !posts.length) {
     return (
-      <div className="grid grid-cols-3 gap-0.5 mt-5">
+      <div className="grid grid-cols-4 gap-0.5 mt-5">
         {Array(limit)
           .fill(0)
           .map((_, index) => (
@@ -99,7 +102,7 @@ const UserListPost = () => {
       hasMore={posts.length < Number(data?.total)}
       loader={
         loadingMore && (
-          <div className="grid grid-cols-3 gap-0.5">
+          <div className="grid grid-cols-4 gap-0.5">
             {Array(3)
               .fill(0)
               .map((_, index) => (
@@ -112,7 +115,7 @@ const UserListPost = () => {
         )
       }
     >
-      <ul className="grid grid-cols-3 gap-0.5">
+      <ul className="grid grid-cols-4 gap-0.5">
         {posts.map((item) => (
           <UserPostItem
             post={item}

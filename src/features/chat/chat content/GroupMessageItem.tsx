@@ -15,7 +15,7 @@ const GroupMessageItem = ({ isCurUser, group, isGroup }: Props) => {
   return (
     <li
       className={cn(
-        "flex gap-x-2 h-full  max-w-[70%] w-full ",
+        "flex gap-x-2 h-full max-w-[90%]  md:max-w-[70%] w-full ",
         isCurUser && "justify-items-end flex-row-reverse",
       )}
     >

@@ -46,7 +46,7 @@ export type IComment = {
   content: string;
   post: string | IPost;
   likes: User[];
-  replies: IComment[];
+  replies: IComment[] | string[];
   parentCommentId: string | null;
   replyCommentId: IComment | string | null;
 } & IMongosee;
