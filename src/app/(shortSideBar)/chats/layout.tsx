@@ -1,5 +1,5 @@
 import SideBar from "@/components/layout/SideBar/SideBar";
-import ChatBoxs from "@/features/chats/chat boxs/ChatBoxs";
+import ChatBoxs from "@/features/chat/chat boxs/ChatBoxs";
 
 export default async function ShortSideBarLayout({
   children,

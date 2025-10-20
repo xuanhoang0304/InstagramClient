@@ -5,7 +5,7 @@ import React, { ReactNode, useEffect } from "react";
 import { toast } from "sonner";
 
 import { socket } from "@/configs/socket";
-import { PUBLIC_ROUTES } from "@/lib/utils";
+import { handleMutateWithKey, PUBLIC_ROUTES } from "@/lib/utils";
 import { IPost, User } from "@/types/types";
 
 interface ActionMapping {
@@ -220,6 +220,9 @@ const SocketProvider = ({ children }: { children: React.ReactNode }) => {
           duration: 5000,
         },
       );
+      handleMutateWithKey(`notify/?filters`);
+      handleMutateWithKey(`comments`);
+      handleMutateWithKey(`posts`);
     };
     socket.on("notify", handleNotify);
     return () => {

@@ -29,7 +29,7 @@ const GroupMessageList = ({ groupList, isGroup }: Props) => {
           <ul
             key={group[0]._id}
             className={cn(
-              `w-full flex flex-col gap-y-5`,
+              `md:w-full  flex flex-col gap-y-5`,
               isCurUser && "items-end",
             )}
           >

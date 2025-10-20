@@ -2,11 +2,12 @@ import { AxiosError } from "axios";
 import DOMPurify from "dompurify";
 import parse from "html-react-parser";
 import { ChevronDown, Ellipsis } from "lucide-react";
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 
 import { apiClient } from "@/configs/axios";
 import envConfig from "@/configs/envConfig";
-import { IGroupResponse } from "@/features/chats/type";
+import { IGroupResponse } from "@/features/chat/type";
 import MiniUserDetails from "@/features/home/components/posts/miniUser/MiniUserDetails";
 import { UnFollowModal } from "@/features/home/components/posts/UnFollowModal";
 import {
@@ -85,10 +86,13 @@ const UserInfo = ({ user, totalPost }: UserInfoProps) => {
         <div className="flex gap-2 w-full md:w-auto flex-wrap justify-between items-center font-semibold text-sm">
           {userId === myUser?._id ? (
             <>
-              <button className="bg-second-button-background whitespace-nowrap md:flex-auto flex-1 hover:bg-primary-gray px-4  transition-colors rounded-[8px] py-[6px]">
-                Chỉnh sửa trang cá nhân
-              </button>
-              <button className="bg-second-button-background md:flex-auto flex-1 hover:bg-primary-gray px-4  transition-colors rounded-[8px] py-[6px]">
+              <Link
+                href={`/account/edit`}
+                className="bg-second-button-background text-center  whitespace-nowrap md:flex-auto flex-1 hover:bg-primary-gray px-4  transition-colors rounded-[8px] py-[6px]"
+              >
+                Chỉnh sửa thông tin cá nhân
+              </Link>
+              <button className="bg-second-button-background shrink-0 whitespace-nowrap md:flex-auto flex-1 hover:bg-primary-gray px-4  transition-colors rounded-[8px] py-[6px]">
                 Xem kho lưu trữ
               </button>
             </>
@@ -96,7 +100,7 @@ const UserInfo = ({ user, totalPost }: UserInfoProps) => {
             <>
               <UnFollowModal
                 Trigger={
-                  <button className="flex items-center gap-x-1 md:flex-auto flex-1 justify-center bg-second-button-background hover:bg-primary-gray px-4  transition-colors rounded-[8px] py-[6px]">
+                  <button className="flex items-center gap-x-1 min-w-[180px] md:flex-auto flex-1 justify-center bg-second-button-background hover:bg-primary-gray px-4  transition-colors rounded-[8px] py-[6px]">
                     <p>Đang theo dõi</p>
                     <ChevronDown className="size-4" />
                   </button>

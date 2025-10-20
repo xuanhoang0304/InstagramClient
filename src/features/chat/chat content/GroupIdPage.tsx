@@ -134,9 +134,8 @@ const GroupIdPage = () => {
 
   return (
     <>
-      <div className="flex-1 h-full">
+      <div className="size-full overflow-hidden">
         <GroupIdHeading group={data?.result}></GroupIdHeading>
-
         <GroupIdContent
           key={groupId as string}
           msgList={messageList}
@@ -146,7 +145,6 @@ const GroupIdPage = () => {
           inputWrapperHeight={inputWrapperHeight}
           onSetNextPage={handleSetNextPage}
         ></GroupIdContent>
-
         <GroupIdInput
           onSetInputWrapperHeight={handleSetInputWrapperHeight}
         ></GroupIdInput>

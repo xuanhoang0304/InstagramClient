@@ -1,4 +1,4 @@
-import GroupIdPage from "@/features/chats/chat content/GroupIdPage";
+import GroupIdPage from "@/features/chat/chat content/GroupIdPage";
 
 const page = () => {
   return <GroupIdPage></GroupIdPage>;

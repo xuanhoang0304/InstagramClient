@@ -21,7 +21,7 @@ const PostItems = dynamic(() => import("./PostItems"), {
       <MobileHeaderListPost></MobileHeaderListPost>
       <ul className="flex flex-col gap-y-5 max-w-[468px] ">
         {tempArr.map((item) => (
-          <li key={item.id} className="p-2">
+          <li key={item.id} className="p-2 md:p-0">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-x-2">
                 <Skeleton className="size-8 rounded-full cursor-pointer"></Skeleton>
@@ -30,7 +30,7 @@ const PostItems = dynamic(() => import("./PostItems"), {
               <Skeleton className="size-6"></Skeleton>
             </div>
             <Skeleton className="w-full md:w-[468px] md:h-[585px] aspect-square rounded-lg mt-3"></Skeleton>
-            <Skeleton className="w-full h-[118px] mt-1 rounded-[2px] mt-tega1"></Skeleton>
+            <Skeleton className="w-full h-[118px] mt-1 rounded-[2px] "></Skeleton>
           </li>
         ))}
       </ul>
@@ -61,9 +61,9 @@ const ListPosts = () => {
     // console.log("fetch more explore");
     setExcludes((prev) => [
       ...prev,
-      ...explore.result.map((item: IPost) => `"${item._id}"`),
+      ...explore?.result.map((item: IPost) => `"${item._id}"`),
     ]);
-    setListPosts((prev) => uniqBy([...prev, ...explore.result], "_id"));
+    setListPosts((prev) => uniqBy([...prev, ...explore?.result], "_id"));
     if (
       following &&
       explore &&
@@ -77,7 +77,12 @@ const ListPosts = () => {
   const handleSetPosts = (post: IPost[] | []) => {
     setListPosts(post);
   };
-
+  useEffect(() => {
+    if (!listPosts.length) return;
+    if (listPosts.length === 1) {
+      fetchData();
+    }
+  }, [listPosts.length]);
   useEffect(() => {
     if (following && listPosts.length < following.total) {
       const arr = uniqBy([...listPosts, ...following.result], "_id");
@@ -91,7 +96,7 @@ const ListPosts = () => {
         <MobileHeaderListPost></MobileHeaderListPost>
         <ul className="flex flex-col gap-y-5 max-w-[468px] mx-auto mt-5 lg:mt-11">
           {tempArr.map((item) => (
-            <li key={item.id} className="p-2">
+            <li key={item.id} className="p-2 md:p-0">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-x-2">
                   <Skeleton className="size-8 rounded-full cursor-pointer"></Skeleton>
@@ -100,14 +105,14 @@ const ListPosts = () => {
                 <Skeleton className="size-6"></Skeleton>
               </div>
               <Skeleton className="w-full md:w-[468px] md:h-[585px] aspect-square rounded-lg mt-3"></Skeleton>
-              <Skeleton className="w-full h-[118px] mt-1 rounded-[2px] mt-tega1"></Skeleton>
+              <Skeleton className="w-full h-[118px] mt-1 rounded-[2px] "></Skeleton>
             </li>
           ))}
         </ul>
       </>
     );
   }
-  if (!listPosts?.length) {
+  if (following && following.total === 0) {
     return <FollowMoreUser></FollowMoreUser>;
   }
   return (
@@ -117,7 +122,7 @@ const ListPosts = () => {
         dataLength={listPosts.length}
         next={fetchData}
         hasMore={hasMore}
-        scrollThreshold={0.9}
+        scrollThreshold={0.7}
         loader={
           (isLoadingFollowing || isLoadingExplore) && (
             <ul className="flex flex-col gap-y-5 max-w-[468px] mx-auto mt-5 lg:mt-11">
@@ -131,7 +136,7 @@ const ListPosts = () => {
                     <Skeleton className="size-6"></Skeleton>
                   </div>
                   <Skeleton className="w-full md:w-[468px] md:h-[585px] aspect-square rounded-lg mt-3"></Skeleton>
-                  <Skeleton className="w-full h-[118px] mt-1 rounded-[2px] mt-tega1"></Skeleton>
+                  <Skeleton className="w-full h-[118px] mt-1 rounded-[2px] "></Skeleton>
                 </li>
               ))}
             </ul>

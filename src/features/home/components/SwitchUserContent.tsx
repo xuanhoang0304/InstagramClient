@@ -19,7 +19,7 @@ import { Label } from "@/components/ui/label";
 import { apiClient } from "@/configs/axios";
 import envConfig from "@/configs/envConfig";
 import { socket } from "@/configs/socket";
-import { handleError } from "@/lib/utils";
+import { handleError, handleMutateWithKey } from "@/lib/utils";
 import { LoginFormData, LoginSchema } from "@/schemas/FormLoginSchema";
 import { useMyStore } from "@/store/zustand";
 import { HttpResponse, User } from "@/types/types";
@@ -76,6 +76,7 @@ export function SwitchUserContent({ trigger, onClose }: Props) {
         setMyUser(res.result.user);
         onClose?.();
         setIsOpen(false);
+        handleMutateWithKey("/api");
         router.push("/");
         router.refresh();
       }

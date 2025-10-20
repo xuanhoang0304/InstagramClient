@@ -47,6 +47,7 @@ const ModalMiniUserProfile = ({
     const data = await handleFollowingUser(id);
     if (data?.code === 200) {
       handleMutateWithKey("/users");
+      handleMutateWithKey("/posts");
       setMyUser(data.data);
     }
   };

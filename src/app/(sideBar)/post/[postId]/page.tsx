@@ -1,4 +1,4 @@
-import PostPage from "@/features/PostPage";
+import PostPage from "@/features/post";
 
 const page = async ({
   params,

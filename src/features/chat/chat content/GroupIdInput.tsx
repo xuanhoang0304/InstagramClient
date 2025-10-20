@@ -9,12 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { socket } from "@/configs/socket";
-import {
-  cn,
-  handleError,
-  handleMutateWithKey,
-  handleUploadMediaFile,
-} from "@/lib/utils";
+import { cn, handleError, handleUploadMediaFile } from "@/lib/utils";
+import { useChatStore } from "@/store/chatStore";
 import { useMyStore } from "@/store/zustand";
 
 import { useMessageStore } from "../MessageStore";
@@ -41,6 +37,7 @@ const GroupIdInput = ({ onSetInputWrapperHeight }: Props) => {
   const { myUser } = useMyStore();
   const { setIsNewMessage, targetMessage, setTargetMessage } =
     useMessageStore();
+  const { setNewMessage } = useChatStore();
   const { groupId } = useParams();
   const ref = useRef<HTMLDivElement>(null);
   // Func
@@ -116,12 +113,12 @@ const GroupIdInput = ({ onSetInputWrapperHeight }: Props) => {
 
   useEffect(() => {
     socket.on("newMessage", (newMessage: IMessageFE) => {
-      handleMutateWithKey(`/groups/?filter={"userId":"${myUser?._id}"`);
       setMessageList((prev) => [newMessage, ...prev]);
       setSearchTxt("");
       setFiles(null);
       setIsNewMessage(true);
       setTargetMessage(null);
+      setNewMessage(newMessage);
     });
 
     return () => {
@@ -157,6 +154,7 @@ const GroupIdInput = ({ onSetInputWrapperHeight }: Props) => {
               )}
               placeholder="Nhắn tin..."
               value={searchTxt}
+              name="Input chat"
               onChange={handleChange}
             ></Textarea>
           </div>

@@ -155,7 +155,7 @@ export default function FormRegisterUser({
               </Label>
               <Input id="name" {...register("name")} />
               {errors.name && (
-                <p className="text-sm text-left text-red-500">
+                <p className="text-xs mt-1.5 text-left text-red-500">
                   {errors.name.message}
                 </p>
               )}
@@ -169,7 +169,7 @@ export default function FormRegisterUser({
               </Label>
               <Input id="username" {...register("username")} />
               {errors.username && (
-                <p className="text-sm text-left text-red-500">
+                <p className="text-xs mt-1.5 text-left text-red-500">
                   {errors.username.message}
                 </p>
               )}
@@ -182,7 +182,7 @@ export default function FormRegisterUser({
               </Label>
               <Input id="password" type="password" {...register("password")} />
               {errors.password && (
-                <p className="text-sm text-left text-red-500">
+                <p className="text-xs mt-1.5 text-left text-red-500">
                   {errors.password.message}
                 </p>
               )}
@@ -211,7 +211,7 @@ export default function FormRegisterUser({
                 )}
               />
               {errors.gender && (
-                <p className="text-sm text-left text-red-500">
+                <p className="text-xs mt-1.5 text-left text-red-500">
                   {errors.gender.message}
                 </p>
               )}
@@ -273,7 +273,7 @@ export default function FormRegisterUser({
                     }}
                   />
                   {errors.avatar && (
-                    <p className="text-sm text-left text-red-500">
+                    <p className="text-xs mt-1.5 text-left text-red-500">
                       {errors.avatar.message as string}
                     </p>
                   )}

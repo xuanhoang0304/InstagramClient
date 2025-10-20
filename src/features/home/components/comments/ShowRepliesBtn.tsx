@@ -1,7 +1,7 @@
 import isEmpty from "lodash/isEmpty";
 import uniqBy from "lodash/uniqBy";
 import { useSearchParams } from "next/navigation";
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect } from "react";
 
 import envConfig from "@/configs/envConfig";
 import { useApi } from "@/hooks/useApi";
@@ -26,121 +26,119 @@ const ShowRepliesBtn = ({
   onSetPosts,
   onSetCmtList,
 }: ShowRepliesBtnProp) => {
-  const [nextPage, setNextPage] = useState(0);
-  const [isShowReplies, setIsShowReplies] = useState(false);
-  const { repliesMap, replyInfoMap, setReplies, setReplyInfoMap } =
-    useRepliesStore();
-  const parentCmtIdParam = useSearchParams().get("parentId");
+  const { replyInfoMap, setReplyInfoMap } = useRepliesStore();
+
   const cmtIdParam = useSearchParams().get("commentId");
+  const parentIdParam = useSearchParams().get("parentId");
+
   const { data } = useApi<{ replies: IComment[] }>(
-    nextPage
-      ? `${envConfig.BACKEND_URL}/api/comments/${parentCmt._id}/replies?page=${nextPage}&limit=3`
+    replyInfoMap[parentCmt._id]?.curPage
+      ? `${envConfig.BACKEND_URL}/api/comments/${parentCmt._id}/replies?page=${replyInfoMap[parentCmt._id].curPage}&limit=3`
       : "",
   );
-  const [isChecked, setIsChecked] = useState(false);
 
-  const handleSetRepleisPage = (page: number) => {
-    setNextPage(page);
-  };
   const handleBtnShowListClick = () => {
-    if (repliesMap[parentCmt._id].length === parentCmt.replies.length) {
-      setReplies(parentCmt._id, []);
-      setNextPage(0);
-      setIsShowReplies(false);
+    if (
+      isEmpty(replyInfoMap) === false &&
+      replyInfoMap[parentCmt._id]?.parentList?.length === totalCmt
+    ) {
       setReplyInfoMap(parentCmt._id, {
+        ...replyInfoMap[parentCmt._id],
         isShowReplies: false,
-        parentId: parentCmt._id,
+        parentList: [],
+        curPage: 0,
       });
-
       return;
     }
-    setNextPage((prev) => prev + 1);
-    setIsShowReplies(true);
-    if (replyInfoMap[parentCmt._id].isShowReplies) return;
     setReplyInfoMap(parentCmt._id, {
+      ...replyInfoMap[parentCmt._id],
       isShowReplies: true,
-      parentId: parentCmt._id,
+      curPage: replyInfoMap[parentCmt._id].curPage + 1,
     });
   };
+  const totalCmt = parentCmt.replies.length;
   useEffect(() => {
-    if (data && isShowReplies) {
+    if (data && data.replies.length && isEmpty(replyInfoMap) === false) {
       const newList = uniqBy(
-        [...repliesMap[parentCmt._id], ...data.replies],
+        [...replyInfoMap[parentCmt._id].parentList, ...data.replies],
         "_id",
       );
-      setReplies(parentCmt._id, newList);
+
+      setReplyInfoMap(parentCmt._id, {
+        ...replyInfoMap[parentCmt._id],
+        parentList: newList,
+      });
     }
-  }, [data]);
+  }, [data, replyInfoMap[parentCmt._id]?.parentList?.length]);
+
   useEffect(() => {
-    setReplies(parentCmt._id, []);
-    setReplyInfoMap(parentCmt._id, {
-      isShowReplies,
-      parentId: parentCmt._id,
-    });
-    return () => {
-      useRepliesStore.getState().resetReplies();
-    };
-  }, [parentCmt._id]);
-  useEffect(() => {
-    if (
-      !parentCmtIdParam ||
-      !cmtIdParam ||
-      parentCmt._id !== parentCmtIdParam ||
-      isChecked
-    )
+    if ((parentIdParam || cmtIdParam) && parentCmt._id === parentIdParam)
       return;
-    if (isEmpty(repliesMap)) {
-      setNextPage(1);
-      setIsShowReplies(true);
-    } else {
-      const cmt = repliesMap[parentCmt._id]?.find(
+    if (isEmpty(replyInfoMap[parentCmt._id])) {
+      setReplyInfoMap(parentCmt._id, {
+        parentId: parentCmt._id,
+        isShowReplies: false,
+        parentList: [],
+        curPage: 0,
+      });
+    }
+  }, [parentCmt._id]);
+
+  // UseEffect when notify navigate here
+  useEffect(() => {
+    if (!parentIdParam || !cmtIdParam || parentCmt._id !== parentIdParam) {
+      return;
+    }
+    if (isEmpty(replyInfoMap[parentCmt._id])) {
+      setReplyInfoMap(parentCmt._id, {
+        parentId: parentIdParam,
+        isShowReplies: parentCmt._id === parentIdParam,
+        curPage: 0,
+        parentList: [],
+      });
+      return;
+    }
+    if (replyInfoMap[parentCmt._id]) {
+      const targetCmt = replyInfoMap[parentCmt._id].parentList.find(
         (cmt) => cmt._id === cmtIdParam,
       );
-      if (!cmt && !nextPage) {
-        setNextPage(1);
-        setIsShowReplies(true);
-        return;
-      }
-      if (repliesMap[parentCmt._id]) {
-        if (repliesMap[parentCmt._id].length) {
-          const cmt = repliesMap[parentCmt._id].find(
-            (cmt) => cmt._id === cmtIdParam,
-          );
-          setIsChecked(!!cmt);
-          if (cmt) return;
-          setNextPage((prev) => prev + 1);
-        }
-      }
+      if (targetCmt?._id || !replyInfoMap[parentCmt._id].isShowReplies) return;
+      setReplyInfoMap(parentCmt._id, {
+        ...replyInfoMap[parentCmt._id],
+        curPage: replyInfoMap[parentCmt._id].curPage + 1,
+      });
     }
-  }, [parentCmtIdParam, cmtIdParam, parentCmt._id, repliesMap]);
+  }, [
+    replyInfoMap[parentCmt._id]?.parentList?.length,
+    parentCmt._id,
+    parentCmtList.length,
+  ]);
+
   return (
     <>
-      {parentCmt.replies.length != 0 && !!Object.entries(repliesMap).length && (
-        <button
-          onClick={handleBtnShowListClick}
-          className="flex items-center mt-1 gap-x-2"
-        >
-          <div className="h-0.25 w-5 bg-second-gray rounded-full"></div>
-          <p className="text-xs text-second-gray">
-            {repliesMap[parentCmt._id]?.length >= parentCmt.replies.length
-              ? "Ẩn các câu trả lời"
-              : `Xem thêm ${
-                  parentCmt.replies.length - repliesMap[parentCmt._id]?.length
-                } câu trả lời`}
-          </p>
-        </button>
-      )}
-      {isShowReplies && Object.entries(repliesMap).length && (
-        <ReplyList
-          repliesCmt={repliesMap[parentCmt._id]}
-          post={post}
-          parentCmtList={parentCmtList}
-          listPosts={listPosts}
-          onSetPosts={onSetPosts}
-          onSetCmtList={onSetCmtList}
-          onSetRepliesPage={handleSetRepleisPage}
-        ></ReplyList>
-      )}
+      <button
+        onClick={handleBtnShowListClick}
+        className="flex items-center mt-1 gap-x-2"
+      >
+        <div className="h-0.25 w-5 bg-second-gray rounded-full"></div>
+        <p className="text-xs text-second-gray">
+          {replyInfoMap[parentCmt._id]?.parentList?.length === totalCmt
+            ? "Ẩn các câu trả lời"
+            : `Xem thêm ${totalCmt - replyInfoMap[parentCmt._id]?.parentList?.length} câu trả lời`}
+        </p>
+        {/* replyInfoMap[parentCmt._id]?.parentList?.length >>>> là số câu trả lời đã hiển thị*/}
+      </button>
+      {!!replyInfoMap[parentCmt._id]?.parentList?.length &&
+        replyInfoMap[parentCmt._id]?.isShowReplies && (
+          <ReplyList
+            repliesCmt={replyInfoMap[parentCmt._id]?.parentList}
+            post={post}
+            parentCmtList={parentCmtList}
+            listPosts={listPosts}
+            onSetPosts={onSetPosts}
+            onSetCmtList={onSetCmtList}
+          ></ReplyList>
+        )}
     </>
   );
 };

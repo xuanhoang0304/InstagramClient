@@ -26,7 +26,7 @@ import { IGroup, IGroupResponse } from "../type";
 import AddGroupInput from "./AddGroupInput";
 import GroupChatSuggestion from "./GroupChatSuggestion";
 
-type SuggestionUserResponse = {
+export type SuggestionUserResponse = {
   result: {
     users: User[];
     totalUser: number;

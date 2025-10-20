@@ -24,7 +24,10 @@ const UserListPost = () => {
   const scrollPositionRef = useRef<number>(0);
   const [loadingMore, setLoadingMore] = useState(false);
   const limit = isPC ? 6 : 9;
-  const postKey = `${envConfig.BACKEND_URL}/api/posts/?filters={"createdBy": ["${userId}"],"isReel":"false"}&limit=${limit}&page=${page}&sorts={ "pinned": -1, "createdAt":-1}`;
+  const postKey =
+    userId !== "notifications"
+      ? `${envConfig.BACKEND_URL}/api/posts/?filters={"createdBy": ["${userId}"],"isReel":"false"}&limit=${limit}&page=${page}&sorts={ "pinned": -1, "createdAt":-1}`
+      : "";
   const { data, isLoading } = useApi<getPostsByCreated>(postKey);
 
   const fetchData = () => {

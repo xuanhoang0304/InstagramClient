@@ -81,7 +81,7 @@ const GroupIdContent = ({
         onScroll={handleScroll}
         ref={scrollableDivRef}
         className={cn(
-          "h-full overflow-y-auto relative flex flex-col-reverse pt-6 pb-4 px-3",
+          "h-full overflow-y-auto overflow-x-hidden relative flex flex-col-reverse pt-6 pb-4 px-3",
           !msgList.length && "flex-col",
         )}
       >
@@ -94,7 +94,7 @@ const GroupIdContent = ({
           loader={null}
           scrollThreshold={0.5}
           scrollableTarget="scrollableDiv"
-          className="flex flex-col-reverse gap-y-4 mt-4 "
+          className="flex flex-col-reverse gap-y-4 mt-4 !overflow-x-hidden"
         >
           <GroupMessageList
             groupList={list}

@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import envConfig from "@/configs/envConfig";
 import { useApi } from "@/hooks/useApi";
 import { tempArr } from "@/lib/utils";
+import { useChatStore } from "@/store/chatStore";
 import { useMyStore } from "@/store/zustand";
 import { HttpResponse } from "@/types/types";
 
@@ -19,6 +20,7 @@ interface GetIGroupResponse extends HttpResponse {
 }
 const ChatsList = () => {
   const { myUser } = useMyStore();
+  const { newMessage, setNewMessage } = useChatStore();
   const [list, setList] = useState<IGroup[] | []>([]);
   const { data, isLoading } = useApi<GetIGroupResponse>(
     myUser?._id
@@ -32,7 +34,23 @@ const ChatsList = () => {
     }
   }, [data]);
 
-  if (!myUser?._id || isLoading) {
+  useEffect(() => {
+    console.log("newMessage", newMessage);
+    if (newMessage?._id) {
+      const newList = [...list].map((group) =>
+        group._id === newMessage.groupId
+          ? {
+              ...group,
+              lastMessage: newMessage,
+            }
+          : group,
+      );
+      console.log("newList", newList);
+      setList(newList);
+      setNewMessage(null);
+    }
+  }, [list, newMessage]);
+  if (!myUser?._id || (isLoading && !list.length)) {
     return (
       <ul className="flex flex-col w-full gap-y-0.5 mt-2  ">
         {tempArr.slice(0, 10).map((item) => (
@@ -45,6 +63,13 @@ const ChatsList = () => {
           </li>
         ))}
       </ul>
+    );
+  }
+  if (!isLoading && list.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <p className="text-gray-500">Không có cuộc hội thoại nào</p>
+      </div>
     );
   }
   return (

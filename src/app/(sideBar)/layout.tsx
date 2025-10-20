@@ -1,6 +1,6 @@
 import "../globals.css";
 
-import SideBar from "../../components/layout/SideBar/SideBar";
+import SideBar from "@/components/layout/SideBar/SideBar";
 
 export default async function SideBarLayout({
   children,

@@ -2,7 +2,7 @@ import { Mic, MicOff } from "lucide-react";
 import Image from "next/image";
 import { memo, RefObject, useEffect, useRef } from "react";
 
-import { IGroup } from "@/features/chats/type";
+import { IGroup } from "@/features/chat/type";
 import { cn } from "@/lib/utils";
 import { User } from "@/types/types";
 
