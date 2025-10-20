@@ -16,7 +16,7 @@ import Peer, { SignalData } from "simple-peer";
 import { toast } from "sonner";
 
 import { socket } from "@/configs/socket";
-import { IGroup } from "@/features/chats/type";
+import { IGroup } from "@/features/chat/type";
 import { cn, handleError } from "@/lib/utils";
 import { useMyStore } from "@/store/zustand";
 import { User } from "@/types/types";

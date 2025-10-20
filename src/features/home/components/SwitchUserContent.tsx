@@ -19,7 +19,7 @@ import { Label } from "@/components/ui/label";
 import { apiClient } from "@/configs/axios";
 import envConfig from "@/configs/envConfig";
 import { socket } from "@/configs/socket";
-import { handleError } from "@/lib/utils";
+import { handleError, handleMutateWithKey } from "@/lib/utils";
 import { LoginFormData, LoginSchema } from "@/schemas/FormLoginSchema";
 import { useMyStore } from "@/store/zustand";
 import { HttpResponse, User } from "@/types/types";
@@ -76,6 +76,7 @@ export function SwitchUserContent({ trigger, onClose }: Props) {
         setMyUser(res.result.user);
         onClose?.();
         setIsOpen(false);
+        handleMutateWithKey("/api");
         router.push("/");
         router.refresh();
       }
@@ -120,14 +121,14 @@ export function SwitchUserContent({ trigger, onClose }: Props) {
           </DialogHeader>
           <div className="grid gap-4 mt-3">
             <div className="grid gap-3">
-              <Label htmlFor="username">Email or Username</Label>
+              <Label htmlFor="username">Email hoặc Tên đăng nhập</Label>
               <Controller
                 name="username"
                 control={control}
                 render={({ field }) => (
                   <Input
                     id="username"
-                    placeholder="Email or Username"
+                    placeholder="Nhập email hoặc tên đăng nhập"
                     className="!text-xs placeholder:text-xs focus-visible:border-2 focus-visible:ring-0"
                     {...field}
                   />
@@ -140,14 +141,14 @@ export function SwitchUserContent({ trigger, onClose }: Props) {
               )}
             </div>
             <div className="grid gap-3">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Mật khẩu</Label>
               <Controller
                 name="password"
                 control={control}
                 render={({ field }) => (
                   <Input
                     id="password"
-                    placeholder="Password"
+                    placeholder="Nhập mật khẩu"
                     className="text-xs placeholder:text-xs focus-visible:border-2 focus-visible:ring-0"
                     type="password"
                     {...field}
@@ -175,7 +176,7 @@ export function SwitchUserContent({ trigger, onClose }: Props) {
                 src="https://storage.googleapis.com/libraries-lib-production/images/GoogleLogo-canvas-404-300px.original.png"
               ></Image>
             </figure>
-            <p>Login with Google</p>
+            <p>Đăng nhập bằng tài khoản Google</p>
           </button>
           <DialogFooter className="mt-5">
             <DialogClose asChild>
@@ -183,14 +184,14 @@ export function SwitchUserContent({ trigger, onClose }: Props) {
                 variant="ghost"
                 className="hover:!bg-second-button-background"
               >
-                Cancel
+                Hủy
               </Button>
             </DialogClose>
             <Button
               type="submit"
               className="bg-second-blue hover:bg-primary-blue text-primary-white"
             >
-              Login
+              Đăng nhập
             </Button>
           </DialogFooter>
         </form>

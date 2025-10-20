@@ -4,7 +4,7 @@ import { CircleX, OctagonAlert } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -180,7 +180,9 @@ const FormLogin = () => {
               </figure>
               <p>Đăng nhập bằng Google</p>
             </button>
-            <button className="font-bold">Quên mật khẩu?</button>
+            <button type="button" className="font-bold">
+              Quên mật khẩu?
+            </button>
           </div>
           <div className="text-center">
             Bạn chưa có tài khoản ư?{" "}
@@ -197,4 +199,4 @@ const FormLogin = () => {
   );
 };
 
-export default FormLogin;
+export default memo(FormLogin);

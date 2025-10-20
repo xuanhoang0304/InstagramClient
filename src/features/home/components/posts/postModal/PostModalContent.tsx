@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { useMediaQuery } from "usehooks-ts";
 
 import envConfig from "@/configs/envConfig";
-import CommentList from "@/features/home/components/comments/CommentList";
 import PostItemHeading from "@/features/home/components/posts/PostItemHeading";
 import PostItemMedia from "@/features/home/components/posts/PostItemMedia";
 import { useApi } from "@/hooks/useApi";
@@ -11,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { HttpResponse, IComment, IPost } from "@/types/types";
 
 import { CommentInput } from "../../comments/CommentInput";
+import CommentList from "../../comments/CommentList";
 import PostButtons from "../PostButtons";
 
 type PostModalContentProps = {
@@ -33,16 +33,12 @@ const PostModalContent = ({
   onSetPosts,
   onSetNewPost,
 }: PostModalContentProps) => {
-  const [commentList, setCommentList] = useState<IComment[] | []>([]);
   const isMobile = useMediaQuery("(max-width: 767px)");
+  const [commentList, setCommentList] = useState<IComment[] | []>([]);
   const [page, setPage] = useState(1);
   const [totalCmt, setTotalCmt] = useState(0);
   const { data } = useApi<getParentCmtByPostId>(
     `${envConfig.BACKEND_URL}/api/posts/${item?._id}/comments?page=${page}&limit=3`,
-    undefined,
-    {
-      revalidateOnMount: true,
-    },
   );
   const handleSetCommentist = (list: IComment[] | []) => {
     setCommentList(list);
@@ -53,15 +49,9 @@ const PostModalContent = ({
 
   useEffect(() => {
     if (data) {
-      if (!commentList.length) {
-        const comments = data.result.comments;
-        setCommentList(comments);
-        setTotalCmt(data.result.totalComments);
-        return;
-      }
-      const arr = uniqBy([...commentList, ...data?.result.comments], "_id");
-
-      setCommentList(arr);
+      setCommentList((prev) =>
+        uniqBy([...prev, ...data?.result.comments], "_id"),
+      );
       setTotalCmt(data?.result.totalComments as number);
     }
   }, [data]);
@@ -109,7 +99,6 @@ const PostModalContent = ({
               post={item}
               parentList={commentList}
               totalCmt={totalCmt}
-              page={page}
               listPosts={listPosts}
               onSetNextPage={handleSetNextPage}
               onSetCmtList={handleSetCommentist}

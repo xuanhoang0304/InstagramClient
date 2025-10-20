@@ -4,7 +4,7 @@ import { motion } from "motion/react";
 import Image from "next/image";
 import { memo } from "react";
 
-import { IGroup } from "@/features/chats/type";
+import { IGroup } from "@/features/chat/type";
 import { useMyStore } from "@/store/zustand";
 import { User } from "@/types/types";
 

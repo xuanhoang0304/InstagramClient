@@ -14,13 +14,12 @@ type PostModalProps = {
 const PostModal = ({ Content, onCloseModal }: PostModalProps) => {
   const ref = useRef<HTMLDivElement>(null);
 
-  const { resetReplies } = useRepliesStore();
   const { settargetCmt } = useMyStore();
-
+  const resetReplyInfoMap = useRepliesStore.getState().resetReplyInfoMap;
   const handleClickOutside = () => {
     settargetCmt(null);
-    resetReplies();
     onCloseModal();
+    resetReplyInfoMap();
   };
 
   useOnClickOutside(ref as React.RefObject<HTMLElement>, handleClickOutside);

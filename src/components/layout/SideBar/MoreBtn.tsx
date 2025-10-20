@@ -13,6 +13,12 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { apiClient } from "@/configs/axios";
 import { SwitchUserContent } from "@/features/home/components/SwitchUserContent";
 import { cn, handleError } from "@/lib/utils";
@@ -20,7 +26,7 @@ import { HttpResponse } from "@/types/types";
 
 interface Props {
   type: "normal" | "short";
-  showDialog: boolean;
+  showDialog: string;
 }
 export function MoreBtn({ type, showDialog }: Props) {
   const router = useRouter();
@@ -51,24 +57,37 @@ export function MoreBtn({ type, showDialog }: Props) {
   };
   return (
     <DropdownMenu open={isOpen} onOpenChange={handleChange} modal={false}>
-      <DropdownMenuTrigger asChild className="">
-        <button
-          className={cn(
-            "p-3 flex items-center gap-x-2 bg-transparent dark:hover:bg-primary-dark-hover hover:bg-second-gray rounded-lg",
-            showDialog && "w-max",
-          )}
-        >
-          <AlignJustify />
-          <p
-            className={cn(
-              "hidden",
-              type == "normal" && !showDialog && "lg:block",
-            )}
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild className="w-full">
+            <DropdownMenuTrigger asChild>
+              <button
+                className={cn(
+                  "p-3 flex items-center gap-x-2 bg-transparent dark:hover:bg-primary-dark-hover hover:bg-second-gray rounded-lg",
+                  showDialog && "w-max",
+                )}
+              >
+                <AlignJustify />
+                <p
+                  className={cn(
+                    "hidden",
+                    type == "normal" && !showDialog && "lg:block",
+                  )}
+                >
+                  Xem thêm
+                </p>
+              </button>
+            </DropdownMenuTrigger>
+          </TooltipTrigger>
+
+          <TooltipContent
+            side="right"
+            className={cn(!showDialog && type === "normal" && "hidden")}
           >
-            Xem thêm
-          </p>
-        </button>
-      </DropdownMenuTrigger>
+            <p>Xem thêm</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
       <DropdownMenuContent
         className="w-[266px] !bg-primary-gray px-2"
         align="end"

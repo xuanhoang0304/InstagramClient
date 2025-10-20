@@ -2,14 +2,17 @@ import { AxiosError } from "axios";
 import DOMPurify from "dompurify";
 import parse from "html-react-parser";
 import { ChevronDown, Ellipsis } from "lucide-react";
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 
+import RealUsername from "@/components/layout/RealUsername";
 import { apiClient } from "@/configs/axios";
 import envConfig from "@/configs/envConfig";
-import { IGroupResponse } from "@/features/chats/type";
+import { IGroupResponse } from "@/features/chat/type";
 import MiniUserDetails from "@/features/home/components/posts/miniUser/MiniUserDetails";
 import { UnFollowModal } from "@/features/home/components/posts/UnFollowModal";
 import {
+  cn,
   handleFollowingUser,
   handleMutateWithKey,
   textWithLinks,
@@ -58,75 +61,14 @@ const UserInfo = ({ user, totalPost }: UserInfoProps) => {
   const bioParsed = parse(sanitizedHTML);
 
   return (
-    <div className="flex-1 flex md:block flex-col-reverse gap-y-4">
+    <div className={cn("flex-1 flex md:block flex-col md:gap-y-4")}>
       <div className="flex items-center gap-2 justify-between md:justify-start flex-wrap">
         <div className="hidden md:flex items-center gap-x-1">
-          <h1 className="text-xs md:text-xl max-w-[170px] line-clamp-1">
-            {user?.name}
-          </h1>
-          {user?.isReal && (
-            <svg
-              aria-label="Đã xác minh"
-              className="x1lliihq x1n2onr6"
-              fill="rgb(0, 149, 246)"
-              height="12"
-              role="img"
-              viewBox="0 0 40 40"
-              width="12"
-            >
-              <title>Đã xác minh</title>
-              <path
-                d="M19.998 3.094 14.638 0l-2.972 5.15H5.432v6.354L0 14.64 3.094 20 0 25.359l5.432 3.137v5.905h5.975L14.638 40l5.36-3.094L25.358 40l3.232-5.6h6.162v-6.01L40 25.359 36.905 20 40 14.641l-5.248-3.03v-6.46h-6.419L25.358 0l-5.36 3.094Zm7.415 11.225 2.254 2.287-11.43 11.5-6.835-6.93 2.244-2.258 4.587 4.581 9.18-9.18Z"
-                fillRule="evenodd"
-              ></path>
-            </svg>
-          )}
-        </div>
-        <div className="flex gap-2 w-full md:w-auto flex-wrap justify-between items-center font-semibold text-sm">
-          {userId === myUser?._id ? (
-            <>
-              <button className="bg-second-button-background whitespace-nowrap md:flex-auto flex-1 hover:bg-primary-gray px-4  transition-colors rounded-[8px] py-[6px]">
-                Chỉnh sửa trang cá nhân
-              </button>
-              <button className="bg-second-button-background md:flex-auto flex-1 hover:bg-primary-gray px-4  transition-colors rounded-[8px] py-[6px]">
-                Xem kho lưu trữ
-              </button>
-            </>
-          ) : myUser?.followings.includes(userId as string) ? (
-            <>
-              <UnFollowModal
-                Trigger={
-                  <button className="flex items-center gap-x-1 md:flex-auto flex-1 justify-center bg-second-button-background hover:bg-primary-gray px-4  transition-colors rounded-[8px] py-[6px]">
-                    <p>Đang theo dõi</p>
-                    <ChevronDown className="size-4" />
-                  </button>
-                }
-                user={user}
-                onFollowFunc={handlFollowOrUnFollow}
-              ></UnFollowModal>
-              <button
-                onClick={() => handleCreateGroupChat(user?._id || "")}
-                className="bg-second-button-background md:flex-auto flex-1 hover:bg-primary-gray px-4  transition-colors rounded-[8px] py-[6px]"
-              >
-                Nhắn tin
-              </button>
-            </>
-          ) : (
-            <>
-              <button
-                onClick={async () => handlFollowOrUnFollow(user?._id || "")}
-                className="bg-primary-blue md:flex-auto flex-1 hover:bg-second-blue text-primary-white px-4 py-[6px] rounded-[8px] transition-colors"
-              >
-                Theo dõi
-              </button>
-              <button
-                onClick={() => handleCreateGroupChat(user?._id || "")}
-                className="bg-second-button-background md:flex-auto flex-1 hover:bg-primary-gray px-4  transition-colors rounded-[8px] py-[6px]"
-              >
-                Nhắn tin
-              </button>
-            </>
-          )}
+          <RealUsername
+            username={user?.name as string}
+            isReal={!!user?.isReal}
+            className="text-2xl"
+          ></RealUsername>
           <button className="hidden md:block">
             <Ellipsis />
           </button>
@@ -152,8 +94,63 @@ const UserInfo = ({ user, totalPost }: UserInfoProps) => {
       </div>
       {/* Bio */}
       {!!bioParsed.toString().length && (
-        <p className="text-xs md:text-base">{bioParsed}</p>
+        <p className="text-xs md:text-sm mt-4">{bioParsed}</p>
       )}
+      {/* Button */}
+      <div
+        className={cn(
+          "md:mt-4 flex gap-2 w-full md:w-auto flex-wrap justify-between items-center font-semibold text-sm",
+          user?.bio && "mt-4",
+        )}
+      >
+        {userId === myUser?._id ? (
+          <>
+            <Link
+              href={`/account/edit`}
+              className="bg-second-button-background text-center  whitespace-nowrap shrink-0 flex-1 hover:bg-primary-gray px-4  transition-colors rounded-[12px] py-3"
+            >
+              Chỉnh sửa thông tin cá nhân
+            </Link>
+            <button className="bg-second-button-background whitespace-nowrap shrink-0 flex-1 hover:bg-primary-gray px-4  transition-colors rounded-[12px] py-3">
+              Xem kho lưu trữ
+            </button>
+          </>
+        ) : myUser?.followings.includes(userId as string) ? (
+          <>
+            <UnFollowModal
+              Trigger={
+                <button className="flex items-center gap-x-1 min-w-[180px]  flex-1 justify-center bg-second-button-background hover:bg-primary-gray px-4  transition-colors rounded-[12px] py-3  shrink-0">
+                  <p>Đang theo dõi</p>
+                  <ChevronDown className="size-4" />
+                </button>
+              }
+              user={user}
+              onFollowFunc={handlFollowOrUnFollow}
+            ></UnFollowModal>
+            <button
+              onClick={() => handleCreateGroupChat(user?._id || "")}
+              className="bg-second-button-background  flex-1 hover:bg-primary-gray px-4  transition-colors rounded-[12px] py-3 shrink-0"
+            >
+              Nhắn tin
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              onClick={async () => handlFollowOrUnFollow(user?._id || "")}
+              className="bg-primary-blue md:flex-auto flex-1 hover:bg-second-blue text-primary-white px-4 py-3 rounded-[12px] transition-colors shrink-0"
+            >
+              Theo dõi
+            </button>
+            <button
+              onClick={() => handleCreateGroupChat(user?._id || "")}
+              className="bg-second-button-background md:flex-auto flex-1 hover:bg-primary-gray px-4  transition-colors rounded-[12px] py-3 shrink-0"
+            >
+              Nhắn tin
+            </button>
+          </>
+        )}
+      </div>
     </div>
   );
 };

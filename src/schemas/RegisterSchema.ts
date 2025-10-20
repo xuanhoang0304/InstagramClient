@@ -9,9 +9,9 @@ export const RegisterShema = () =>
     username: z
       .string()
       .trim()
-      .min(4, "Username phải có ít nhất 4 ký tự")
+      .min(4, "Tên đăng nhập phải có ít nhất 4 ký tự")
       .toLowerCase(),
-    name: z.string().trim().min(2, "Name phải có ít nhất 2 ký tự"),
+    name: z.string().trim().min(2, "Tên phải có ít nhất 2 ký tự"),
     password: z
       .string()
       .min(8, { message: "Mật khẩu phải có ít nhất 8 ký tự" })

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from "axios";
-import { getCookie, setCookie } from "cookies-next";
+import { deleteCookie, getCookie, setCookie } from "cookies-next";
 import { toast } from "sonner";
 
 import envConfig from "./envConfig";
@@ -111,13 +111,12 @@ class AxiosClient {
       const newAccessToken = await this.refreshTokenPromise;
       return newAccessToken;
     } catch (error: any) {
-      if (error.response?.status !== 401) {
-        toast.error("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại", {
-          duration: 5000,
-        });
+      if (error.response?.status === 400) {
+        deleteCookie("refreshToken");
+        window.location.href = "/login";
         setTimeout(() => {
-          window.location.href = "/login";
-        }, 3000);
+          toast.error("Đăng nhập lại để thử lại");
+        }, 2000);
       }
       return "";
     } finally {

@@ -3,10 +3,11 @@ import { toast } from "sonner";
 import { mutate } from "swr";
 import { twMerge } from "tailwind-merge";
 
+import { Media } from "@/components/layout/SideBar/type";
 import { apiClient } from "@/configs/axios";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import envConfig from "@/configs/envConfig";
-import { IGroupResponse } from "@/features/chats/type";
+import { IGroupResponse } from "@/features/chat/type";
 import { CommentInputFormData } from "@/features/home/components/comments/schema/CommentInputSchema";
 import {
   getParentCmtByPostId,
@@ -93,7 +94,7 @@ export function getRelativeTime(isoTime: string): string {
 }
 export function textWithLinks(input: string) {
   return input
-    .replaceAll(`\\n`, "</br>")
+    .replaceAll(`\n`, "</br>")
     .replaceAll(
       /[^: \n]+:([^ \n]+)/g,
       (match, url) =>
@@ -151,6 +152,7 @@ export const handleFollowingUser = async (id: string) => {
     const data: updateUser = await apiClient.fetchApi(`/users/${id}/follow`, {
       method: "PUT",
     });
+
     return data;
   } catch (error: any) {
     toast.error(error.message);
@@ -220,7 +222,6 @@ export const handleGetParentCmtByPostId = async (
     handleError("handleGetParentCmtByPostId", error);
   }
 };
-
 export const handleGetPostByPostId = async (postId: string) => {
   try {
     const data: IPost = await apiClient.fetchApi(`/posts/${postId}`);
@@ -283,6 +284,17 @@ export const handleUpdateGroup = async (
     }
   } catch (error) {
     handleError("handleUpdateGroup", error);
+  }
+};
+export const handleDeleteMedias = async (medias: { paths: Media[] }) => {
+  try {
+    const res = await apiClient.fetchApi(`/upload/by-paths`, {
+      method: "PUT",
+      data: medias,
+    });
+    return res;
+  } catch (error) {
+    handleError("handleDeleteMedias", error);
   }
 };
 

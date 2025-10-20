@@ -3,7 +3,7 @@ import { MessageCircleMore, UserPlus } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { apiClient } from "@/configs/axios";
-import { IGroupResponse } from "@/features/chats/type";
+import { IGroupResponse } from "@/features/chat/type";
 import { UnFollowModal } from "@/features/home/components/posts/UnFollowModal";
 import { cn } from "@/lib/utils";
 import { useMyStore } from "@/store/zustand";

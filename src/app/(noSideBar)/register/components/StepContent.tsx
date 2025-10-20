@@ -1,9 +1,11 @@
+import { memo } from "react";
+
 import { cn } from "@/lib/utils";
 
 type StepContentType = {
   isActive: boolean;
   stepNumber: number;
-  heading: string;
+  heading?: string;
   onSetStep?: (step: number) => void;
 };
 const StepContent = ({
@@ -19,29 +21,31 @@ const StepContent = ({
     >
       <div
         className={cn(
-          "flex items-center justify-center size-10 border-primary-gray border-2  rounded-full group-hover:border-red-400 transition-colors",
-          isActive && "border-red-400",
+          "flex items-center justify-center size-10 border-primary-gray border-2  rounded-full group-hover:border-primary-blue transition-colors",
+          isActive && "border-primary-blue",
         )}
       >
         <p
           className={cn(
-            "font-semibold text-xl group-hover:text-red-400 transition-colors",
-            isActive && "text-red-400",
+            "font-semibold text-xl group-hover:text-primary-blue transition-colors",
+            isActive && "text-primary-blue",
           )}
         >
           {stepNumber}
         </p>
       </div>
-      <h2
-        className={cn(
-          "font-semibold group-hover:text-red-400",
-          isActive && "text-red-400",
-        )}
-      >
-        {heading}
-      </h2>
+      {heading && (
+        <h2
+          className={cn(
+            "font-semibold group-hover:text-primary-blue",
+            isActive && "text-primary-blue",
+          )}
+        >
+          {heading}
+        </h2>
+      )}
     </div>
   );
 };
 
-export default StepContent;
+export default memo(StepContent);

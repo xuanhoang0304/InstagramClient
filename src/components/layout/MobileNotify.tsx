@@ -14,7 +14,7 @@ const MobileNotify = () => {
   return (
     <Drawer>
       <DrawerTrigger asChild>
-        <Heart className="size-7" />
+        <Heart className="size-6" />
       </DrawerTrigger>
       <DrawerContent className="!bg-primary-gray !rounded-none  !h-[100vh] !max-h-full !mt-0">
         <DrawerHeader className="relative">

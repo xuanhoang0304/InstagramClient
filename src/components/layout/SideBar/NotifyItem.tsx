@@ -145,7 +145,10 @@ const NotifyItem = ({ item }: Props) => {
               />
             ) : (
               <Image
-                src={(item.target.target_id as IPost).media[0].path}
+                src={
+                  ((item.target.target_id as IComment).post as IPost).media[0]
+                    .path
+                }
                 width={60}
                 height={60}
                 alt="post-image"
@@ -189,7 +192,10 @@ const NotifyItem = ({ item }: Props) => {
               />
             ) : (
               <Image
-                src={(item.target.target_id as IPost).media[0].path}
+                src={
+                  ((item.target.target_id as IComment).post as IPost).media[0]
+                    .path
+                }
                 width={60}
                 height={60}
                 alt="post-image"

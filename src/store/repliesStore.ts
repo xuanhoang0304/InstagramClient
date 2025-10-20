@@ -6,18 +6,17 @@ import { IComment } from "@/types/types";
 interface IReplyInfo {
   parentId: string;
   isShowReplies: boolean;
+  parentList: IComment[];
+  curPage: number;
 }
 interface RepliesState {
-  repliesMap: { [key: string]: IComment[] | [] };
   replyInfoMap: Record<string, IReplyInfo>;
   setReplyInfoMap: (parentId: string, repliesInfo: IReplyInfo) => void;
-  setReplies: (commentId: string, replies: IComment[] | []) => void;
-  resetReplies: () => void;
+  resetReplyInfoMap: () => void;
 }
 
 export const useRepliesStore = create<RepliesState>()(
   devtools((set) => ({
-    repliesMap: {},
     replyInfoMap: {},
     setReplyInfoMap: (parentId: string, replyInfoMap: IReplyInfo) =>
       set((state) => ({
@@ -26,13 +25,9 @@ export const useRepliesStore = create<RepliesState>()(
           [parentId]: replyInfoMap,
         },
       })),
-    setReplies: (commentId, replies) =>
-      set((state) => ({
-        repliesMap: {
-          ...state.repliesMap,
-          [commentId]: replies,
-        },
+    resetReplyInfoMap: () =>
+      set(() => ({
+        replyInfoMap: {},
       })),
-    resetReplies: () => set({ repliesMap: {} }),
   })),
 );

@@ -10,8 +10,6 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
-import MobileNotify from "./MobileNotify";
-
 const MobileHeaderListPost = () => {
   const [isHeaderHidden, setIsHeaderHidden] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -88,10 +86,10 @@ const MobileHeaderListPost = () => {
         </PopoverContent>
       </Popover>
       <div className="flex items-center gap-x-2">
-        <button className="p-2 flex items-center justify-center relative">
+        {/* <button className="p-2 flex items-center justify-center relative">
           <MobileNotify></MobileNotify>
           <div className="size-2 rounded-full bg-red-500 absolute top-2 right-2"></div>
-        </button>
+        </button> */}
         <button
           onClick={() => router.push(`/chats`)}
           className="p-2 flex items-center justify-center"

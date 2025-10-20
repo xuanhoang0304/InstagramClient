@@ -39,8 +39,8 @@ const NotifyList = () => {
   };
   useEffect(() => {
     if (data && data.result.result.length) {
-      const list = data.result.result;
-      setListNotify((prev) => uniqBy([...prev, ...list], "_id"));
+      const newList = uniqBy([...listNotify, ...data.result.result], "_id");
+      setListNotify(newList);
       setTotal(data.result.totalResult);
     }
   }, [data]);
@@ -60,13 +60,6 @@ const NotifyList = () => {
   // }, [listNotify, pageNotify, isLoading]);
   useEffect(() => {
     const element = ref.current;
-    if (element) {
-      if (isLoading) {
-        element.style.overflow = "hidden";
-      } else {
-        element.style.overflow = "auto";
-      }
-    }
     const handleScroll = () => {
       if (listNotify.length === total || isLoading) return;
 
@@ -74,7 +67,6 @@ const NotifyList = () => {
         const scrollBottom =
           element.scrollHeight - element.scrollTop - element.clientHeight;
         if (scrollBottom < 200) {
-          console.log(`first`);
           handleLoadMore();
         }
       }
@@ -87,7 +79,7 @@ const NotifyList = () => {
         element.removeEventListener("scroll", handleScroll);
       };
     }
-  }, [ref.current, listNotify, total, isLoading]);
+  }, [ref.current, listNotify, total]);
   if (isLoading && !listNotify.length) {
     return (
       <ul>

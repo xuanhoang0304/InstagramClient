@@ -1,19 +1,15 @@
 import { Ellipsis } from "lucide-react";
-import { RefObject, useRef, useState } from "react";
+import { memo, RefObject, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useOnClickOutside } from "usehooks-ts";
 
 import { apiClient } from "@/configs/axios";
-import {
-  handleError,
-  handleGetPostByPostId,
-  handleMutateWithKey,
-} from "@/lib/utils";
+import { handleError, handleMutateWithKey } from "@/lib/utils";
 import { useRepliesStore } from "@/store/repliesStore";
 import { useMyStore } from "@/store/zustand";
 import { IComment, IPost, updateComment } from "@/types/types";
 
-type CommentActions = {
+type CommentActionsProps = {
   cmt: IComment;
   parentCmtList: IComment[];
   repliesList?: IComment[];
@@ -21,10 +17,9 @@ type CommentActions = {
   listPosts?: IPost[];
   onSetCmtList: (list: IComment[] | []) => void;
   onSetPosts?: (posts: IPost[] | []) => void;
-  onSetRepliesPage?: (page: number) => void;
 };
 
-export function CommentActions({
+const CommentActions = ({
   cmt,
   isParent,
   parentCmtList,
@@ -32,10 +27,9 @@ export function CommentActions({
   listPosts,
   onSetCmtList,
   onSetPosts,
-  onSetRepliesPage,
-}: CommentActions) {
+}: CommentActionsProps) => {
   const { myUser } = useMyStore();
-  const { setReplies } = useRepliesStore();
+  const { setReplyInfoMap, replyInfoMap } = useRepliesStore();
   const [isShow, setIsShow] = useState(false);
   const [showConfirm, setShowComfirm] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -56,14 +50,11 @@ export function CommentActions({
       );
       if (result.code === 204) {
         toast.success("Đã xóa comment thành công!");
-        if (isParent && parentCmtList) {
-          // console.log("delete parent");
+        if (isParent) {
           const newList = [...parentCmtList].filter(
             (cmt) => cmt._id !== result.data._id,
           );
-          const newPost = await handleGetPostByPostId(
-            result.data.post as string,
-          );
+          const newPost = result.data.post as IPost;
           if (listPosts && listPosts.length) {
             const newListPost = listPosts.map((post) =>
               post._id === newPost?._id ? newPost : post,
@@ -71,36 +62,39 @@ export function CommentActions({
             onSetPosts?.(newListPost);
           }
           onSetCmtList?.(newList);
-          setReplies(String(result.data.parentCommentId), newList);
-          handleMutateWithKey(`posts/${result.data.post}/comments?`);
+          handleMutateWithKey(`posts/${newPost._id}/comments?`);
           return;
         }
         if (repliesList) {
-          // console.log("delete replies");
           const newList = [...repliesList].filter((cmt) => cmt._id !== cmtId);
-          setReplies(String(cmt.parentCommentId), newList);
-          const parentCmt: { result: IComment } = await apiClient.fetchApi(
-            `/comments/${result.data.parentCommentId}`,
+          const newParentCmtList = parentCmtList.map((cmt) =>
+            cmt._id === result.data.parentCommentId
+              ? {
+                  ...cmt,
+                  replies: cmt.replies.filter((id) => id !== cmtId) as string[],
+                }
+              : cmt,
           );
-
-          const newParentList = [...parentCmtList].map((cmt) =>
-            cmt._id === parentCmt.result._id ? parentCmt.result : cmt,
-          );
-          onSetCmtList?.(newParentList);
-
-          const newPost = await handleGetPostByPostId(
-            result.data.post as string,
-          );
-          if (listPosts && listPosts.length) {
-            const newListPost = listPosts.map((post) =>
-              post._id === newPost?._id ? newPost : post,
-            );
-            onSetPosts?.(newListPost);
-          }
-          onSetRepliesPage?.(1);
+          const newListPosts = listPosts?.map((post) =>
+            post._id === (result.data.post as IPost)._id
+              ? {
+                  ...post,
+                  comments: post.comments.filter((id) => id !== cmtId),
+                }
+              : post,
+          ) as IPost[];
+          onSetCmtList?.(newParentCmtList);
+          onSetPosts?.(newListPosts);
+          setReplyInfoMap(String(result.data.parentCommentId), {
+            ...replyInfoMap[String(result.data.parentCommentId)],
+            parentList: newList,
+          });
         }
         setIsShow(false);
-        handleMutateWithKey(`posts/${result.data.post}/comments?`);
+        handleMutateWithKey(
+          `posts/${(result.data.post as IPost)._id}/comments?`,
+        );
+        handleMutateWithKey(`comments/${result.data.parentCommentId}/replies`);
       }
     } catch (error) {
       handleError("handleDeleteCmt-CommentAction", error);
@@ -183,4 +177,6 @@ export function CommentActions({
       )}
     </>
   );
-}
+};
+
+export default memo(CommentActions);

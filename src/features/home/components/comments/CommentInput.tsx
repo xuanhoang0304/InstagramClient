@@ -1,11 +1,11 @@
 "use client";
 
+import { isEmpty } from "lodash";
 import { CircleX, Smile } from "lucide-react";
 import { useForm } from "react-hook-form";
 
 import InputForm from "@/app/(noSideBar)/register/components/InputForm";
 import { Button } from "@/components/ui/button";
-import { apiClient } from "@/configs/axios";
 import {
   CommentFormSchema,
   CommentInputFormData,
@@ -38,9 +38,8 @@ export function CommentInput({
   listPosts,
   onSetPosts,
 }: CommentInputProps) {
-  const { targetCmt, setNewCmt, settargetCmt } = useMyStore();
-  const { repliesMap, setReplies, replyInfoMap } = useRepliesStore();
-
+  const { targetCmt, settargetCmt } = useMyStore();
+  const { setReplyInfoMap, replyInfoMap } = useRepliesStore();
   const {
     control,
     handleSubmit,
@@ -58,68 +57,53 @@ export function CommentInput({
   const content = watch("content");
 
   async function onSubmit(data: CommentInputFormData) {
+    // comment in postmodal
     if (cmtList?.length) {
       if (targetCmt?._id) {
-        const newContet = data.content.replace(
-          `@${targetCmt.createdBy.name}`,
-          `<a href="/${targetCmt.createdBy._id}" class="text-[#708dff]">@${targetCmt.createdBy.name}</a>`,
-        );
-        const newData: CommentInputFormData = {
-          ...data,
-          content: newContet,
-          replyCommentId: targetCmt._id,
-        };
+        // create reply
+        data.replyCommentId = targetCmt._id;
         const parentCmtId = targetCmt.parentCommentId
           ? targetCmt.parentCommentId
           : targetCmt._id;
-
         const newCmt = (await handleReplyCmtPost(
           parentCmtId,
-          newData,
+          data,
         )) as IComment;
-        const parentCmt: { result: IComment } = await apiClient.fetchApi(
-          `/comments/${parentCmtId}`,
+        const mutateCmtId = targetCmt.parentCommentId
+          ? targetCmt.parentCommentId
+          : String(newCmt.parentCommentId);
+
+        handleMutateWithKey(`posts/${post?._id}/comments`);
+        handleMutateWithKey(`comments/${mutateCmtId}/replies`);
+        handleMutateWithKey(`posts/following`);
+        handleMutateWithKey(`posts/discover`);
+        const newCmtList = [...cmtList].map((cmt) =>
+          cmt._id === mutateCmtId
+            ? {
+                ...cmt,
+                replies: [...cmt.replies, newCmt._id] as string[],
+              }
+            : cmt,
         );
-        if (!targetCmt.parentCommentId) {
-          console.log("reply parent");
-          const newList = [...cmtList].map((cmt) =>
-            cmt._id === parentCmt.result._id ? parentCmt.result : cmt,
-          );
-          const newPost = await handleGetPostByPostId(newCmt?.post as string);
-          const newListPost = listPosts?.map((post) =>
-            post._id === newPost?._id ? newPost : post,
-          );
-          const isShowReplies = replyInfoMap[parentCmtId]?.isShowReplies;
-          const newReplies = !isShowReplies
-            ? [...repliesMap[parentCmtId]]
-            : [...repliesMap[parentCmtId], newCmt];
-          reset();
-          handleMutateWithKey(`posts/${post?._id}/comments?`);
-          onSetPosts?.(newListPost as IPost[]);
-          onSetCmtList?.(newList);
-          settargetCmt(null);
-          setNewCmt(newCmt);
-          setReplies(parentCmtId, newReplies);
+        const newListPost = listPosts?.map((post) =>
+          post._id === String(newCmt.post)
+            ? { ...post, comments: [...post.comments, newCmt._id] }
+            : post,
+        );
+        onSetPosts?.(newListPost as IPost[]);
+        reset();
+        settargetCmt(null);
+        onSetCmtList?.(newCmtList);
+        if (isEmpty(replyInfoMap[mutateCmtId])) {
           return;
         }
-        console.log("rep replies");
-        const newList = [...cmtList].map((cmt) =>
-          cmt._id === parentCmt.result._id ? parentCmt.result : cmt,
-        );
-        const newPost = await handleGetPostByPostId(newCmt?.post as string);
-        const newListPost = listPosts?.map((post) =>
-          post._id === newPost?._id ? newPost : post,
-        );
-        reset();
-        handleMutateWithKey(`posts/${post?._id}/comments?`);
-        setReplies(parentCmtId, [...repliesMap[parentCmtId], newCmt]);
-        onSetPosts?.(newListPost as IPost[]);
-        onSetCmtList?.(newList);
-        settargetCmt(null);
-        setNewCmt(newCmt);
+        setReplyInfoMap(mutateCmtId, {
+          ...replyInfoMap[mutateCmtId],
+          parentList: [...replyInfoMap[mutateCmtId].parentList, newCmt],
+        });
         return;
       }
-      console.log("comment post");
+      // create parent comment in post modal
       const newCmt = await handleCmtPost(data);
       if (newCmt?._id) {
         const newList = [...cmtList, newCmt];
@@ -130,10 +114,13 @@ export function CommentInput({
         reset();
         onSetPosts?.(newListPost as IPost[]);
         onSetCmtList?.(newList);
-        handleMutateWithKey(`posts/${post?._id}/comments?`);
+        handleMutateWithKey(`posts/${post?._id}/comments`);
+        handleMutateWithKey(`posts/following`);
+        handleMutateWithKey(`posts/discover`);
         return;
       }
     }
+    // create parent comment in postitem
     const newCmt = await handleCmtPost(data);
     const newPost = await handleGetPostByPostId(newCmt?.post as string);
     const newList = listPosts?.map((post) =>
@@ -195,12 +182,8 @@ export function CommentInput({
         </div>
         <Button
           className={cn(
-            "bg-second-blue text-primary-white hover:bg-primary-blue",
-            errors.content &&
-              "pointer-events-none bg-gray-400 text-primary-gray",
-            !modal && !content
-              ? "hidden"
-              : "py-1 px-2 bg-transparent rounded-none hover:bg-transparent text-primary-blue hover:text-primary-blue-hover",
+            "bg-transparent! opacity-100 transition-all text-primary-blue hover:text-second-blue",
+            !content && "opacity-0",
           )}
           type="submit"
         >

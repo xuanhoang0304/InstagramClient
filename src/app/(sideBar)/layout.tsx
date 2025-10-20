@@ -1,6 +1,6 @@
 import "../globals.css";
 
-import SideBar from "../../components/layout/SideBar/SideBar";
+import SideBar from "@/components/layout/SideBar/SideBar";
 
 export default async function SideBarLayout({
   children,
@@ -8,7 +8,7 @@ export default async function SideBarLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <main className="flex">
+    <main className="flex min-h-screen md:min-h-auto">
       <SideBar type="normal"></SideBar>
       {children}
     </main>

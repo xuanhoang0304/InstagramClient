@@ -150,6 +150,18 @@ button {
 }
 
 /* Swipper */
+.mySwiper2 .swiper-slide {
+  opacity: 0.5;
+  /* filter: blur(1px); */
+  transform: scale(0.9);
+  transition: all 0.3s ease;
+}
+
+.mySwiper2 .swiper-slide-thumb-active {
+  opacity: 1;
+  /* filter: blur(0); */
+  transform: scale(1);
+}
 
 .PostItemSwiper .swiper-pagination-bullet {
   background-color: white !important;
